@@ -1,0 +1,9 @@
+# Robots.txt for Arham Corporate Website
+# Production Domain: To be finalized upon management confirmation in Phase 10.
+User-agent: *
+Allow: /
+Disallow: /scratch/
+Disallow: /test_map.html
+
+# XML Sitemap reference
+Sitemap: /sitemap.xml
