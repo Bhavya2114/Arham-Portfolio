@@ -13,6 +13,8 @@ import { INDIA_MAP_VIEWBOX, INDIA_MAP_STATES } from './indiaMapGeometry';
  * - `variant="dark"` (Our Presence page): navy base, emerald highlights with a soft glow,
  *   and a selected-state outline drawn above neighbouring boundaries. The default
  *   `variant="light"` rendering is unchanged.
+ * - Dark variant strokes use `non-scaling-stroke` so boundaries stay crisp when the
+ *   caller zooms via `viewBox`; `children` render as an overlay (e.g. city markers).
  */
 export const IndiaMapSvg = ({
   activeStateCodes = [],
@@ -23,6 +25,8 @@ export const IndiaMapSvg = ({
   variant = 'light',
   viewBox = INDIA_MAP_VIEWBOX,
   svgClassName = 'w-full h-auto max-h-[580px] drop-shadow-subtle select-none transition-all duration-200',
+  showGlow = true,
+  children = null,
 }) => {
   const activeSet = new Set(Array.isArray(activeStateCodes) ? activeStateCodes : []);
   const isDark = variant === 'dark';
@@ -60,7 +64,7 @@ export const IndiaMapSvg = ({
         </desc>
 
         {/* Dark variant: soft emerald glow beneath highlighted states (decorative) */}
-        {isDark && (
+        {isDark && showGlow && (
           <>
             <defs>
               <filter id="india-map-glow" x="-20%" y="-20%" width="140%" height="140%">
@@ -129,6 +133,7 @@ export const IndiaMapSvg = ({
                 strokeWidth={strokeWidth}
                 strokeLinejoin="round"
                 strokeLinecap="round"
+                vectorEffect={isDark ? 'non-scaling-stroke' : undefined}
                 role={isActive ? 'button' : undefined}
                 aria-hidden={!isActive ? 'true' : undefined}
                 tabIndex={isActive ? 0 : -1}
@@ -137,7 +142,7 @@ export const IndiaMapSvg = ({
                 onClick={() => handleStateClick(state)}
                 onKeyDown={(e) => handleKeyDown(e, state)}
               >
-                <title>{`${state.name} (${state.type})${isActive ? ' • Verified Projects' : ''}`}</title>
+                <title>{`${state.name} (${state.type})${isActive ? (isDark ? ' • Coverage state' : ' • Verified Projects') : ''}`}</title>
               </path>
             );
           })}
@@ -151,8 +156,11 @@ export const IndiaMapSvg = ({
             className="pointer-events-none fill-none stroke-emerald-50"
             strokeWidth={1.6}
             strokeLinejoin="round"
+            vectorEffect="non-scaling-stroke"
           />
         )}
+
+        {children}
       </svg>
     </div>
   );

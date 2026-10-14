@@ -16,9 +16,8 @@
  */
 
 import { PROJECTS } from './projects.js';
-import { STATE_BY_CODE, isValidStateCode, VERIFIED_GEOGRAPHIC_COVERAGE } from './states.js';
-
-export { VERIFIED_GEOGRAPHIC_COVERAGE };
+import { STATE_BY_CODE, isValidStateCode } from './states.js';
+import { getPresenceStateCodes, getPresenceCities } from './presenceCoverage.js';
 
 /**
  * Sanitizes a project record for public distribution, enforcing confidentiality.
@@ -255,22 +254,21 @@ export const getFilteredPublishedProjects = (
 };
 
 /**
- * Selector 12: Retrieve verified geographic coverage state codes (e.g. ['IN-MH', 'IN-RJ']).
+ * Selector 12: Retrieve geographic coverage state codes from `presenceCoverage.js` (sorted).
  * @returns {string[]}
  */
 export const getCoverageStateCodes = () => {
-  return Object.keys(VERIFIED_GEOGRAPHIC_COVERAGE).sort();
+  return getPresenceStateCodes().sort();
 };
 
 /**
- * Selector 13: Retrieve verified geographic coverage cities for a specified state code.
+ * Selector 13: Retrieve coverage cities from `presenceCoverage.js` for a specified state code.
  * @param {string} stateCode - Administrative state code (e.g. 'IN-RJ')
  * @returns {string[]}
  */
 export const getCoverageCitiesByState = (stateCode) => {
   if (!stateCode || typeof stateCode !== 'string') return [];
-  const record = VERIFIED_GEOGRAPHIC_COVERAGE[stateCode];
-  return record ? [...record.cities] : [];
+  return getPresenceCities(stateCode);
 };
 
 /**

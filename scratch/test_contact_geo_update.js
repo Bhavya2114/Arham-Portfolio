@@ -12,10 +12,9 @@
  *    - isEmailConfigured is strictly false
  *    - isDeliveryConfigured is strictly false
  *    - Form does not fake submission or transmission
- * 3. Verified Geographic Coverage:
- *    - Rajasthan (IN-RJ) active with Jaipur, Kota, Jaisalmer
- *    - Maharashtra (IN-MH) active with Pune, Nagpur
- *    - All other 34 states/UTs remain neutral
+ * 3. Geographic Coverage (shared `presenceCoverage.js` configuration):
+ *    - Exactly the 11 supplied states are active; the other 25 states/UTs remain neutral
+ *    - Coverage selectors return the shared configuration's cities (Jaisalmer removed)
  *    - No duplicate cities or duplicate state records
  * 4. Production Dataset Purity:
  *    - PROJECTS array is strictly empty (length: 0)
@@ -26,7 +25,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { PROJECTS } from '../src/data/projects.js';
-import { INDIAN_STATES, STATE_BY_CODE, VERIFIED_GEOGRAPHIC_COVERAGE } from '../src/data/states.js';
+import { INDIAN_STATES, STATE_BY_CODE } from '../src/data/states.js';
+import { getPresenceStateCodes, getPresenceCities } from '../src/data/presenceCoverage.js';
 import { 
   COMPANY_CONTACT, 
   ENQUIRY_TYPES, 
@@ -101,39 +101,36 @@ assert(mailtoResult.formattedDraft.includes('Architectural & Commercial Lighting
 
 // 5. Geographic Coverage Registry
 console.log('\n5. Geographic Coverage Registry & State Highlights:');
+const EXPECTED_CODES = ['IN-AS', 'IN-BR', 'IN-CT', 'IN-GA', 'IN-GJ', 'IN-JH', 'IN-MH', 'IN-OR', 'IN-RJ', 'IN-UP', 'IN-WB'];
 const coverageCodes = getCoverageStateCodes();
-assert(coverageCodes.length === 2, `Coverage states count is 2 (got ${coverageCodes.length})`);
-assert(coverageCodes.includes('IN-RJ'), 'Rajasthan (IN-RJ) is in coverage states');
-assert(coverageCodes.includes('IN-MH'), 'Maharashtra (IN-MH) is in coverage states');
+assert(coverageCodes.length === 11, `Coverage states count is 11 (got ${coverageCodes.length})`);
+assert(coverageCodes.join(',') === EXPECTED_CODES.join(','), 'Coverage states equal the supplied 11 (sorted)');
+assert(coverageCodes.join(',') === [...getPresenceStateCodes()].sort().join(','), 'Coverage selector mirrors presenceCoverage.js');
 
 const activeCodes = getActiveStateCodes();
-assert(activeCodes.length === 2, `Active state codes count is exactly 2 (got ${activeCodes.length})`);
-assert(activeCodes[0] === 'IN-MH' && activeCodes[1] === 'IN-RJ', 'Active codes sorted: ["IN-MH", "IN-RJ"]');
+assert(activeCodes.join(',') === EXPECTED_CODES.join(','), 'Homepage active codes equal the supplied 11 (empty PROJECTS)');
 
-// Verify all other 34 states/UTs remain neutral
 const neutralStates = INDIAN_STATES.filter((s) => !activeCodes.includes(s.code));
-assert(neutralStates.length === 34, `Exactly 34 states/UTs remain neutral (got ${neutralStates.length})`);
+assert(neutralStates.length === 25, `Exactly 25 states/UTs remain neutral (got ${neutralStates.length})`);
 assert(!activeCodes.includes('IN-DL'), 'Delhi is neutral');
 assert(!activeCodes.includes('IN-KA'), 'Karnataka is neutral');
-assert(!activeCodes.includes('IN-GJ'), 'Gujarat is neutral');
+assert(!activeCodes.includes('IN-MP'), 'Madhya Pradesh is neutral');
 
 // 6. City Exposure per State
 console.log('\n6. City Exposure for Supplied Locations:');
-const rjCities = getCitiesByState('IN-RJ');
-assert(rjCities.length === 3, `Rajasthan has 3 cities (got ${rjCities.length})`);
-assert(rjCities.includes('Jaipur'), 'Rajasthan includes Jaipur');
-assert(rjCities.includes('Kota'), 'Rajasthan includes Kota');
-assert(rjCities.includes('Jaisalmer'), 'Rajasthan includes Jaisalmer');
+EXPECTED_CODES.forEach((code) => {
+  assert(
+    JSON.stringify(getCitiesByState(code)) === JSON.stringify(getPresenceCities(code)) &&
+      JSON.stringify(getCoverageCitiesByState(code)) === JSON.stringify(getPresenceCities(code)),
+    `${code} homepage cities equal presenceCoverage.js cities`
+  );
+});
+assert(!getCitiesByState('IN-RJ').includes('Jaisalmer'), 'Jaisalmer is no longer listed for Rajasthan');
+assert(getCitiesByState('IN-UP').length === 0, 'Uttar Pradesh has no cities');
 
-const mhCities = getCitiesByState('IN-MH');
-assert(mhCities.length === 2, `Maharashtra has 2 cities (got ${mhCities.length})`);
-assert(mhCities.includes('Pune'), 'Maharashtra includes Pune');
-assert(mhCities.includes('Nagpur'), 'Maharashtra includes Nagpur');
-
-// Check for no duplicates
-const allCoverageCities = [...rjCities, ...mhCities];
-const uniqueCoverageCities = new Set(allCoverageCities);
-assert(allCoverageCities.length === uniqueCoverageCities.size, 'No duplicate cities exist across coverage data');
+const allCoverageCities = EXPECTED_CODES.flatMap((code) => getCitiesByState(code));
+assert(allCoverageCities.length === 27, `27 coverage cities in total (got ${allCoverageCities.length})`);
+assert(allCoverageCities.length === new Set(allCoverageCities).size, 'No duplicate cities exist across coverage data');
 
 // 7. Backward Compatibility & Dataset Purity
 console.log('\n7. Backward Compatibility & Purity:');

@@ -38,7 +38,7 @@ import {
  * geometry to the geographic data layer and selectors.
  * 
  * Invariants & Policies:
- * - Highlights verified corporate coverage states (Rajasthan, Maharashtra) alongside any published projects.
+ * - Highlights coverage states from `presenceCoverage.js` (shared with /presence) alongside any published projects.
  * - Selecting a state exposes verified municipal operational hubs without fabricating completed project records.
  * - Privacy & Confidentiality: Public selectors guarantee confidential client names and
  *   internal reference numbers are stripped before rendering.
@@ -467,7 +467,9 @@ export const PresencePreview = ({ projects } = {}) => {
                       <p className="text-xs text-brand-slate max-w-sm mx-auto leading-relaxed">
                         {selectedCity
                           ? `Arham maintains verified electrical contracting and engineering coverage in ${selectedCity}, ${selectedStateDetails.name}. Project installation records are undergoing authentication prior to publication.`
-                          : `Arham maintains verified electrical engineering coverage across ${stateCities.join(', ')} in ${selectedStateDetails.name}. Project installation records are undergoing authentication prior to publication.`}
+                          : stateCities.length > 0
+                            ? `Arham maintains verified electrical engineering coverage across ${stateCities.join(', ')} in ${selectedStateDetails.name}. Project installation records are undergoing authentication prior to publication.`
+                            : `Arham maintains electrical engineering coverage in ${selectedStateDetails.name}. Specific cities have not been listed yet, and project installation records are undergoing authentication prior to publication.`}
                       </p>
                       {selectedCity && (
                         <div className="pt-2">
@@ -685,7 +687,7 @@ export const PresencePreview = ({ projects } = {}) => {
         {/* Informational Scope Footnote */}
         <div className="p-4 rounded-xl bg-white border border-brand-border text-left">
           <p className="text-xs text-brand-slate leading-relaxed">
-            <span className="font-semibold text-brand-navy">Geographic Coverage Disclosure:</span> Highlighted locations reflect Arham's verified geographic coverage across Rajasthan and Maharashtra. Completed project installation records remain unlisted pending final client publication authorization.
+            <span className="font-semibold text-brand-navy">Geographic Coverage Disclosure:</span> Highlighted locations reflect Arham's geographic coverage as listed on the Our Presence page. Completed project installation records remain unlisted pending final client publication authorization.
           </p>
         </div>
 

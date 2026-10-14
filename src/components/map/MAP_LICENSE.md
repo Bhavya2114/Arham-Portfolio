@@ -37,4 +37,6 @@
   - `x = 27.3816 × longitude − 1767.155`
   - `y = −27.3492 × mercatorY(latitude) + 1138.898`, where `mercatorY(φ) = ln(tan(π/4 + φ/2))` expressed in degrees
   - Residuals: RMS ≈ 0.57 units (≈ 2 km), max ≈ 2.5 units (≈ 10 km). That is accurate enough for city-level markers.
-- **Status**: City markers are **pending**. The reference extents were approximate public values, used only to test this fit. No city coordinates are stored in the codebase. Before any marker is rendered, verified latitude/longitude must be supplied for each city in `src/data/presenceCoverage.js`, and the fit must be re-checked.
+- **Status**: City markers are **live on /presence** (Phase C). The reference extents were approximate public values, used only to test this fit. The calibration is in `src/lib/mapProjection.js`.
+- **Phase C city coordinates**: `src/data/cityCoordinates.js` records the sourced coordinates for all 27 coverage cities: an OpenStreetMap settlement point (or the Wikipedia coordinate for Nagpur and Kolkata), cross-checked against a second source. The two sources agree within 2.85 km, and every projected point lands inside its own state outline. The /presence page renders them as markers and shows the OSM credit beneath the map whenever markers are visible.
+- **OSM attribution**: OpenStreetMap-derived coordinates are © OpenStreetMap contributors (ODbL 1.0). Credit them wherever city markers are shown.

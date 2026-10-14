@@ -1,7 +1,8 @@
 /**
  * Our Presence Geographic Coverage Configuration — Phase B
  *
- * User-supplied coverage for the /presence page: 11 states and 27 named cities.
+ * Single source of truth for geographic coverage, shared by the /presence page and the
+ * homepage map (via the coverage selectors): 11 states and 27 named cities.
  * This is a geographic coverage configuration, NOT proof of completed projects.
  * Project records, counts and photographs come exclusively from `projects.js`
  * via the public selectors.
@@ -9,8 +10,8 @@
  * Invariants:
  * - Only the states and cities listed here may be highlighted on the Our Presence map.
  * - Uttar Pradesh is highlighted with no cities; no city may be invented for it.
- * - City entries carry names only. Coordinates are deliberately absent until
- *   verified coordinates are supplied (see MAP_LICENSE.md, Section 6).
+ * - City entries carry names only. Sourced coordinates are recorded separately in
+ *   `cityCoordinates.js` (pending approval; see MAP_LICENSE.md, Section 6).
  * - `presenceLevel: 'major'` marks the supplied "heavy presence" states.
  */
 

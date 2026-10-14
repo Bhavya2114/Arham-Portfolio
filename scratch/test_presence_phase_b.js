@@ -97,7 +97,12 @@ console.log('\n4. No Fabricated Coordinates or Markers:');
 const coverageSrc = read('../src/data/presenceCoverage.js');
 assert(!/\b(lat|lng|lon|latitude|longitude|coordinates)\s*:/.test(coverageSrc), 'Coverage config contains no coordinate fields');
 const presenceMapSrc = read('../src/components/map/PresenceMap.jsx');
-assert(!/<circle|cx=/.test(presenceMapSrc), 'PresenceMap renders no positioned city markers');
+// Phase C replaced the Phase B "no markers" rule: markers may only come from the sourced coordinate record.
+const presencePageSrc = read('../src/pages/Presence.jsx');
+assert(
+  presencePageSrc.includes("from '../data/cityCoordinates.js'") && presencePageSrc.includes('projectLatLon'),
+  'Marker positions come only from cityCoordinates.js via mapProjection.js'
+);
 assert(PRESENCE_COVERAGE.every((e) => Object.isFrozen(e) && Object.isFrozen(e.cities)), 'Coverage entries are frozen');
 
 console.log('\n5. Empty Project Dataset Neutrality:');
@@ -124,6 +129,23 @@ assert(mapSrc.includes('viewBox = INDIA_MAP_VIEWBOX'), 'IndiaMapSvg defaults to 
 const previewSrc = read('../src/sections/PresencePreview.jsx');
 assert(!previewSrc.includes('variant="dark"'), 'Homepage PresencePreview does not opt into the dark variant');
 assert(previewSrc.includes('getActiveStateCodes'), 'Homepage PresencePreview still uses its existing selectors');
+
+console.log('\n8. Single Source of Truth for Coverage:');
+const statesSrc = read('../src/data/states.js');
+const selectorsSrc = read('../src/data/projectSelectors.js');
+assert(!statesSrc.includes('VERIFIED_GEOGRAPHIC_COVERAGE'), 'Obsolete VERIFIED_GEOGRAPHIC_COVERAGE removed from states.js');
+assert(!selectorsSrc.includes('VERIFIED_GEOGRAPHIC_COVERAGE'), 'Selectors no longer reference the obsolete coverage list');
+assert(selectorsSrc.includes("from './presenceCoverage.js'"), 'Coverage selectors read presenceCoverage.js');
+assert(pageSrc.includes('presenceCoverage'), '/presence page reads presenceCoverage.js');
+const srcFiles = [];
+const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).forEach((d) => {
+  const full = path.join(dir, d.name);
+  if (d.isDirectory()) walk(full);
+  else if (/\.(jsx?|md)$/.test(d.name)) srcFiles.push(full);
+});
+walk(path.resolve(__dirname, '../src'));
+assert(srcFiles.every((f) => !fs.readFileSync(f, 'utf-8').includes('Jaisalmer')), 'No source file mentions Jaisalmer');
+assert(!previewSrc.includes('across Rajasthan and Maharashtra'), 'Homepage disclosure no longer hardcodes the old two-state coverage');
 
 console.log(`\nResults: ${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);

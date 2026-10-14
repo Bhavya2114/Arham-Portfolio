@@ -68,22 +68,8 @@ export const isValidStateCode = (code) => {
 };
 
 /**
- * Verified Corporate Geographic Coverage Registry
- * 
- * Confirmed operational geographic coverage hubs and regional municipalities.
- * Operates independently of published case studies and avoids fabricating project records.
+ * Geographic coverage (which states and cities Arham covers) is defined solely in
+ * `presenceCoverage.js`. This registry only describes administrative geography.
  */
-export const VERIFIED_GEOGRAPHIC_COVERAGE = Object.freeze({
-  'IN-RJ': Object.freeze({
-    stateCode: 'IN-RJ',
-    stateName: 'Rajasthan',
-    cities: Object.freeze(['Jaipur', 'Kota', 'Jaisalmer']),
-  }),
-  'IN-MH': Object.freeze({
-    stateCode: 'IN-MH',
-    stateName: 'Maharashtra',
-    cities: Object.freeze(['Pune', 'Nagpur']),
-  }),
-});
 
 export default INDIAN_STATES;
