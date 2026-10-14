@@ -30,3 +30,11 @@
 ## 5. Limitations & Legal Disclaimer
 - **Not an Official Survey of India Endorsement**: This vector map is a simplified digital visualization intended solely for web navigation and locating project records. It does not constitute an official cartographic publication or legal survey clearance by the Survey of India or the Government of India.
 - **No Boundary Disputes Asserted**: The depiction of borders is for informational reference only.
+
+## 6. Projection Calibration (Phase B investigation)
+- **Finding**: The geometry uses a **Mercator** projection. Fitting known state extents gives equal horizontal and vertical scale (≈27.38 SVG units per degree of longitude), which is what Mercator should produce.
+- **Calibration** (least-squares fit against 39 reference extents of Gujarat, Arunachal Pradesh, Tamil Nadu, Goa, Delhi, Tripura, Sikkim, Kerala, Rajasthan, West Bengal, Odisha and Punjab):
+  - `x = 27.3816 × longitude − 1767.155`
+  - `y = −27.3492 × mercatorY(latitude) + 1138.898`, where `mercatorY(φ) = ln(tan(π/4 + φ/2))` expressed in degrees
+  - Residuals: RMS ≈ 0.57 units (≈ 2 km), max ≈ 2.5 units (≈ 10 km). That is accurate enough for city-level markers.
+- **Status**: City markers are **pending**. The reference extents were approximate public values, used only to test this fit. No city coordinates are stored in the codebase. Before any marker is rendered, verified latitude/longitude must be supplied for each city in `src/data/presenceCoverage.js`, and the fit must be re-checked.

@@ -32,7 +32,7 @@ export const NAV_ITEMS = [
   { 
     name: 'Our Presence', 
     path: '/presence', 
-    isAvailable: false,
+    isAvailable: true,
     plannedPhase: 'Phase 3',
     description: 'Interactive administrative map and regional execution footprint.'
   },
