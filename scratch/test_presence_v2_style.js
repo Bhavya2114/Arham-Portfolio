@@ -63,7 +63,12 @@ const two = splitRegionEdges([{ d: 'M0 0l10 0l0 10l-10 0z' }, { d: 'M10 0l10 0l0
 assert(edges.outer.length > 0 && edges.shared.length > 0 && two.shared === 'M10 0L10 10' && !two.outer.includes('10 0L10 10') && two.outer === 'M0 0L10 0M10 10L0 10 0 0M10 0L20 0 20 10 10 10', 'Edge split: a border between two states is drawn once as shared, everything else as outer');
 
 console.log('\n2b. Overview city dots');
-assert(/const OVERVIEW_CITY = \{ dotPx: 2, haloPx: 6, haloOpacity: 0\.18 \};/.test(mapSrc) && /r=\{OVERVIEW_CITY\.dotPx \* unit\} fill="#FFFFFF"/.test(mapSrc) && /r=\{OVERVIEW_CITY\.haloPx \* unit\} fill="#FFFFFF" fillOpacity=\{OVERVIEW_CITY\.haloOpacity\}/.test(mapSrc), '~4 px white dot over a faint see-through white halo (no blur)');
+assert(/const OVERVIEW_CITY = \{ dotPx: 1\.5, opacity: 0\.9 \};/.test(mapSrc) && /r=\{OVERVIEW_CITY\.dotPx \* unit\} fill="#FFFFFF" fillOpacity=\{OVERVIEW_CITY\.opacity\}/.test(mapSrc) && !/haloPx|OVERVIEW_CITY\.halo/.test(mapCode), 'Overview: only a ~3 px bright white dot (90 %), no halo');
+
+console.log('\n2c. Zoomed state: districts and pins');
+assert(/const DISTRICT_LINE = \{ color: '#1A2A06', opacity: 0\.6, width: 0\.7 \};/.test(mapSrc) && /stroke=\{DISTRICT_LINE\.color\}\s*strokeOpacity=\{DISTRICT_LINE\.opacity\}\s*strokeWidth=\{DISTRICT_LINE\.width\}/.test(mapSrc), 'District lines: dark olive "engraved" lines, 60 %, 0.7 px');
+assert(/const PIN_HALO = \{ scale: 2\.2, opacity: 0\.18 \};/.test(mapSrc) && /\{!moving && <circle r=\{r \* PIN_HALO\.scale\} fill="#FFFFFF" fillOpacity=\{PIN_HALO\.opacity\} aria-hidden="true" \/>\}/.test(mapSrc), 'Pin halo: white circle 2.2x the dot at 18 %, no blur, hidden while moving');
+assert(/\{isSelected && \(\s*<text[\s\S]*?paintOrder="stroke"[\s\S]*?className="fill-white[^"]*"[\s\S]*?\{m\.city\}/.test(mapSrc), 'Selected pin: city name in white with a dark paint-order outline');
 assert(/<g aria-hidden="true" className="pointer-events-none" data-layer="overview-cities">/.test(mapSrc) && /\{overviewCityLayer\}/.test(mapSrc), 'Overview dots are decorative and not interactive');
 assert(/overviewCities=\{overviewCities\}/.test(presenceSrc) && /const overviewCities = useMemo\(/.test(presenceSrc), 'Presence page passes every worked city');
 assert(/const r = MARKER_RADIUS_PX \* unit \* \(isSelected \? 1\.3 : 1\);/.test(mapSrc) && /const MARKER_RADIUS_PX = 5;/.test(mapSrc) && /fill="#FFFFFF"\s*stroke=\{MAP_COLORS\.land\}/.test(mapSrc) && /fill="none" stroke=\{MAP_COLORS\.edge\} strokeWidth=\{2\}/.test(mapSrc), 'City pins: 10 px white dots with a thin dark outline; selected bigger with a yellow ring; no pulse');

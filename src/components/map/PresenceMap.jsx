@@ -41,12 +41,15 @@ const CLUSTER_RADIUS_PX = 36;
 const ZOOM_STEP = 1.6;
 const DRAG_THRESHOLD_PX = 6;
 const MARKER_RADIUS_PX = 5;
-// Overview city dots: ~4 px white dot over a faint white halo (screen px radii).
-const OVERVIEW_CITY = { dotPx: 2, haloPx: 6, haloOpacity: 0.18 };
+// Overview city dots: a small bright white dot, ~3 px across (screen px radius).
+const OVERVIEW_CITY = { dotPx: 1.5, opacity: 0.9 };
+// Soft halo behind each zoomed city pin: white, ~2.2× the dot, no blur.
+const PIN_HALO = { scale: 2.2, opacity: 0.18 };
 // Plain navy radial background behind the map (CSS only, static).
 const MAP_BACKGROUND = 'radial-gradient(ellipse at 50% 45%, #0B1030 0%, #070A1F 100%)';
-// District lines inside the selected state: thin light lime, readable on the dark olive fill.
-const DISTRICT_LINE = { color: '#C9E77A', opacity: 0.35, width: 0.75 };
+// District lines inside the selected state: dark olive, "engraved" into the fill, so the yellow
+// outer edge stays the only bright line.
+const DISTRICT_LINE = { color: '#1A2A06', opacity: 0.6, width: 0.7 };
 const MAX_HIT_RADIUS_PX = 22;
 const MIN_HIT_RADIUS_PX = 12;
 const MARKER_CLEARANCE_PX = 28; // space kept between the selected city marker and the overlay
@@ -311,15 +314,12 @@ export const PresenceMap = ({
     }
   };
 
-  // India overview: a small white dot with a faint see-through halo for every worked city. Decorative
-  // (not interactive); hidden while moving and once a state is selected (its cities become pins).
+  // India overview: a small bright white dot for every worked city. Decorative (not interactive);
+  // hidden while moving and once a state is selected (its cities become pins).
   const overviewCityLayer = !selectedCode && !moving && overviewCities.length > 0 && (
     <g aria-hidden="true" className="pointer-events-none" data-layer="overview-cities">
       {overviewCities.map((c) => (
-        <circle key={`halo-${c.stateCode}-${c.city}`} cx={c.x} cy={c.y} r={OVERVIEW_CITY.haloPx * unit} fill="#FFFFFF" fillOpacity={OVERVIEW_CITY.haloOpacity} />
-      ))}
-      {overviewCities.map((c) => (
-        <circle key={`dot-${c.stateCode}-${c.city}`} cx={c.x} cy={c.y} r={OVERVIEW_CITY.dotPx * unit} fill="#FFFFFF" />
+        <circle key={`${c.stateCode}-${c.city}`} cx={c.x} cy={c.y} r={OVERVIEW_CITY.dotPx * unit} fill="#FFFFFF" fillOpacity={OVERVIEW_CITY.opacity} />
       ))}
     </g>
   );
@@ -343,6 +343,7 @@ export const PresenceMap = ({
           >
             <title>{m.city}</title>
             <circle r={hitRadiusPx[m.city] * unit} fill="transparent" />
+            {!moving && <circle r={r * PIN_HALO.scale} fill="#FFFFFF" fillOpacity={PIN_HALO.opacity} aria-hidden="true" />}
             <circle
               r={r + 5 * unit}
               className="fill-none stroke-brand-accent opacity-0 group-focus-visible:opacity-100"
