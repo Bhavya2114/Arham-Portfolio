@@ -20,6 +20,7 @@ export const IndiaMapSvg = ({
   activeStateCodes = [],
   selectedStateCode = null,
   onSelectState = null,
+  onSelectInactiveState = null,
   className = '',
   ariaLabel = 'Map of India - Project Locations',
   variant = 'light',
@@ -37,6 +38,8 @@ export const IndiaMapSvg = ({
   const handleStateClick = (state) => {
     if (activeSet.has(state.id) && onSelectState) {
       onSelectState(state.id);
+    } else if (!activeSet.has(state.id) && onSelectInactiveState) {
+      onSelectInactiveState(state.id);
     }
   };
 

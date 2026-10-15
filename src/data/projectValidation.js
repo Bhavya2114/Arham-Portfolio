@@ -17,7 +17,7 @@
 
 import { isValidStateCode } from './states.js';
 import { PROJECT_CATEGORIES, PROJECT_STATUSES, PROJECTS } from './projects.js';
-import { getPublishedProjects, getPublishedStateCodes } from './projectSelectors.js';
+import { getPublishedProjects, getPublishedStateCodes, hasVerifiedCoordinates } from './projectSelectors.js';
 
 /**
  * Validates a single project record against schema and publication rules.
@@ -88,6 +88,13 @@ export const validateProjectRecord = (record, existingIds = new Set()) => {
         `Project "${record.id || 'unidentified'}" images field must be an array of paths if provided.`
       );
     }
+  }
+
+  // 6b. Optional verified site coordinates (required only for map markers)
+  if (record.coordinates !== undefined && !hasVerifiedCoordinates(record)) {
+    errors.push(
+      `Project "${record.id || 'unidentified'}" has invalid coordinates. Expected { lat, lon } numbers within India, or omit the field.`
+    );
   }
 
   // 7. Confidentiality Audit

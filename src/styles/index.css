@@ -90,3 +90,19 @@ p {
     linear-gradient(to right, rgba(16, 29, 44, 0.035) 1px, transparent 1px),
     linear-gradient(to bottom, rgba(16, 29, 44, 0.035) 1px, transparent 1px);
 }
+
+/* Our Presence campus card: horizontal content slide (320 ms ease-out, subtle fade).
+   Reduced motion is handled by the global rule above and by CampusCard skipping the slide. */
+.campus-slide {
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  animation-fill-mode: both;
+}
+.campus-in-from-right { animation-name: campus-in-from-right; }
+.campus-in-from-left { animation-name: campus-in-from-left; }
+.campus-out-to-left { animation-name: campus-out-to-left; }
+.campus-out-to-right { animation-name: campus-out-to-right; }
+@keyframes campus-in-from-right { from { transform: translateX(100%); opacity: 0.85; } to { transform: translateX(0); opacity: 1; } }
+@keyframes campus-in-from-left { from { transform: translateX(-100%); opacity: 0.85; } to { transform: translateX(0); opacity: 1; } }
+@keyframes campus-out-to-left { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0.85; } }
+@keyframes campus-out-to-right { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0.85; } }

@@ -51,6 +51,9 @@ export const PROJECT_STATUSES = Object.freeze([
  * @property {boolean} isClientConfidential - If true, client name must be withheld in public views
  * @property {string} [clientName] - Optional internal client record (withheld if isClientConfidential is true)
  * @property {string} [scope] - Optional summary of technical scope (e.g. '33kV Substation')
+ * @property {{ lat: number, lon: number }} [coordinates] - Verified building location (WGS84 degrees).
+ *   Required for a project marker on the /presence map. Must be the actual site, never a
+ *   city-centre substitute; records without it stay off the map but remain publishable.
  */
 
 /**

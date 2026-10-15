@@ -150,17 +150,17 @@ assert(mapSrc.includes('prefers-reduced-motion'), 'Zoom animation respects prefe
 assert(mapSrc.includes("touchAction: isZoomed ? 'none' : 'pan-y pinch-zoom'"), 'Map captures touch only while zoomed (page scroll unaffected at overview)');
 assert(mapSrc.includes('role="button"') && mapSrc.includes('tabIndex={0}') && mapSrc.includes('aria-pressed={isSelected}'), 'Markers are keyboard-operable buttons');
 const pageSrc = read('../src/pages/Presence.jsx');
-const explorerSrc = read('../src/components/presence/LocationExplorer.jsx');
-assert(pageSrc.includes('<LocationExplorer') && explorerSrc.includes('Search cities or states') && explorerSrc.includes('aria-expanded={open}'), '"Explore locations" searchable city list replaces the permanent state grid');
+assert(!/LocationExplorer|Explore locations/.test(pageSrc), '"Explore locations" button removed (navigation is by map selection)');
 assert(!pageSrc.includes('States we cover'), 'No permanent "States we cover" grid on the India overview');
-assert((pageSrc.match(/\{selectedState && selectedCity && \(/g) || []).length === 2, 'Desktop panel and mobile sheet render only while a city is selected');
+// Project discovery phase: details open only after a project pin (or same-site cluster) is chosen.
+assert((pageSrc.match(/\{detailsOpen && \(/g) || []).length === 2, 'Desktop panel and mobile sheet render only while project details are open');
 assert(pageSrc.includes('hidden lg:block') && pageSrc.includes('<BottomSheet'), 'Desktop side panel + mobile bottom sheet');
-assert(pageSrc.includes('onSelectCity={selectMarkerCity}') && pageSrc.includes('onSelectCity={selectLocation}'), 'Markers and the location list drive the same selected-city state');
+assert((pageSrc.match(/dispatch\(\{ type: 'selectCity'/g) || []).length === 1, 'City markers drive the selected-city state through the one reducer');
 const sheetSrc = read('../src/components/presence/BottomSheet.jsx');
 assert(sheetSrc.includes('lg:hidden') && sheetSrc.includes("['peek', 'half', 'full']"), 'Bottom sheet is mobile-only with three snap points');
 assert(sheetSrc.includes('Expand details') && sheetSrc.includes('Close details'), 'Sheet has expand/collapse and close buttons');
-const detailsSrc = read('../src/components/presence/CityDetails.jsx');
-assert(detailsSrc.includes('will be added here when available'), 'City details show an empty projects section with neutral copy');
+const statusSrc = read('../src/components/presence/CityStatus.jsx');
+assert(statusSrc.includes('Project locations will appear here as approved project information becomes available.'), 'Selected city shows a compact, honest empty state');
 const previewSrc = read('../src/sections/PresencePreview.jsx');
 assert(!previewSrc.includes('PresenceMap') && !previewSrc.includes('cityCoordinates'), 'Homepage preview does not use markers or the Phase C map');
 

@@ -148,6 +148,40 @@ export const getPublishedProjectsByStateAndCity = (stateCode, city, projects = P
 };
 
 /**
+ * Approximate India extent used to reject obviously invalid project coordinates.
+ */
+const INDIA_BOUNDS = Object.freeze({ minLat: 6, maxLat: 38, minLon: 68, maxLon: 98 });
+
+/**
+ * Whether a project carries a usable verified site location for map display.
+ * @param {Object} project
+ * @returns {boolean}
+ */
+export const hasVerifiedCoordinates = (project) => {
+  const c = project && project.coordinates;
+  if (!c || typeof c !== 'object') return false;
+  const { lat, lon } = c;
+  return (
+    typeof lat === 'number' && typeof lon === 'number' &&
+    Number.isFinite(lat) && Number.isFinite(lon) &&
+    lat >= INDIA_BOUNDS.minLat && lat <= INDIA_BOUNDS.maxLat &&
+    lon >= INDIA_BOUNDS.minLon && lon <= INDIA_BOUNDS.maxLon
+  );
+};
+
+/**
+ * Selector 5b: Published projects in a city that can be placed on the map
+ * (i.e. with verified site coordinates). City coordinates are never used as a substitute.
+ *
+ * @param {string} stateCode
+ * @param {string} city
+ * @param {Array} [projects=PROJECTS]
+ * @returns {Array}
+ */
+export const getMappedProjectsByStateAndCity = (stateCode, city, projects = PROJECTS) =>
+  getPublishedProjectsByStateAndCity(stateCode, city, projects).filter(hasVerifiedCoordinates);
+
+/**
  * Selector 6: Retrieve count of published projects for a specified state.
  * 
  * @param {string} stateCode - Administrative state code (e.g. 'IN-MH')

@@ -144,7 +144,10 @@ const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).forEach((d) =
   else if (/\.(jsx?|md)$/.test(d.name)) srcFiles.push(full);
 });
 walk(path.resolve(__dirname, '../src'));
-assert(srcFiles.every((f) => !fs.readFileSync(f, 'utf-8').includes('Jaisalmer')), 'No source file mentions Jaisalmer');
+// Generated district geography legitimately names Jaisalmer *district*; it must never appear as a city.
+const isGeneratedGeography = (f) => /[\\/]data[\\/]geo[\\/]states[\\/]/.test(f);
+assert(srcFiles.filter((f) => !isGeneratedGeography(f)).every((f) => !fs.readFileSync(f, 'utf-8').includes('Jaisalmer')), 'No source file mentions Jaisalmer (outside generated district data)');
+assert(!read('../src/data/geo/states/IN-RJ.js').includes('"Jaisalmer":'), 'Jaisalmer is not a city-area entry');
 assert(!previewSrc.includes('across Rajasthan and Maharashtra'), 'Homepage disclosure no longer hardcodes the old two-state coverage');
 
 console.log(`\nResults: ${passed} passed, ${failed} failed`);

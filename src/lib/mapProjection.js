@@ -24,4 +24,11 @@ export const projectLatLon = (lat, lon) => ({
   y: Y_SCALE * mercatorY(lat) + Y_OFFSET,
 });
 
+/**
+ * Approximate ground distance covered by one SVG unit at a latitude (east–west).
+ * @param {number} lat
+ * @returns {number} kilometres per SVG unit
+ */
+export const kmPerUnitAt = (lat) => (111.32 * Math.cos((lat * Math.PI) / 180)) / X_SCALE;
+
 export default projectLatLon;
