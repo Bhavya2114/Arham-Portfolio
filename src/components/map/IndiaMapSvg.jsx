@@ -1,5 +1,6 @@
 import React, { useMemo, useRef } from 'react';
 import { INDIA_MAP_VIEWBOX, INDIA_MAP_STATES } from './indiaMapGeometry';
+import { splitRegionEdges } from './regionEdges';
 
 /**
  * Reusable India Map SVG Component — Phase 3.2
@@ -12,9 +13,11 @@ import { INDIA_MAP_VIEWBOX, INDIA_MAP_STATES } from './indiaMapGeometry';
  * - Accessible keyboard navigation and screen reader support for active states.
  * - `variant="dark"` (Our Presence page): a cheap "neon" look —
  *   · other states: cyan outline over a dark land tint, plus a faint second outline 3 px lower;
- *   · worked states: dark olive radial fill (lighter in the centre) with a plain yellow edge;
- *   · fake glow without blur: two wider, faint strokes in the edge yellow under the edge — for the
- *     selected state, or for every worked state when none is selected;
+ *   · worked states: one dark olive radial fill for the whole map (lighter over central India);
+ *   · the worked region's outer outline gets the yellow edge; borders shared by two worked states
+ *     are thinner and dimmer (outline split once per coverage set, see `regionEdges.js`);
+ *   · fake glow without blur: two wider, faint strokes in the edge yellow under the edge — around
+ *     the selected state, or around the worked region's outer outline when none is selected;
  *   · with a state selected, the other worked states are drawn at 35 % (per-path opacity).
  *   Performance rules: no blur filters, patterns, masks or group opacity, no animation; while
  *   `moving` (zoom / pan / drag) only the state fills and their edges are drawn.
@@ -40,8 +43,12 @@ export const MAP_COLORS = Object.freeze({
 const OTHER_FILL_OPACITY = 0.45;
 const ECHO = { offsetPx: 3, opacity: 0.22 }; // faint second cyan outline under other states
 const EDGE_WIDTH = 1.5;
+const SHARED_EDGE = { width: 0.8, opacity: 0.5 }; // borders between two worked states
 const FAKE_GLOW = [[10, 0.07], [5, 0.18]]; // [stroke width px, stroke opacity], widest first
 const DIM = 0.35; // other worked states while one is selected
+// One fill gradient for the whole map, in map coordinates: centred on central India, lighter in the
+// middle and darker toward the outer edges of the worked region.
+const FILL_GRADIENT = { cx: 481, cy: 496, r: 440 };
 
 const viewBoxWidth = (vb) => Number(String(vb).trim().split(/[\s,]+/)[2]) || 1;
 
@@ -137,6 +144,11 @@ export const IndiaMapSvg = ({
 
   // ---- Dark variant (Our Presence): static elements built once per coverage / selection ----
   const activeKey = isDark ? [...activeSet].sort().join(',') : '';
+  const regionEdges = useMemo(() => {
+    if (!isDark) return null;
+    const set = new Set(activeKey ? activeKey.split(',') : []);
+    return splitRegionEdges(INDIA_MAP_STATES.filter((state) => set.has(state.id)));
+  }, [isDark, activeKey]);
   const L = useMemo(() => {
     if (!isDark) return null;
     const set = new Set(activeKey ? activeKey.split(',') : []);
@@ -189,18 +201,31 @@ export const IndiaMapSvg = ({
       states.map((state) => (
         <path key={state.id} d={state.d} fill="none" stroke={color} strokeOpacity={opacity} strokeWidth={width} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
       ));
+    const line = (key, d, width, opacity) =>
+      d ? (
+        <path key={key} d={d} fill="none" stroke={MAP_COLORS.edge} strokeOpacity={opacity} strokeWidth={width} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+      ) : null;
+    // Overview: the region's outer outline is bright, shared borders quiet. With a state selected the
+    // region's lines are dimmed and the selected state gets its own full outline (+ fake glow).
+    const regionOpacity = hero ? DIM : 1;
+    const regionLines = [
+      line('shared', regionEdges.shared, SHARED_EDGE.width, SHARED_EDGE.opacity * regionOpacity),
+      line('outer', regionEdges.outer, EDGE_WIDTH, regionOpacity),
+    ];
 
     return {
       echo: strokes(others, 1.5, ECHO.opacity, MAP_COLORS.cyan),
       otherStates: others.map(otherState),
       dimmedStates: dimmed.map((state) => workedState(state, DIM)),
-      dimmedEdges: strokes(dimmed, EDGE_WIDTH, DIM, MAP_COLORS.edge),
       litStates: lit.map((state) => workedState(state)),
-      fakeGlow: FAKE_GLOW.map(([width, opacity]) => strokes(lit, width, opacity, MAP_COLORS.edge)),
-      litEdges: strokes(lit, EDGE_WIDTH, 1, MAP_COLORS.edge),
+      regionLines,
+      fakeGlow: FAKE_GLOW.map(([width, opacity]) =>
+        hero ? strokes([hero], width, opacity, MAP_COLORS.edge) : line(`glow-${width}`, regionEdges.outer, width, opacity)
+      ),
+      heroEdge: hero ? strokes([hero], EDGE_WIDTH, 1, MAP_COLORS.edge) : null,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDark, activeKey, selectedStateCode]);
+  }, [isDark, activeKey, selectedStateCode, regionEdges]);
 
   const deco = { 'aria-hidden': 'true', className: 'pointer-events-none' };
 
@@ -218,22 +243,22 @@ export const IndiaMapSvg = ({
           Administrative vector map of India showing 28 states and 8 union territories with verified boundaries.
         </desc>
 
-        {/* Dark variant: worked-state fills (darker at the edge, lighter in the centre) */}
+        {/* Dark variant: one worked-state fill for the whole map (map coordinates, lighter over central India) */}
         {isDark && (
           <defs>
-            <radialGradient id="india-map-worked-fill" cx="0.5" cy="0.5" r="0.65">
+            <radialGradient id="india-map-worked-fill" gradientUnits="userSpaceOnUse" cx={FILL_GRADIENT.cx} cy={FILL_GRADIENT.cy} r={FILL_GRADIENT.r}>
               <stop offset="0%" stopColor={MAP_COLORS.workedCenter} />
               <stop offset="100%" stopColor={MAP_COLORS.workedEdge} />
             </radialGradient>
-            <radialGradient id="india-map-worked-fill-hover" cx="0.5" cy="0.5" r="0.65">
+            <radialGradient id="india-map-worked-fill-hover" gradientUnits="userSpaceOnUse" cx={FILL_GRADIENT.cx} cy={FILL_GRADIENT.cy} r={FILL_GRADIENT.r}>
               <stop offset="0%" stopColor={MAP_COLORS.hoverCenter} />
               <stop offset="100%" stopColor={MAP_COLORS.hoverEdge} />
             </radialGradient>
           </defs>
         )}
 
-        {/* State Boundaries. Dark order: echo outline → other states → dimmed worked states + edges →
-            lit worked states → fake glow → yellow edges. Only worked states are focusable, so their
+        {/* State Boundaries. Dark order: echo outline → other states → worked states (dimmed, then lit)
+            → region lines (quiet shared borders, outer outline) → fake glow → selected-state edge. Only worked states are focusable, so their
             tab order is unchanged. */}
         <g id="india-states-layer">
           {!isDark && INDIA_MAP_STATES.map(renderLightState)}
@@ -242,10 +267,10 @@ export const IndiaMapSvg = ({
               {!moving && <g {...deco} data-layer="outline-echo" transform={`translate(0 ${ECHO.offsetPx * unit})`}>{L.echo}</g>}
               {L.otherStates}
               {L.dimmedStates}
-              <g {...deco} data-layer="dimmed-edges">{L.dimmedEdges}</g>
               {L.litStates}
+              <g {...deco} data-layer="region-edges">{L.regionLines}</g>
               {!moving && <g {...deco} data-layer="fake-glow">{L.fakeGlow}</g>}
-              <g {...deco} data-layer="edges">{L.litEdges}</g>
+              <g {...deco} data-layer="edges">{L.heroEdge}</g>
             </>
           )}
         </g>

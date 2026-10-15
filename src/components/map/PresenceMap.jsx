@@ -41,6 +41,8 @@ const CLUSTER_RADIUS_PX = 36;
 const ZOOM_STEP = 1.6;
 const DRAG_THRESHOLD_PX = 6;
 const MARKER_RADIUS_PX = 5;
+// Overview city dots: ~4 px white dot over a faint white halo (screen px radii).
+const OVERVIEW_CITY = { dotPx: 2, haloPx: 6, haloOpacity: 0.18 };
 // Plain navy radial background behind the map (CSS only, static).
 const MAP_BACKGROUND = 'radial-gradient(ellipse at 50% 45%, #0B1030 0%, #070A1F 100%)';
 // District lines inside the selected state: thin light lime, readable on the dark olive fill.
@@ -81,6 +83,7 @@ export const PresenceMap = ({
   onBackgroundTap,
   onReset,
   markers = [],
+  overviewCities = [],
   selectedCity = null,
   onSelectCity,
   geography = null,
@@ -307,6 +310,19 @@ export const PresenceMap = ({
       onSelectCity?.(city);
     }
   };
+
+  // India overview: a small white dot with a faint see-through halo for every worked city. Decorative
+  // (not interactive); hidden while moving and once a state is selected (its cities become pins).
+  const overviewCityLayer = !selectedCode && !moving && overviewCities.length > 0 && (
+    <g aria-hidden="true" className="pointer-events-none" data-layer="overview-cities">
+      {overviewCities.map((c) => (
+        <circle key={`halo-${c.stateCode}-${c.city}`} cx={c.x} cy={c.y} r={OVERVIEW_CITY.haloPx * unit} fill="#FFFFFF" fillOpacity={OVERVIEW_CITY.haloOpacity} />
+      ))}
+      {overviewCities.map((c) => (
+        <circle key={`dot-${c.stateCode}-${c.city}`} cx={c.x} cy={c.y} r={OVERVIEW_CITY.dotPx * unit} fill="#FFFFFF" />
+      ))}
+    </g>
+  );
 
   const markerLayer = markers.length > 0 && (
     <g role="group" aria-label={`Cities in ${selectedState?.name || 'selected state'}`}>
@@ -655,6 +671,7 @@ export const PresenceMap = ({
           moving={moving}
         >
           {geographyLayer}
+          {overviewCityLayer}
           {markerLayer}
           {projectLayer}
         </IndiaMapSvg>

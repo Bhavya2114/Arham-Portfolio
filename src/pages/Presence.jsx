@@ -64,6 +64,15 @@ export const Presence = () => {
   }, [nav.stateCode]);
   const geography = geo.stateCode === nav.stateCode ? geo.data : null;
 
+  // Every worked city, shown as a small dot at the India overview.
+  const overviewCities = useMemo(
+    () =>
+      CITY_COORDINATES
+        .filter((c) => coverageStateCodes.includes(c.stateCode) && getPresenceState(c.stateCode)?.cities.includes(c.city))
+        .map((c) => ({ city: c.city, stateCode: c.stateCode, ...projectLatLon(c.lat, c.lon) })),
+    [coverageStateCodes]
+  );
+
   // City markers for the selected state (reference points, not building locations).
   const cityMarkers = useMemo(() => {
     if (!selectedState) return [];
@@ -254,6 +263,7 @@ export const Presence = () => {
                 onSelectInactiveState={() => dispatch({ type: 'reset' })}
                 onBackgroundTap={() => dispatch({ type: 'reset' })}
                 markers={cityMarkers}
+                overviewCities={overviewCities}
                 selectedCity={selectedCity}
                 onSelectCity={(city) => dispatch({ type: 'selectCity', stateCode: nav.stateCode, city })}
                 geography={geography}
