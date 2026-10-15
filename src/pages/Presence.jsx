@@ -228,14 +228,16 @@ export const Presence = () => {
           <header className="max-w-2xl space-y-3">
             <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-brand-accent">
               <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
-              Our Presence
+              Our Work
             </p>
             <h1 id="presence-heading" className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-heading tracking-tight text-white">
-              Our Presence Across India
+              Where We&apos;ve Worked
             </h1>
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              Arham carries out electrical wiring and lighting installations for educational and commercial
-              clients. Highlighted states show where our teams work today.
+              Explore the cities where Arham has delivered electrical wiring and lighting projects.
+            </p>
+            <p className="text-xs sm:text-sm text-slate-400 tracking-wide leading-relaxed">
+              Interactive map · Project locations · Electrical and lighting work
             </p>
           </header>
 

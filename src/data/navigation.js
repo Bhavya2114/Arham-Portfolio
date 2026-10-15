@@ -30,7 +30,7 @@ export const NAV_ITEMS = [
     description: 'Commercial, industrial, and architectural infrastructure portfolio.'
   },
   { 
-    name: 'Our Presence', 
+    name: 'Our Work',
     path: '/presence', 
     isAvailable: true,
     plannedPhase: 'Phase 3',
