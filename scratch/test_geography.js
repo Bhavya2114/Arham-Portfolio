@@ -184,7 +184,7 @@ assert(/City locations ©/.test(mapSrc), 'OSM credit refers to city locations on
 assert(read('../src/data/geo/SOURCES.md').includes('ShareAlike notice: `states/IN-GJ.js`'), 'SOURCES.md documents the Gujarat ShareAlike licence');
 assert(pageSrc.includes('loadStateGeography(nav.stateCode)') && pageSrc.includes("status: 'error'"), 'Page lazy-loads geography and tolerates load failure');
 const mapSvgSrc = read('../src/components/map/IndiaMapSvg.jsx');
-assert(mapSvgSrc.includes("fillClass = 'fill-[#16263A]") && mapSvgSrc.includes('fill-emerald-600/70'), 'Uncovered states stay subdued; coverage states highlighted');
+assert(mapSvgSrc.includes('fill={MAP_COLORS.land}') && mapSvgSrc.includes('stroke={MAP_COLORS.cyan}') && mapSvgSrc.includes('fill="url(#india-map-worked-fill)"'), 'Uncovered states stay subdued (cyan outline); coverage states highlighted');
 assert(fs.existsSync(path.resolve(__dirname, '../src/data/geo/SOURCES.md')), 'Dataset sources and licences recorded');
 
 console.log(`\nResults: ${passed} passed, ${failed} failed`);

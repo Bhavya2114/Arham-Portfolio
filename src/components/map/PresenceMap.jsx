@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
 import { MousePointerClick, Plus, Minus, Maximize2, Move } from 'lucide-react';
-import IndiaMapSvg from './IndiaMapSvg';
+import IndiaMapSvg, { MAP_COLORS } from './IndiaMapSvg';
 import { startOverlayEntrance, OVERLAY_ENTER } from '../../lib/overlayEntrance.js';
 import { isMapBackgroundTap } from '../../lib/mapBackgroundTap.js';
 import { createSettleQueue } from '../../lib/viewSettle.js';
@@ -41,6 +41,10 @@ const CLUSTER_RADIUS_PX = 36;
 const ZOOM_STEP = 1.6;
 const DRAG_THRESHOLD_PX = 6;
 const MARKER_RADIUS_PX = 5;
+// Plain navy radial background behind the map (CSS only, static).
+const MAP_BACKGROUND = 'radial-gradient(ellipse at 50% 45%, #0B1030 0%, #070A1F 100%)';
+// District lines inside the selected state: thin light lime, readable on the dark olive fill.
+const DISTRICT_LINE = { color: '#C9E77A', opacity: 0.35, width: 0.75 };
 const MAX_HIT_RADIUS_PX = 22;
 const MIN_HIT_RADIUS_PX = 12;
 const MARKER_CLEARANCE_PX = 28; // space kept between the selected city marker and the overlay
@@ -93,6 +97,7 @@ export const PresenceMap = ({
   const viewRef = useRef(HOME_VIEW);
   const animationRef = useRef(null);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const [svgSize, setSvgSize] = useState({ w: 0, h: 0 });
 
   const commitView = useCallback((next) => {
@@ -177,6 +182,8 @@ export const PresenceMap = ({
 
   // ---- Zoom controls ----
   const isZoomed = view.k > 1.001;
+  // While zooming, panning or dragging the map draws only state fills and their edges.
+  const moving = isAnimating || isDragging;
   const zoomBy = (factor) => animateTo({ ...viewRef.current, k: viewRef.current.k * factor });
   const fitView = () => animateTo(getTargetView());
 
@@ -235,9 +242,11 @@ export const PresenceMap = ({
         stopAnimation('interrupted');
         beginGesture();
         if (gesture.current) gesture.current.moved = true;
+        setIsDragging(true);
         return;
       }
       g.moved = true;
+      setIsDragging(true);
     }
     const k1 = pointers.current.size > 1 && start.spread > 0
       ? clamp(g.view.k * (now.spread / start.spread), 1, MAX_ZOOM)
@@ -255,7 +264,10 @@ export const PresenceMap = ({
     pointers.current.delete(e.pointerId);
     if (gesture.current?.moved) suppressClick.current = true;
     if (pointers.current.size > 0) beginGesture();
-    else gesture.current = null;
+    else {
+      gesture.current = null;
+      setIsDragging(false);
+    }
   };
 
   const handleClickCapture = (e) => {
@@ -300,7 +312,7 @@ export const PresenceMap = ({
     <g role="group" aria-label={`Cities in ${selectedState?.name || 'selected state'}`}>
       {markers.map((m) => {
         const isSelected = selectedCity === m.city;
-        const r = MARKER_RADIUS_PX * unit * (isSelected ? 1.4 : 1);
+        const r = MARKER_RADIUS_PX * unit * (isSelected ? 1.3 : 1);
         return (
           <g
             key={m.city}
@@ -322,12 +334,13 @@ export const PresenceMap = ({
               vectorEffect="non-scaling-stroke"
             />
             {isSelected && (
-              <circle r={r + 3.5 * unit} className="fill-brand-accent/25 stroke-white" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
+              <circle r={r + 3.5 * unit} fill="none" stroke={MAP_COLORS.edge} strokeWidth={2} vectorEffect="non-scaling-stroke" />
             )}
             <circle
               r={r}
-              className="fill-brand-accent stroke-brand-navy-dark group-hover:fill-amber-300 transition-colors"
-              strokeWidth={1.5}
+              fill="#FFFFFF"
+              stroke={MAP_COLORS.land}
+              strokeWidth={1.25}
               vectorEffect="non-scaling-stroke"
             />
             {m.count > 0 && (
@@ -364,7 +377,7 @@ export const PresenceMap = ({
     () => (selectedCode ? INDIA_MAP_STATES.find((st) => st.id === selectedCode) || null : null),
     [selectedCode]
   );
-  const geographyLayer = selectedShape && geography && geography.stateCode === selectedCode && (
+  const geographyLayer = !moving && selectedShape && geography && geography.stateCode === selectedCode && (
     <g aria-hidden="true" className="pointer-events-none" data-layer="state-geography">
       <defs>
         <clipPath id="presence-selected-state-clip">
@@ -377,8 +390,10 @@ export const PresenceMap = ({
             <path
               key={dist.name}
               d={dist.d}
-              className="fill-none stroke-emerald-950/50"
-              strokeWidth={0.75}
+              fill="none"
+              stroke={DISTRICT_LINE.color}
+              strokeOpacity={DISTRICT_LINE.opacity}
+              strokeWidth={DISTRICT_LINE.width}
               strokeLinejoin="round"
               vectorEffect="non-scaling-stroke"
             >
@@ -388,7 +403,7 @@ export const PresenceMap = ({
         </g>
       </g>
       {/* Re-draw the state outline above the district lines */}
-      <path d={selectedShape.d} className="fill-none stroke-emerald-50" strokeWidth={1.6} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
+      <path d={selectedShape.d} fill="none" stroke={MAP_COLORS.edge} strokeWidth={1.5} strokeLinejoin="round" vectorEffect="non-scaling-stroke" />
     </g>
   );
 
@@ -619,7 +634,7 @@ export const PresenceMap = ({
       <div
         ref={wrapperRef}
         className={`relative overflow-hidden rounded-xl ${isZoomed ? 'cursor-grab active:cursor-grabbing' : ''}`}
-        style={{ touchAction: isZoomed ? 'none' : 'pan-y pinch-zoom' }}
+        style={{ background: MAP_BACKGROUND, touchAction: isZoomed ? 'none' : 'pan-y pinch-zoom' }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerEnd}
@@ -636,7 +651,8 @@ export const PresenceMap = ({
           onSelectInactiveState={onSelectInactiveState}
           ariaLabel="Map of India highlighting Arham's coverage states"
           svgClassName="w-full h-auto max-h-[75vh] select-none"
-          showGlow={!isZoomed && !isAnimating}
+          pxUnit={unit}
+          moving={moving}
         >
           {geographyLayer}
           {markerLayer}
@@ -695,22 +711,21 @@ export const PresenceMap = ({
       <div className="mt-3 space-y-1.5 text-center">
         <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-slate-400" aria-label="Map legend">
           <li className="inline-flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm bg-emerald-600/70 border border-emerald-300/80" aria-hidden="true" />
-            Coverage state
-          </li>
-          <li className="inline-flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm bg-emerald-400 border border-emerald-100" aria-hidden="true" />
+            <span className="w-3 h-3 rounded-sm bg-[#5C7E1C] border-[1.5px] border-[#D9E35A]" aria-hidden="true" />
             Selected
           </li>
-          {markers.length > 0 ? (
+          <li className="inline-flex items-center gap-1.5">
+            <span className="w-3 h-3 rounded-sm bg-[#2F4A10] border border-[#D9E35A]/40" aria-hidden="true" />
+            Worked locations
+          </li>
+          <li className="inline-flex items-center gap-1.5">
+            <span className="w-3 h-3 rounded-sm bg-[#070A1F]/50 border-[1.5px] border-[#3FD0E6]" aria-hidden="true" />
+            Other states
+          </li>
+          {markers.length > 0 && (
             <li className="inline-flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-brand-accent border border-brand-navy-dark" aria-hidden="true" />
+              <span className="w-2.5 h-2.5 rounded-full bg-white border border-[#070A1F]" aria-hidden="true" />
               City
-            </li>
-          ) : (
-            <li className="inline-flex items-center gap-1.5">
-              <span className="w-3 h-3 rounded-sm bg-[#16263A] border border-slate-600" aria-hidden="true" />
-              Other states
             </li>
           )}
           {projectMarkers.length > 0 && (

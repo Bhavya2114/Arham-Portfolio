@@ -36,7 +36,7 @@ assert(!/Back to India|Back to \$\{|backLabel|onBack=|goBackOneLevel/.test(pageS
 assert(!/ArrowLeft/.test(mapSrc), 'Map toolbar no longer imports the back arrow');
 
 console.log('\n2. Uncovered state returns to India');
-assert(/onSelectInactiveState = null,/.test(svgSrc) && /else if \(!activeSet\.has\(state\.id\) && onSelectInactiveState\) \{\s*onSelectInactiveState\(state\.id\);/.test(svgSrc), 'IndiaMapSvg forwards clicks on uncovered states only when a handler is given');
+assert(/onSelectInactiveState = null,/.test(svgSrc) && /else if \(!set\.has\(state\.id\) && onInactive\) \{\s*onInactive\(state\.id\);/.test(svgSrc), 'IndiaMapSvg forwards clicks on uncovered states only when a handler is given');
 assert(/onSelectInactiveState=\{onSelectInactiveState\}/.test(mapSrc), 'PresenceMap passes the handler to the SVG');
 assert(pageSrc.includes("onSelectInactiveState={() => dispatch({ type: 'reset' })}"), 'Presence page resets to India on an uncovered state');
 assert(!/onSelectInactiveState/.test(homeSrc), 'Homepage preview unchanged (no inactive-state handler)');
