@@ -29,23 +29,32 @@ const prefersReducedMotion = () =>
 const stop = (e) => e.stopPropagation();
 
 /** One project's content (image + details). `ghost` = the outgoing copy during a slide (inert). */
+// Photo: full card height on the left, edge to edge, ~40 % of the card width; its frame (10:11 on
+// phones, square from sm) drives the card height, ~25 % taller than before (the card's rounded corners
+// clip it, so only the outer left corners are rounded).
 const CampusSlide = ({ loc, ghost = false }) => (
-  <div className="flex gap-3">
-    <img
-      src={loc.photos?.[0]}
-      alt={ghost ? '' : loc.name}
-      draggable={false}
-      loading="lazy"
-      decoding="async"
-      className="w-20 sm:w-28 aspect-[4/3] shrink-0 self-center rounded-xl object-cover"
-    />
-    <div className="min-w-0 flex-1 flex flex-col gap-1" {...(ghost ? {} : { 'aria-live': 'polite', 'aria-atomic': 'true' })}>
+  <div className="flex">
+    <div className="w-[40%] aspect-[10/11] sm:aspect-square shrink-0" data-project-photo="">
+      <img
+        src={loc.photos?.[0]}
+        alt={ghost ? '' : loc.name}
+        draggable={false}
+        loading="lazy"
+        decoding="async"
+        className="h-full w-full object-cover"
+      />
+    </div>
+    <div className="min-w-0 flex-1 flex flex-col gap-1 p-2.5 sm:p-3" {...(ghost ? {} : { 'aria-live': 'polite', 'aria-atomic': 'true' })}>
       <span className="self-start rounded-full border border-teal-100/25 bg-white/10 px-2 py-0.5 text-[10px] font-medium tracking-wide text-teal-50" data-project-type="">
         {loc.type}
       </span>
       <h3 className="text-sm sm:text-[15px] font-semibold leading-snug text-white line-clamp-2">{loc.name}</h3>
       {loc.location && <p className="text-[11px] sm:text-xs leading-snug text-white/80 line-clamp-3" data-project-location="">{loc.location}</p>}
-      <p className="text-[11px] sm:text-xs leading-snug text-white/80" data-project-scope="">{[loc.scope, loc.year].filter(Boolean).join(' · ')}</p>
+      <p className="text-[11px] sm:text-xs leading-snug text-white/80" data-project-scope="">
+        {loc.scope}
+        {/* No-break space + no-wrap: "· 2022" stays with the last word, never alone on a new line. */}
+        {loc.year && <>{loc.scope ? '\u00A0' : ''}<span className="whitespace-nowrap">· {loc.year}</span></>}
+      </p>
     </div>
   </div>
 );
@@ -164,14 +173,14 @@ export const CampusCard = ({ city, projects: locations = [], currentId = null, o
         onPointerCancel={handlePointerEnd}
         onClickCapture={handleClickCapture}
         style={{ touchAction: 'pan-y' }}
-        className="flex gap-3 rounded-2xl border border-teal-200/25 bg-teal-700/35 p-2.5 sm:p-3 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md select-none cursor-grab active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+        className="flex overflow-hidden rounded-2xl border border-teal-200/25 bg-teal-700/35 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md select-none cursor-grab active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
       >
         {/* The glass card stays put; only its content slides (clipped here). */}
-        <div className="relative min-w-0 flex-1 overflow-hidden -m-1 p-1" data-campus-viewport>
+        <div className="relative min-w-0 flex-1 overflow-hidden" data-campus-viewport>
           {slide && (
             <div
               aria-hidden="true"
-              className={`absolute inset-1 pointer-events-none campus-slide ${outgoingAnim}`}
+              className={`absolute inset-0 pointer-events-none campus-slide ${outgoingAnim}`}
               data-campus-slide="out"
             >
               <CampusSlide loc={locations[slide.from]} ghost />

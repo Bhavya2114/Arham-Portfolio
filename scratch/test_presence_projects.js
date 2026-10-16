@@ -40,8 +40,6 @@ const { getPresenceStateCodes, getPresenceState } = await load('../src/data/pres
 
 console.log('\n1. Main\'s card design, unchanged');
 const sameAsMain = [
-  'className="w-20 sm:w-28 aspect-[4/3] shrink-0 self-center rounded-xl object-cover"',
-  'className="flex gap-3 rounded-2xl border border-teal-200/25 bg-teal-700/35 p-2.5 sm:p-3 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md select-none cursor-grab active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"',
   'className="self-start rounded-full border border-teal-100/25 bg-white/10 px-2 py-0.5 text-[10px] font-medium tracking-wide text-teal-50"',
   'className="text-sm sm:text-[15px] font-semibold leading-snug text-white line-clamp-2"',
   '<div className="inline-flex items-center gap-2 rounded-full bg-brand-navy-dark/70 px-2 text-[11px] text-white/85 backdrop-blur-sm">',
@@ -50,7 +48,10 @@ const sameAsMain = [
   "slide.dir === 'next' ? 'campus-in-from-right' : 'campus-in-from-left'",
   "style={{ touchAction: 'pan-y' }}",
 ];
-assert(mainCard && sameAsMain.every((s) => mainCard.includes(s) && cardSrc.includes(s)), 'Same layout, sizes, colours, photo size, corners, swipe, slide and dots + "n / total" pager as main');
+assert(mainCard && sameAsMain.every((s) => mainCard.includes(s) && cardSrc.includes(s)), 'Same chip, title, colours, swipe, slide and dots + "n / total" pager as main');
+assert(cardSrc.includes('className="flex overflow-hidden rounded-2xl border border-teal-200/25 bg-teal-700/35 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md select-none cursor-grab active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"')
+  && mainCard.includes('border border-teal-200/25 bg-teal-700/35') && mainCard.includes('shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md'), 'Same glass card (colours, border, shadow, corners); padding moved onto the text so the photo is edge to edge');
+assert(/<div className="w-\[40%\] aspect-\[10\/11\] sm:aspect-square shrink-0" data-project-photo="">/.test(cardSrc) && /className="h-full w-full object-cover"/.test(cardSrc) && /flex-1 flex flex-col gap-1 p-2\.5 sm:p-3/.test(cardSrc) && /absolute inset-0 pointer-events-none campus-slide/.test(cardSrc), 'Bigger photo: full card height on the left, edge to edge, 40 % wide, cover; its frame drives the height');
 const moveHandler = (cardSrc.match(/const handlePointerMove = \(e\) => \{[\s\S]*?\n  \};/) || [''])[0];
 assert(!/dragX|setDragX/.test(cardSrc) && /setDragOffset\(atEdge \? dx \/ 4 : dx\);/.test(moveHandler) && !/\bset(?!DragOffset\b|PointerCapture\b)[A-Z]\w*\(/.test(moveHandler)
   && /el\.style\.transform = px \? `translateX\(\$\{px\}px\)` : '';/.test(cardSrc) && /ref=\{contentRef\}\s*className=\{slide \? `campus-slide \$\{incomingAnim\}` : 'transition-transform duration-200'\}/.test(cardSrc), 'Swipe follows the finger through a ref transform (no React state per move); eases back with main\'s 200 ms transition');
@@ -64,7 +65,7 @@ assert(/'transition-\[transform,opacity\] duration-300 ease-out translate-y-0 op
 
 console.log('\n2. Only the text changed');
 assert(/\{loc\.type\}/.test(cardSrc) && !/Campus location/.test(cardSrc), 'Chip: the project type ("Coaching centre") instead of "Campus location"');
-assert(/\{loc\.name\}<\/h3>/.test(cardSrc) && /data-project-location="">\{loc\.location\}<\/p>/.test(cardSrc) && /\[loc\.scope, loc\.year\]\.filter\(Boolean\)\.join\(' · '\)/.test(cardSrc), 'Name, area + city location, "scope · year"');
+assert(/\{loc\.name\}<\/h3>/.test(cardSrc) && /data-project-location="">\{loc\.location\}<\/p>/.test(cardSrc) && /\{loc\.scope\}/.test(cardSrc) && /\{loc\.scope \? '\\u00A0' : ''\}<span className="whitespace-nowrap">· \{loc\.year\}<\/span>/.test(cardSrc), 'Name, area + city location, "scope · year" (year kept with the last word, never alone on a new line)');
 assert(!/suppliedAddress|Directions|google\.com\/maps|Navigation|View project|\/projects\//.test(code(cardSrc)), 'No address, no Directions, no "View project"');
 assert(/src=\{loc\.photos\?\.\[0\]\}/.test(cardSrc) && /alt=\{ghost \? '' : loc\.name\}/.test(cardSrc), 'Photo: the project\'s photo; alt = project name');
 
