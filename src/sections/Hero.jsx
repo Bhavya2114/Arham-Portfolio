@@ -10,7 +10,7 @@ import { Zap, ArrowRight, MessageSquare, ShieldCheck, Sparkles } from 'lucide-re
  */
 export const Hero = ({ onOpenEnquiry }) => {
   return (
-    <section className="relative w-full py-12 sm:py-16 lg:py-20 overflow-hidden bg-gradient-to-b from-navy-900 to-navy-950">
+    <section className="relative w-full py-12 sm:py-16 lg:py-20 overflow-hidden bg-navy-950">
       <Container size="default">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           
@@ -25,12 +25,12 @@ export const Hero = ({ onOpenEnquiry }) => {
             </div>
 
             {/* Primary Headline */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.85rem] font-bold font-heading text-white tracking-tight leading-[1.1]">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.85rem] font-bold font-heading text-heading tracking-tight leading-[1.1]">
               High-Precision Electrical Infrastructure & Architectural Lighting
             </h1>
 
             {/* Supporting Paragraph */}
-            <p className="text-base sm:text-lg text-muted-dark leading-relaxed max-w-2xl">
+            <p className="text-base sm:text-lg text-body leading-relaxed max-w-2xl">
               Arham delivers specialized electrical engineering, industrial infrastructure wiring, power distribution systems, and architectural lighting installations for commercial and industrial facilities.
             </p>
 
@@ -80,11 +80,11 @@ export const Hero = ({ onOpenEnquiry }) => {
             <div className="relative rounded-2xl bg-surface p-2 sm:p-2.5 border border-white/[0.08] shadow-card">
               
               {/* Architectural Image Container */}
-              <div className="relative w-full aspect-[4/3] sm:aspect-[16/11] lg:aspect-[4/3] rounded-xl overflow-hidden bg-slate-100">
+              <div className="relative w-full aspect-[4/3] sm:aspect-[16/11] lg:aspect-[4/3] rounded-xl overflow-hidden bg-white/[0.06]">
                 <img
                   src="/images/hero-architecture.jpg"
                   alt="Modern commercial facility with architectural exterior lighting and structural engineering"
-                  className="w-full h-full object-cover object-center"
+                  className="w-full h-full object-cover object-center rounded-xl border border-white/[0.08]"
                   loading="eager"
                 />
 

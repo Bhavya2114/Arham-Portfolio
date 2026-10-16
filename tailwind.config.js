@@ -7,12 +7,17 @@ export default {
   theme: {
     extend: {
       colors: {
-        // "Light in the dark" palette. One accent only: yellow = important / clickable.
+        // "Light in the dark" palette, tonal dark (no light sections). One accent only: yellow =
+        // important / clickable.
         navy: {
-          950: "#070A1F", // dark base
-          900: "#0B1030", // dark gradient top
+          950: "#070A1F", // dark base (sections alternate 950 / 800)
+          900: "#0B1030", // dark gradient top; form inputs
+          800: "#0E1430", // the lighter of the two section shades
         },
-        surface: "#111733", // cards on dark
+        surface: "#111733", // /presence panels
+        card: "#151C3D", // cards on both section shades (1px white/7 % border)
+        heading: "#EEF1F7", // headings (not pure white)
+        body: "#B9C1D3", // body text
         accent: {
           DEFAULT: "#D9E35A", // buttons, highlights, active states
           hover: "#E6EE7A",
@@ -20,26 +25,27 @@ export default {
         },
         olive: "#3F5A14", // secondary (also links / icons / focus rings on light: AA on white)
         cyan: "#3FD0E6", // thin detail lines only, sparingly
-        light: "#F7F8FA", // light section background
-        ink: "#0F172A", // text on light
+        // Legacy names from the light theme, now pointing at their tonal-dark equivalents.
+        light: "#0E1430", // = navy-800 (was the light section background)
+        ink: "#EEF1F7", // = heading (was text on light)
         muted: {
-          DEFAULT: "#627289", // muted text on light (#64748B nudged darker: AA 4.6:1 on #F7F8FA)
+          DEFAULT: "#9AA3B8", // muted text
           dark: "#9AA3B8", // muted text on dark
         },
         // Legacy names, kept as aliases onto the new palette until the pages are restyled (stage 2).
         // The old brand blue is gone; its uses were moved to accent / olive.
         brand: {
-          navy: "#0F172A", // = ink
+          navy: "#EEF1F7", // = heading
           "navy-dark": "#070A1F", // = navy-950
           "navy-light": "#111733", // = surface
-          bg: "#F7F8FA", // = light
-          "warm-white": "#F7F8FA",
-          slate: "#627289", // = muted
-          "slate-light": "#9AA3B8", // = muted-dark
-          "slate-dark": "#475569",
+          bg: "#0E1430", // = navy-800
+          "warm-white": "#0E1430",
+          slate: "#B9C1D3", // = body
+          "slate-light": "#9AA3B8", // = muted
+          "slate-dark": "#B9C1D3",
           accent: "#D9E35A", // = accent
-          border: "#E2E8F0",
-          "border-subtle": "#F1F5F9",
+          border: "#FFFFFF12", // white / 7 %
+          "border-subtle": "#FFFFFF0A",
         },
         status: {
           success: "#059669",

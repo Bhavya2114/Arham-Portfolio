@@ -43,7 +43,7 @@ export const ServicesOverview = () => {
   return (
     <section
       id="services"
-      className="w-full py-16 sm:py-20 lg:py-24 border-t border-white/[0.08] bg-gradient-to-b from-navy-900 to-navy-950 scroll-mt-20"
+      className="w-full py-16 sm:py-20 lg:py-24 border-t border-white/[0.08] bg-navy-950 scroll-mt-20"
       aria-labelledby="services-heading"
     >
       <Container size="default" className="space-y-12 sm:space-y-16">
@@ -89,12 +89,12 @@ export const ServicesOverview = () => {
                   </div>
 
                   {/* Service Heading */}
-                  <h3 className="text-lg font-bold font-heading text-white leading-snug">
+                  <h3 className="text-lg font-bold font-heading text-heading leading-snug">
                     {service.title}
                   </h3>
 
                   {/* General Description */}
-                  <p className="text-sm text-muted-dark leading-relaxed">
+                  <p className="text-base text-body leading-[1.65]">
                     {service.description}
                   </p>
                 </div>
@@ -113,9 +113,9 @@ export const ServicesOverview = () => {
         </div>
 
         {/* Call to action linking to dedicated Services page */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-surface border border-white/[0.08]">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-card border border-white/[0.07]">
           <div className="space-y-1 text-left">
-            <h4 className="text-sm font-bold font-heading text-white">
+            <h4 className="text-sm font-bold font-heading text-heading">
               Detailed Scope & Execution Methodology
             </h4>
             <p className="text-xs text-muted-dark">
@@ -136,8 +136,8 @@ export const ServicesOverview = () => {
         </div>
 
         {/* Informational Disclosure / Footnote */}
-        <div className="p-4 rounded-xl bg-surface border border-white/[0.08] text-left">
-          <p className="text-xs text-muted-dark leading-relaxed">
+        <div className="p-4 rounded-xl bg-card border border-white/[0.07] text-left">
+          <p className="text-xs text-body leading-relaxed">
             <span className="font-semibold text-white">Scope Disclosure:</span> Capability categories and service scopes outlined above represent provisional business domains. Specific technical capacities, load parameters, and project classifications are subject to formal confirmation by company management prior to publication.
           </p>
         </div>

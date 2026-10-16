@@ -76,10 +76,10 @@ export const ProjectCard = ({ project, stateName = '' }) => {
       key={id}
       variant="default"
       padding="none"
-      className="overflow-hidden border border-brand-border hover:border-olive/40 hover:shadow-elevated transition-all duration-200 flex flex-col group"
+      className="overflow-hidden border border-brand-border hover:border-accent/40 hover:shadow-elevated transition-all duration-200 flex flex-col group rounded-xl border border-white/[0.08]"
     >
       {/* Visual Asset or Architectural Engineering Placeholder */}
-      <div className="relative w-full h-44 sm:h-48 bg-slate-100 overflow-hidden border-b border-brand-border">
+      <div className="relative w-full h-44 sm:h-48 bg-white/[0.06] overflow-hidden border-b border-brand-border">
         {hasValidImage ? (
           <img
             src={primaryImage}
@@ -90,7 +90,7 @@ export const ProjectCard = ({ project, stateName = '' }) => {
           />
         ) : (
           <div 
-            className="w-full h-full flex flex-col items-center justify-center p-4 text-center bg-gradient-to-br from-slate-50 to-slate-100 select-none"
+            className="w-full h-full flex flex-col items-center justify-center p-4 text-center bg-gradient-to-br from-card to-navy-800 select-none"
             aria-hidden="true"
           >
             {/* Subtle engineering grid backdrop */}
@@ -101,8 +101,8 @@ export const ProjectCard = ({ project, stateName = '' }) => {
                 backgroundSize: '16px 16px'
               }}
             />
-            <div className="relative z-10 w-10 h-10 rounded-full bg-white shadow-subtle border border-brand-border flex items-center justify-center text-brand-navy mb-2 group-hover:scale-110 transition-transform">
-              <CategoryIcon className="w-5 h-5 text-olive" />
+            <div className="relative z-10 w-10 h-10 rounded-full bg-card shadow-subtle border border-brand-border flex items-center justify-center text-brand-navy mb-2 group-hover:scale-110 transition-transform">
+              <CategoryIcon className="w-5 h-5 text-accent" />
             </div>
             <p className="relative z-10 text-xs font-semibold text-brand-navy font-heading">
               {categoryConfig.label}
@@ -145,7 +145,7 @@ export const ProjectCard = ({ project, stateName = '' }) => {
         <div className="space-y-2">
           {/* Geographic Location Label */}
           <div className="flex items-center gap-1.5 text-xs text-brand-slate font-medium">
-            <MapPin className="w-3.5 h-3.5 text-olive shrink-0" aria-hidden="true" />
+            <MapPin className="w-3.5 h-3.5 text-accent shrink-0" aria-hidden="true" />
             <span>
               {city}
               {stateName ? `, ${stateName}` : ''}
@@ -156,21 +156,21 @@ export const ProjectCard = ({ project, stateName = '' }) => {
           <h4 className="text-base font-bold font-heading text-brand-navy leading-snug line-clamp-2">
             <Link 
               to={`/projects/${id}`} 
-              className="hover:text-olive transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-olive rounded"
+              className="hover:text-accent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent rounded"
             >
               {name}
             </Link>
           </h4>
 
           {/* Approved Factual Project Summary */}
-          <p className="text-xs sm:text-sm text-brand-slate leading-relaxed line-clamp-3">
+          <p className="text-base text-brand-slate leading-[1.65] line-clamp-3">
             {description}
           </p>
         </div>
 
         {/* Engineering Scope (if cataloged) */}
         {scope && (
-          <div className="pt-3 border-t border-slate-100 flex items-start gap-2 text-xs text-slate-600">
+          <div className="pt-3 border-t border-white/[0.07] flex items-start gap-2 text-xs text-body">
             <FileText className="w-3.5 h-3.5 text-muted shrink-0 mt-0.5" aria-hidden="true" />
             <span className="line-clamp-1">
               <strong className="text-brand-navy font-semibold">Scope:</strong> {scope}
@@ -180,13 +180,13 @@ export const ProjectCard = ({ project, stateName = '' }) => {
 
         {/* Authentication Badge & Profile Link */}
         <div className="pt-3 flex items-center justify-between text-[11px] text-muted border-t border-brand-border">
-          <span className="inline-flex items-center gap-1 text-slate-500 font-mono text-[10px]">
-            <CheckCircle2 className="w-3 h-3 text-emerald-600" aria-hidden="true" />
+          <span className="inline-flex items-center gap-1 text-muted font-mono text-[10px]">
+            <CheckCircle2 className="w-3 h-3 text-emerald-300" aria-hidden="true" />
             AUTHENTICATED
           </span>
           <Link
             to={`/projects/${id}`}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-olive hover:text-brand-navy transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-olive rounded"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-accent hover:text-brand-navy transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent rounded"
             aria-label={`View project profile for ${name}`}
           >
             <span>View Profile</span>

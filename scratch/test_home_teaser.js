@@ -4,7 +4,7 @@
  * The interactive map lives only on /presence: the homepage shows a static image of its overview
  * (WebP + PNG fallback, lazy, fixed width / height), the stats from one constant, and links to
  * /presence. Also checks that no map code is on the homepage and that the homepage sections
- * alternate light / dark (no two dark sections next to each other).
+ * alternate between the two navy shades (tonal dark; no light sections).
  */
 
 import fs from 'fs';
@@ -60,20 +60,23 @@ if (process.env.BUILD_DIR) {
   assert(homeChunk && !/india-states-layer|INDIA_MAP_STATES|regionEdges|india-map-worked-fill/.test(code), `Home chunk (${homeChunk}) carries no map code`);
 }
 
-console.log('\n4. Light / dark rhythm');
+console.log('\n4. Tonal dark rhythm (navy-950 / navy-800, no light sections)');
 const sections = [...home.matchAll(/<(Hero|CompanyIntroduction|ServicesOverview|ProjectPreview|PresenceTeaser)\b|<section[\s\S]*?className="([^"]+)"/g)].map((m) => m[1] || 'EnquirySection');
-const darkOf = {
-  Hero: /from-navy-900 to-navy-950/.test(read('../src/sections/Hero.jsx')),
-  CompanyIntroduction: /from-navy-900|bg-navy-950/.test(read('../src/sections/CompanyIntroduction.jsx').split('\n').find((l) => l.includes('<section')) || ''),
-  ServicesOverview: /from-navy-900 to-navy-950/.test(read('../src/sections/ServicesOverview.jsx')),
-  ProjectPreview: /from-navy-900|bg-navy-950/.test(read('../src/sections/ProjectPreview.jsx').split('className=').slice(0, 3).join('')),
-  PresenceTeaser: /from-navy-900 to-navy-950/.test(teaser),
-  EnquirySection: /<section[\s\S]*?id="contact"[\s\S]*?className="[^"]*(from-navy-900|bg-navy-950)/.test(home),
+const sectionClass = (src) => (src.match(/<section[\s\S]*?className="([^"]+)"/) || ['', ''])[1];
+const shadeOf = (cls) => (/\bbg-navy-950\b/.test(cls) ? '950' : /\bbg-navy-800\b/.test(cls) ? '800' : `other(${cls.match(/\bbg-[\w-]+/)?.[0] || 'none'})`);
+const shades = {
+  Hero: shadeOf(sectionClass(read('../src/sections/Hero.jsx'))),
+  CompanyIntroduction: shadeOf(sectionClass(read('../src/sections/CompanyIntroduction.jsx'))),
+  ServicesOverview: shadeOf(sectionClass(read('../src/sections/ServicesOverview.jsx'))),
+  ProjectPreview: shadeOf(sectionClass(read('../src/sections/ProjectPreview.jsx'))),
+  PresenceTeaser: shadeOf(sectionClass(teaser)),
+  EnquirySection: shadeOf((home.match(/<section\s+id="contact"\s+className="([^"]+)"/) || ['', ''])[1]),
 };
-const order = sections.map((s) => (darkOf[s] ? 'dark' : 'light'));
-const adjacentDark = order.some((t, i) => t === 'dark' && order[i + 1] === 'dark');
-assert(sections.join(',') === 'Hero,CompanyIntroduction,ServicesOverview,ProjectPreview,PresenceTeaser,EnquirySection' && order.join(',') === 'dark,light,dark,light,dark,light' && !adjacentDark,
-  `Sections alternate (${sections.map((s, i) => `${s}:${order[i]}`).join(' ')}), then the dark footer`);
+const order = sections.map((name) => shades[name]);
+const footerShade = shadeOf((read('../src/components/layout/Footer.jsx').match(/<footer className="([^"]+)"/) || ['', ''])[1]);
+assert(sections.join(',') === 'Hero,CompanyIntroduction,ServicesOverview,ProjectPreview,PresenceTeaser,EnquirySection' && order.join(',') === '950,800,950,800,950,800' && footerShade === '950',
+  `Sections alternate navy-950 / navy-800 (${sections.map((n, i) => `${n}:${order[i]}`).join(' ')}), then the navy-950 footer`);
+assert(!/\bbg-(white|light|slate-50|slate-100)\b(?!\/)/.test(home + teaser + read('../src/sections/Hero.jsx') + read('../src/sections/CompanyIntroduction.jsx') + read('../src/sections/ServicesOverview.jsx') + read('../src/sections/ProjectPreview.jsx')), 'No white / light backgrounds on the homepage');
 
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);

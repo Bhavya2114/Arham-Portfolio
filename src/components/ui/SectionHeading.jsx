@@ -2,7 +2,8 @@ import React from 'react';
 
 /**
  * Reusable SectionHeading primitive for consistent title and subtitle hierarchy.
- * `tone`: 'light' (ink title, muted subtitle) or 'dark' (white title, muted-dark subtitle).
+ * Tonal dark theme: heading #EEF1F7, subtitle in body #B9C1D3 on both section shades (`tone` kept for
+ * compatibility).
  */
 export const SectionHeading = ({
   title,
@@ -15,7 +16,6 @@ export const SectionHeading = ({
   ...props
 }) => {
   const isCenter = align === 'center';
-  const isDark = tone === 'dark';
 
   return (
     <div
@@ -24,12 +24,12 @@ export const SectionHeading = ({
     >
       {badge && <div className="mb-1">{badge}</div>}
 
-      <HeadingTag className={`text-2xl sm:text-3xl font-bold font-heading tracking-tight ${isDark ? 'text-white' : 'text-ink'}`}>
+      <HeadingTag className={`text-2xl sm:text-3xl font-bold font-heading tracking-tight text-heading`}>
         {title}
       </HeadingTag>
 
       {subtitle && (
-        <p className={`text-sm sm:text-base leading-relaxed ${isDark ? 'text-muted-dark' : 'text-muted'} ${isCenter ? 'max-w-2xl' : 'max-w-3xl'}`}>
+        <p className={`text-base leading-[1.65] text-body ${isCenter ? 'max-w-2xl' : 'max-w-3xl'}`}>
           {subtitle}
         </p>
       )}

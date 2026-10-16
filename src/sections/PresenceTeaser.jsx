@@ -13,17 +13,17 @@ import { PRESENCE_TEASER_STATS, PRESENCE_OVERVIEW_IMAGE } from '../data/presence
 export const PresenceTeaser = () => (
   <section
     id="presence"
-    className="w-full py-16 sm:py-20 lg:py-24 border-t border-white/[0.08] bg-gradient-to-b from-navy-900 to-navy-950 text-white scroll-mt-20"
+    className="w-full py-16 sm:py-20 lg:py-24 border-t border-white/[0.08] bg-navy-950 text-white scroll-mt-20"
     aria-labelledby="presence-teaser-heading"
   >
     <Container size="default">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
         <div className="lg:col-span-6 space-y-6">
           <div className="space-y-3">
-            <h2 id="presence-teaser-heading" className="text-3xl sm:text-4xl font-bold font-heading text-white tracking-tight">
+            <h2 id="presence-teaser-heading" className="text-3xl sm:text-4xl font-bold font-heading text-heading tracking-tight">
               Our work across India
             </h2>
-            <p className="text-base sm:text-lg text-muted-dark leading-relaxed max-w-xl">
+            <p className="text-base sm:text-lg text-body leading-relaxed max-w-xl">
               Electrical wiring and lighting projects in cities across the country.
             </p>
           </div>

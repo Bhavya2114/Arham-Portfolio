@@ -60,7 +60,7 @@ export const ProjectPreview = () => {
   return (
     <section
       id="projects"
-      className="w-full py-16 sm:py-20 lg:py-24 border-t border-brand-border bg-white scroll-mt-20"
+      className="w-full py-16 sm:py-20 lg:py-24 border-t border-brand-border bg-navy-800 scroll-mt-20"
       aria-labelledby="projects-heading"
     >
       <Container size="default" className="space-y-12 sm:space-y-16">
@@ -89,14 +89,14 @@ export const ProjectPreview = () => {
                 key={item.id}
                 variant="default"
                 padding="none"
-                className="overflow-hidden border border-brand-border hover:border-olive/40 hover:shadow-elevated transition-all duration-200 flex flex-col group"
+                className="overflow-hidden border border-brand-border hover:border-accent/40 hover:shadow-elevated transition-all duration-200 flex flex-col group"
               >
                 {/* Visual Imagery Panel */}
-                <div className="relative w-full aspect-[16/10] bg-slate-100 overflow-hidden">
+                <div className="relative w-full aspect-[16/10] bg-white/[0.06] overflow-hidden">
                   <img
                     src={item.image}
                     alt={item.alt}
-                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                    className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300 rounded-xl border border-white/[0.08]"
                     loading="lazy"
                   />
                   
@@ -112,17 +112,17 @@ export const ProjectPreview = () => {
                 {/* Card Content */}
                 <div className="p-5 sm:p-6 space-y-3 flex-1 flex flex-col justify-between">
                   <div className="space-y-2">
-                    <h3 className="text-lg font-bold font-heading text-brand-navy leading-snug group-hover:text-olive transition-colors duration-150">
+                    <h3 className="text-lg font-bold font-heading text-brand-navy leading-snug group-hover:text-accent transition-colors duration-150">
                       {item.title}
                     </h3>
-                    <p className="text-sm text-brand-slate leading-relaxed">
+                    <p className="text-base text-brand-slate leading-[1.65]">
                       {item.description}
                     </p>
                   </div>
 
                   {/* Disclosure Tags */}
                   <div className="pt-3 border-t border-brand-border/60 flex items-center justify-between text-xs text-brand-slate">
-                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted">
                       <span className="w-1.5 h-1.5 rounded-full bg-slate-400" aria-hidden="true" />
                       {item.category}
                     </span>
@@ -137,13 +137,13 @@ export const ProjectPreview = () => {
         </div>
 
         {/* CTA Bar targeting Geographic Presence */}
-        <div className="p-6 sm:p-8 rounded-2xl bg-brand-bg border border-brand-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+        <div className="p-6 sm:p-8 rounded-2xl bg-navy-800 border border-brand-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="space-y-1.5 max-w-xl">
             <div className="inline-flex items-center gap-2 text-xs font-bold font-heading uppercase tracking-wider text-brand-navy">
-              <MapPin className="w-4 h-4 text-olive" aria-hidden="true" />
+              <MapPin className="w-4 h-4 text-accent" aria-hidden="true" />
               Geographic Project Locations
             </div>
-            <p className="text-sm text-brand-slate leading-relaxed">
+            <p className="text-base text-brand-slate leading-[1.65]">
               Explore planned geographic mapping and how regional project locations will be organized once company location data is confirmed.
             </p>
           </div>
@@ -173,7 +173,7 @@ export const ProjectPreview = () => {
         </div>
 
         {/* Informational Disclosure Footnote */}
-        <div className="p-4 rounded-xl bg-white border border-brand-border text-left">
+        <div className="p-4 rounded-xl bg-card border border-brand-border text-left">
           <p className="text-xs text-brand-slate leading-relaxed">
             <span className="font-semibold text-brand-navy">Project Documentation Notice:</span> The photographs presented above provide illustrative visual representations of broad electrical and lighting engineering domains. Specific completed client projects, technical parameters, and verified site records are published in the dedicated project gallery upon corporate verification.
           </p>

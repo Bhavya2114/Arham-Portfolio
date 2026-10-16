@@ -44,7 +44,7 @@ export const Contact = () => {
   );
 
   return (
-    <div className="w-full bg-brand-bg min-h-screen">
+    <div className="w-full bg-navy-800 min-h-screen">
       <PageHero breadcrumb="Contact">
         <header className="space-y-4 max-w-4xl">
           <SectionHeading
@@ -73,13 +73,13 @@ export const Contact = () => {
             <Card
               variant="default"
               padding="lg"
-              className="bg-white border border-brand-border shadow-subtle space-y-6 text-left"
+              className="bg-card border border-brand-border shadow-subtle space-y-6 text-left"
             >
               <div className="space-y-1 border-b border-brand-border pb-4">
                 <h2 className="text-lg sm:text-xl font-bold font-heading text-brand-navy">
                   Initiate a Project Consultation
                 </h2>
-                <p className="text-xs sm:text-sm text-brand-slate leading-relaxed">
+                <p className="text-base text-brand-slate leading-[1.65]">
                   Provide your technical requirements below. We review single-line diagrams, containment specifications, and project schedules.
                 </p>
               </div>
@@ -99,10 +99,10 @@ export const Contact = () => {
             <Card
               variant="default"
               padding="lg"
-              className="bg-white border border-brand-border space-y-5 text-left shadow-subtle"
+              className="bg-card border border-brand-border space-y-5 text-left shadow-subtle"
             >
               <div className="flex items-center gap-2 pb-3 border-b border-brand-border">
-                <Building2 className="w-4 h-4 text-olive" aria-hidden="true" />
+                <Building2 className="w-4 h-4 text-accent" aria-hidden="true" />
                 <h2 className="text-sm font-bold font-heading uppercase tracking-wider text-brand-navy">
                   Corporate Coordinates
                 </h2>
@@ -111,8 +111,8 @@ export const Contact = () => {
               <div className="space-y-4 text-xs">
                 
                 {/* Telephone */}
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-olive/15/70 text-olive flex items-center justify-center shrink-0 mt-0.5">
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-brand-border">
+                  <div className="w-8 h-8 rounded-lg bg-accent/15/70 text-accent flex items-center justify-center shrink-0 mt-0.5">
                     <Phone className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <div className="space-y-0.5">
@@ -120,12 +120,12 @@ export const Contact = () => {
                     {COMPANY_CONTACT.isPhoneConfigured ? (
                       <a 
                         href={`tel:${COMPANY_CONTACT.phone}`} 
-                        className="text-olive font-medium hover:underline text-xs"
+                        className="text-accent font-medium hover:underline text-xs"
                       >
                         {COMPANY_CONTACT.phone}
                       </a>
                     ) : (
-                      <span className="text-slate-500 italic block">
+                      <span className="text-muted italic block">
                         Awaiting management confirmation
                       </span>
                     )}
@@ -134,8 +134,8 @@ export const Contact = () => {
 
                 {/* WhatsApp */}
                 {COMPANY_CONTACT.isWhatsAppConfigured && (
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-brand-border">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-100/80 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-brand-border">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-400/15 text-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
                       <MessageCircle className="w-4 h-4" aria-hidden="true" />
                     </div>
                     <div className="space-y-0.5">
@@ -144,7 +144,7 @@ export const Contact = () => {
                         href={COMPANY_CONTACT.whatsappUrl} 
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-emerald-700 hover:text-emerald-800 font-medium hover:underline text-xs"
+                        className="inline-flex items-center gap-1.5 text-emerald-300 hover:text-emerald-200 font-medium hover:underline text-xs"
                         aria-label={`Open WhatsApp chat with Arham at ${COMPANY_CONTACT.whatsapp}`}
                       >
                         <span>{COMPANY_CONTACT.whatsapp}</span>
@@ -155,8 +155,8 @@ export const Contact = () => {
                 )}
 
                 {/* Email */}
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-olive/15/70 text-olive flex items-center justify-center shrink-0 mt-0.5">
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-brand-border">
+                  <div className="w-8 h-8 rounded-lg bg-accent/15/70 text-accent flex items-center justify-center shrink-0 mt-0.5">
                     <Mail className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <div className="space-y-0.5">
@@ -164,12 +164,12 @@ export const Contact = () => {
                     {COMPANY_CONTACT.hasEmail ? (
                       <a 
                         href={`mailto:${COMPANY_CONTACT.email}`} 
-                        className="text-olive font-medium hover:underline text-xs"
+                        className="text-accent font-medium hover:underline text-xs"
                       >
                         {COMPANY_CONTACT.email}
                       </a>
                     ) : (
-                      <span className="text-slate-500 italic block">
+                      <span className="text-muted italic block">
                         Awaiting management confirmation
                       </span>
                     )}
@@ -177,8 +177,8 @@ export const Contact = () => {
                 </div>
 
                 {/* Registered Office */}
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-olive/15/70 text-olive flex items-center justify-center shrink-0 mt-0.5">
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-brand-border">
+                  <div className="w-8 h-8 rounded-lg bg-accent/15/70 text-accent flex items-center justify-center shrink-0 mt-0.5">
                     <MapPin className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <div className="space-y-0.5">
@@ -188,7 +188,7 @@ export const Contact = () => {
                         {COMPANY_CONTACT.address}
                       </span>
                     ) : (
-                      <span className="text-slate-500 italic block">
+                      <span className="text-muted italic block">
                         Official address to be provided
                       </span>
                     )}
@@ -196,8 +196,8 @@ export const Contact = () => {
                 </div>
 
                 {/* Operational Hours */}
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-olive/15/70 text-olive flex items-center justify-center shrink-0 mt-0.5">
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-brand-border">
+                  <div className="w-8 h-8 rounded-lg bg-accent/15/70 text-accent flex items-center justify-center shrink-0 mt-0.5">
                     <Clock className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <div className="space-y-0.5">
@@ -207,7 +207,7 @@ export const Contact = () => {
                         {COMPANY_CONTACT.businessHours}
                       </span>
                     ) : (
-                      <span className="text-slate-500 italic block">
+                      <span className="text-muted italic block">
                         Standard business hours to be confirmed
                       </span>
                     )}
@@ -221,10 +221,10 @@ export const Contact = () => {
             <Card
               variant="default"
               padding="lg"
-              className="bg-white border border-brand-border space-y-4 text-left shadow-subtle"
+              className="bg-card border border-brand-border space-y-4 text-left shadow-subtle"
             >
               <div className="flex items-center gap-2 pb-2 border-b border-brand-border">
-                <FileText className="w-4 h-4 text-olive" aria-hidden="true" />
+                <FileText className="w-4 h-4 text-accent" aria-hidden="true" />
                 <h3 className="text-xs font-bold font-heading uppercase tracking-wider text-brand-navy">
                   Tender & RFP Submissions
                 </h3>
@@ -248,8 +248,8 @@ export const Contact = () => {
             </Card>
 
             {/* Confidentiality Notice */}
-            <div className="p-4 rounded-xl bg-olive/10 border border-olive/15 flex items-start gap-2.5 text-xs text-slate-600 text-left">
-              <ShieldCheck className="w-4 h-4 text-olive shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="p-4 rounded-xl bg-accent/10 border border-accent/15 flex items-start gap-2.5 text-xs text-body text-left">
+              <ShieldCheck className="w-4 h-4 text-accent shrink-0 mt-0.5" aria-hidden="true" />
               <p className="leading-relaxed">
                 <strong className="font-semibold text-brand-navy">Privacy Assurance:</strong> Arham does not distribute or sell commercial enquiry details. All shared drawings and project specifications remain protected under corporate nondisclosure principles.
               </p>

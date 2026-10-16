@@ -325,10 +325,10 @@ export const Presence = () => {
       </section>
 
       {/* Project showcase status + enquiry */}
-      <section className="border-t border-white/10" aria-labelledby="presence-projects-heading">
+      <section className="border-t border-white/10 bg-navy-800" aria-labelledby="presence-projects-heading">
         <Container size="default" className="py-10 sm:py-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="space-y-1.5 max-w-xl">
-            <h2 id="presence-projects-heading" className="text-lg font-bold font-heading text-white">
+            <h2 id="presence-projects-heading" className="text-lg font-bold font-heading text-heading">
               Project showcase
             </h2>
             <p className="text-sm text-slate-400 leading-relaxed">

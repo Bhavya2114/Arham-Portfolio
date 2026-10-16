@@ -56,7 +56,7 @@ export const ProjectDetail = () => {
   // Handle Project Not Found or Unpublished ID
   if (!project) {
     return (
-      <div className="w-full bg-gradient-to-b from-navy-900 to-navy-950 min-h-[70vh] py-16 flex items-center">
+      <div className="w-full bg-navy-800 min-h-[70vh] py-16 flex items-center">
         <Container size="default">
           <Card
             variant="dark"
@@ -71,10 +71,10 @@ export const ProjectDetail = () => {
               <Badge variant="neutral-dark" size="sm" className="mx-auto">
                 Record Status: Not Found or Unverified
               </Badge>
-              <h1 className="text-2xl sm:text-3xl font-bold font-heading text-white">
+              <h1 className="text-2xl sm:text-3xl font-bold font-heading text-heading">
                 Project Profile Not Available
               </h1>
-              <p className="text-sm text-muted-dark leading-relaxed max-w-lg mx-auto">
+              <p className="text-base text-muted-dark leading-[1.65] max-w-lg mx-auto">
                 The requested project identifier (<code className="bg-white/10 text-white px-1.5 py-0.5 rounded text-xs font-mono">{id || 'unknown'}</code>) does not correspond to an active, publicly released project record.
               </p>
               <p className="text-xs text-muted-dark max-w-md mx-auto italic">
@@ -139,7 +139,7 @@ export const ProjectDetail = () => {
   const currentImage = hasValidImages ? images[activeImageIdx] || images[0] : null;
 
   return (
-    <div className="w-full bg-brand-bg min-h-screen">
+    <div className="w-full bg-navy-800 min-h-screen">
       <PageHero>
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-muted-dark">
           <Link to="/" className="hover:text-accent transition-colors">Home</Link>
@@ -168,11 +168,11 @@ export const ProjectDetail = () => {
             </Badge>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading text-white tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading text-heading tracking-tight leading-tight">
             {name}
           </h1>
 
-          <p className="text-sm sm:text-base text-muted-dark leading-relaxed">
+          <p className="text-base text-muted-dark leading-[1.65]">
             Verified corporate installation record under Arham's {categoryConfig.label.toLowerCase()} discipline in {city}, {stateName}.
           </p>
         </header>
@@ -188,14 +188,14 @@ export const ProjectDetail = () => {
           <main className="lg:col-span-8 space-y-8" aria-label="Project Details">
             
             {/* Visual Showcase: Approved Photographs or Architectural Blueprint */}
-            <div className="bg-white rounded-2xl border border-brand-border overflow-hidden shadow-subtle">
+            <div className="bg-card rounded-2xl border border-brand-border overflow-hidden shadow-subtle">
               {hasValidImages ? (
                 <div className="space-y-3 p-4 sm:p-5">
-                  <div className="relative w-full aspect-[16/10] bg-slate-100 rounded-xl overflow-hidden border border-brand-border">
+                  <div className="relative w-full aspect-[16/10] bg-white/[0.06] rounded-xl overflow-hidden border border-brand-border">
                     <img
                       src={currentImage}
                       alt={`Site photograph of ${name}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover rounded-xl border border-white/[0.08]"
                       onError={() => setImageError(true)}
                     />
                   </div>
@@ -208,8 +208,8 @@ export const ProjectDetail = () => {
                           key={idx}
                           type="button"
                           onClick={() => setActiveImageIdx(idx)}
-                          className={`relative w-20 h-14 rounded-lg overflow-hidden border-2 transition-all shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-olive ${
-                            activeImageIdx === idx ? 'border-olive ring-1 ring-olive' : 'border-brand-border opacity-70 hover:opacity-100'
+                          className={`relative w-20 h-14 rounded-lg overflow-hidden border-2 transition-all shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
+                            activeImageIdx === idx ? 'border-accent ring-1 ring-accent' : 'border-brand-border opacity-70 hover:opacity-100'
                           }`}
                           aria-label={`View photo ${idx + 1}`}
                           aria-current={activeImageIdx === idx}
@@ -217,7 +217,7 @@ export const ProjectDetail = () => {
                           <img
                             src={imgUrl}
                             alt=""
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover rounded-xl border border-white/[0.08]"
                             onError={() => setImageError(true)}
                           />
                         </button>
@@ -226,7 +226,7 @@ export const ProjectDetail = () => {
                   )}
                 </div>
               ) : (
-                <div className="w-full h-64 sm:h-80 relative flex flex-col items-center justify-center p-6 text-center bg-gradient-to-br from-slate-50 to-slate-100 select-none">
+                <div className="w-full h-64 sm:h-80 relative flex flex-col items-center justify-center p-6 text-center bg-gradient-to-br from-card to-navy-800 select-none">
                   {/* Blueprint Grid pattern */}
                   <div 
                     className="absolute inset-0 opacity-[0.04] pointer-events-none"
@@ -235,13 +235,13 @@ export const ProjectDetail = () => {
                       backgroundSize: '16px 16px'
                     }}
                   />
-                  <div className="relative z-10 w-16 h-16 rounded-2xl bg-white shadow-subtle border border-brand-border flex items-center justify-center text-brand-navy mb-3">
-                    <CategoryIcon className="w-8 h-8 text-olive" />
+                  <div className="relative z-10 w-16 h-16 rounded-2xl bg-card shadow-subtle border border-brand-border flex items-center justify-center text-brand-navy mb-3">
+                    <CategoryIcon className="w-8 h-8 text-accent" />
                   </div>
                   <h2 className="relative z-10 text-base font-bold text-brand-navy font-heading">
                     {categoryConfig.label} Installation
                   </h2>
-                  <p className="relative z-10 text-xs text-slate-500 mt-1 max-w-sm">
+                  <p className="relative z-10 text-xs text-muted mt-1 max-w-sm">
                     Verified site engineering profile. Visual photographic documentation is archived under corporate records.
                   </p>
                 </div>
@@ -249,36 +249,36 @@ export const ProjectDetail = () => {
             </div>
 
             {/* Approved Project Description */}
-            <Card variant="default" padding="lg" className="bg-white border border-brand-border space-y-4">
+            <Card variant="default" padding="lg" className="bg-card border border-brand-border space-y-4">
               <div className="flex items-center gap-2 pb-3 border-b border-brand-border">
-                <FileText className="w-4 h-4 text-olive" aria-hidden="true" />
+                <FileText className="w-4 h-4 text-accent" aria-hidden="true" />
                 <h2 className="text-base font-bold font-heading text-brand-navy">
                   Approved Project Summary
                 </h2>
               </div>
-              <p className="text-sm sm:text-base text-brand-slate leading-relaxed whitespace-pre-line">
+              <p className="text-base text-brand-slate leading-[1.65] whitespace-pre-line">
                 {description}
               </p>
             </Card>
 
             {/* Approved Engineering Scope (Only shown when verified) */}
             {scope && (
-              <Card variant="default" padding="lg" className="bg-white border border-brand-border space-y-3">
+              <Card variant="default" padding="lg" className="bg-card border border-brand-border space-y-3">
                 <div className="flex items-center gap-2 pb-2 border-b border-brand-border">
-                  <CategoryIcon className="w-4 h-4 text-olive" aria-hidden="true" />
+                  <CategoryIcon className="w-4 h-4 text-accent" aria-hidden="true" />
                   <h2 className="text-base font-bold font-heading text-brand-navy">
                     Technical Scope & Execution
                   </h2>
                 </div>
-                <div className="p-4 rounded-xl bg-slate-50 border border-brand-border text-sm text-brand-navy font-medium">
+                <div className="p-4 rounded-xl bg-white/[0.04] border border-brand-border text-sm text-brand-navy font-medium">
                   {scope}
                 </div>
               </Card>
             )}
 
             {/* Confidentiality & Verification Disclosure */}
-            <div className="p-4 rounded-xl bg-olive/10 border border-olive/15 flex items-start gap-3 text-xs text-brand-slate">
-              <Info className="w-4 h-4 text-olive shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="p-4 rounded-xl bg-accent/10 border border-accent/15 flex items-start gap-3 text-xs text-brand-slate">
+              <Info className="w-4 h-4 text-accent shrink-0 mt-0.5" aria-hidden="true" />
               <div className="space-y-1">
                 <span className="font-semibold text-brand-navy block">
                   Confidentiality & Public Release Policy:
@@ -295,64 +295,64 @@ export const ProjectDetail = () => {
           <aside className="lg:col-span-4 space-y-6" aria-label="Project Specifications">
             
             {/* Verified Specifications Card */}
-            <Card variant="default" padding="lg" className="bg-white border border-brand-border space-y-5">
+            <Card variant="default" padding="lg" className="bg-card border border-brand-border space-y-5">
               <div className="flex items-center gap-2 pb-3 border-b border-brand-border">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" aria-hidden="true" />
+                <ShieldCheck className="w-4 h-4 text-emerald-300" aria-hidden="true" />
                 <h2 className="text-sm font-bold font-heading uppercase tracking-wider text-brand-navy">
                   Verified Specifications
                 </h2>
               </div>
 
               <dl className="space-y-3.5 text-xs">
-                <div className="flex items-start justify-between py-1 border-b border-slate-100">
-                  <dt className="text-slate-500 font-medium">Project Record ID</dt>
+                <div className="flex items-start justify-between py-1 border-b border-white/[0.07]">
+                  <dt className="text-muted font-medium">Project Record ID</dt>
                   <dd className="font-mono font-semibold text-brand-navy">{id}</dd>
                 </div>
 
-                <div className="flex items-start justify-between py-1 border-b border-slate-100">
-                  <dt className="text-slate-500 font-medium">Engineering Category</dt>
+                <div className="flex items-start justify-between py-1 border-b border-white/[0.07]">
+                  <dt className="text-muted font-medium">Engineering Category</dt>
                   <dd className="font-semibold text-brand-navy text-right">{categoryConfig.label}</dd>
                 </div>
 
-                <div className="flex items-start justify-between py-1 border-b border-slate-100">
-                  <dt className="text-slate-500 font-medium">Municipality / City</dt>
+                <div className="flex items-start justify-between py-1 border-b border-white/[0.07]">
+                  <dt className="text-muted font-medium">Municipality / City</dt>
                   <dd className="font-semibold text-brand-navy text-right">{city}</dd>
                 </div>
 
-                <div className="flex items-start justify-between py-1 border-b border-slate-100">
-                  <dt className="text-slate-500 font-medium">Administrative State</dt>
+                <div className="flex items-start justify-between py-1 border-b border-white/[0.07]">
+                  <dt className="text-muted font-medium">Administrative State</dt>
                   <dd className="font-semibold text-brand-navy text-right">{stateName}</dd>
                 </div>
 
-                <div className="flex items-start justify-between py-1 border-b border-slate-100">
-                  <dt className="text-slate-500 font-medium">State Code</dt>
-                  <dd className="font-mono text-slate-600">{stateCode}</dd>
+                <div className="flex items-start justify-between py-1 border-b border-white/[0.07]">
+                  <dt className="text-muted font-medium">State Code</dt>
+                  <dd className="font-mono text-body">{stateCode}</dd>
                 </div>
 
                 {completionYear && (
-                  <div className="flex items-start justify-between py-1 border-b border-slate-100">
-                    <dt className="text-slate-500 font-medium">Completion Year</dt>
+                  <div className="flex items-start justify-between py-1 border-b border-white/[0.07]">
+                    <dt className="text-muted font-medium">Completion Year</dt>
                     <dd className="font-semibold text-brand-navy">{completionYear}</dd>
                   </div>
                 )}
 
-                <div className="flex items-start justify-between py-1 border-b border-slate-100">
-                  <dt className="text-slate-500 font-medium">Lifecycle Status</dt>
-                  <dd className="inline-flex items-center gap-1 font-semibold text-emerald-600">
+                <div className="flex items-start justify-between py-1 border-b border-white/[0.07]">
+                  <dt className="text-muted font-medium">Lifecycle Status</dt>
+                  <dd className="inline-flex items-center gap-1 font-semibold text-emerald-300">
                     <CheckCircle2 className="w-3 h-3" />
                     Published
                   </dd>
                 </div>
 
                 <div className="flex items-start justify-between py-1">
-                  <dt className="text-slate-500 font-medium">Verification Status</dt>
-                  <dd className="text-slate-600">Authenticated</dd>
+                  <dt className="text-muted font-medium">Verification Status</dt>
+                  <dd className="text-body">Authenticated</dd>
                 </div>
               </dl>
             </Card>
 
             {/* Quick Actions & Navigation Card */}
-            <Card variant="default" padding="lg" className="bg-white border border-brand-border space-y-4">
+            <Card variant="default" padding="lg" className="bg-card border border-brand-border space-y-4">
               <h2 className="text-sm font-bold font-heading uppercase tracking-wider text-brand-navy">
                 Explore More Work
               </h2>

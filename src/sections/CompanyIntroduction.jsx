@@ -20,7 +20,7 @@ import {
  */
 export const CompanyIntroduction = () => {
   return (
-    <section id="about" className="w-full py-16 sm:py-20 lg:py-24 border-t border-brand-border bg-white scroll-mt-20">
+    <section id="about" className="w-full py-16 sm:py-20 lg:py-24 border-t border-brand-border bg-navy-800 scroll-mt-20">
       <Container size="default" className="space-y-12 sm:space-y-16">
         
         {/* Two-Column Company Overview Grid */}
@@ -42,12 +42,12 @@ export const CompanyIntroduction = () => {
             </h2>
 
             {/* Core Business Description Paragraph */}
-            <p className="text-base text-brand-navy/90 leading-relaxed">
+            <p className="text-base text-brand-navy/90 leading-[1.65]">
               Arham is a specialized contracting firm delivering comprehensive electrical engineering, heavy-duty industrial wiring, power distribution networks, and architectural lighting solutions. We collaborate with commercial enterprises, manufacturing facilities, and infrastructure contractors to execute resilient, code-compliant electrical installations.
             </p>
 
             {/* Secondary Paragraph: Operational Reliability Context */}
-            <p className="text-sm sm:text-base text-brand-slate leading-relaxed">
+            <p className="text-base text-brand-slate leading-[1.65]">
               In modern built environments, dependable electrical systems constitute the essential foundation for operational continuity, workplace safety, and energy performance. Paired with deliberate, high-efficiency illumination design, our installations ensure enduring utility while enhancing architectural presence.
             </p>
 
@@ -77,14 +77,14 @@ export const CompanyIntroduction = () => {
 
           {/* Right Column: Visual Composition (5 cols on large screens) */}
           <div className="lg:col-span-5 w-full">
-            <div className="relative rounded-2xl bg-brand-bg p-2 sm:p-2.5 border border-brand-border shadow-card">
+            <div className="relative rounded-2xl bg-navy-800 p-2 sm:p-2.5 border border-brand-border shadow-card">
               
               {/* Technical Imagery Frame */}
-              <div className="relative w-full aspect-[4/3] sm:aspect-[16/11] lg:aspect-[4/3] rounded-xl overflow-hidden bg-slate-100">
+              <div className="relative w-full aspect-[4/3] sm:aspect-[16/11] lg:aspect-[4/3] rounded-xl overflow-hidden bg-white/[0.06]">
                 <img
                   src="/images/about-engineering.jpg"
                   alt="Industrial power distribution control room and cable management infrastructure"
-                  className="w-full h-full object-cover object-center"
+                  className="w-full h-full object-cover object-center rounded-xl border border-white/[0.08]"
                   loading="lazy"
                 />
 
@@ -124,13 +124,13 @@ export const CompanyIntroduction = () => {
             
             {/* Highlight 1: Electrical Infrastructure & Wiring */}
             <Card variant="muted" padding="md" className="space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-olive/15 text-olive flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-accent/15 text-accent flex items-center justify-center">
                 <Cable className="w-5 h-5" aria-hidden="true" />
               </div>
               <h4 className="text-base font-bold text-brand-navy font-heading">
                 Electrical Infrastructure & Wiring
               </h4>
-              <p className="text-xs sm:text-sm text-brand-slate leading-relaxed">
+              <p className="text-base text-brand-slate leading-[1.65]">
                 Turnkey execution of industrial raceways, structured cable trays, conduits, and heavy-duty wiring networks engineered for sustained mechanical and thermal durability.
               </p>
               <div className="pt-1 text-[11px] font-mono text-muted">
@@ -140,13 +140,13 @@ export const CompanyIntroduction = () => {
 
             {/* Highlight 2: Power Distribution & Engineering Systems */}
             <Card variant="muted" padding="md" className="space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-olive/15 text-olive flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-accent/15 text-accent flex items-center justify-center">
                 <Cpu className="w-5 h-5" aria-hidden="true" />
               </div>
               <h4 className="text-base font-bold text-brand-navy font-heading">
                 Power Distribution & Engineering Systems
               </h4>
-              <p className="text-xs sm:text-sm text-brand-slate leading-relaxed">
+              <p className="text-base text-brand-slate leading-[1.65]">
                 Installation, busbar trunking, panel erection, and termination for main switchboards, distribution boards, and motor control centers (MCC).
               </p>
               <div className="pt-1 text-[11px] font-mono text-muted">
@@ -156,13 +156,13 @@ export const CompanyIntroduction = () => {
 
             {/* Highlight 3: Architectural & Commercial Lighting */}
             <Card variant="muted" padding="md" className="space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-100 text-amber-800 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-amber-400/15 text-amber-200 flex items-center justify-center">
                 <Lightbulb className="w-5 h-5" aria-hidden="true" />
               </div>
               <h4 className="text-base font-bold text-brand-navy font-heading">
                 Architectural & Commercial Lighting
               </h4>
-              <p className="text-xs sm:text-sm text-brand-slate leading-relaxed">
+              <p className="text-base text-brand-slate leading-[1.65]">
                 Tailored illumination solutions including exterior building facade highlights, energy-efficient commercial layouts, and industrial high-bay lighting.
               </p>
               <div className="pt-1 text-[11px] font-mono text-muted">

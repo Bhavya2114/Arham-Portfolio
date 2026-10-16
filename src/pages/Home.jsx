@@ -45,7 +45,7 @@ export const Home = () => {
       {/* 6. Commercial Enquiry Section (Phase 7) */}
       <section 
         id="contact" 
-        className="w-full py-16 sm:py-20 border-t border-brand-border bg-light text-ink scroll-mt-20"
+        className="w-full py-16 sm:py-20 border-t border-brand-border bg-navy-800 text-body scroll-mt-20"
         aria-labelledby="home-contact-heading"
       >
         <Container size="default" className="space-y-10">
@@ -58,12 +58,12 @@ export const Home = () => {
             <h2 id="home-contact-heading" className="text-2xl sm:text-3xl md:text-4xl font-bold font-heading text-ink tracking-tight">
               Ready to Discuss Your Project Requirements?
             </h2>
-            <p className="text-sm sm:text-base text-muted leading-relaxed">
+            <p className="text-base text-muted leading-[1.65]">
               Connect with our electrical engineering and lighting team to discuss facility drawings, power distribution requirements, or tender specifications.
             </p>
           </div>
 
-          <div className="max-w-3xl mx-auto bg-white rounded-2xl border border-brand-border p-6 sm:p-8 lg:p-10 text-ink shadow-card">
+          <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-brand-border p-6 sm:p-8 lg:p-10 text-ink shadow-card">
             <EnquiryForm idPrefix="home-contact" />
           </div>
 

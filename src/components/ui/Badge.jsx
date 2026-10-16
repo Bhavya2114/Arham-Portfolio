@@ -11,20 +11,20 @@ export const Badge = ({
   icon: Icon,
 }) => {
   const variantStyles = {
-    // One accent: an olive tint on light backgrounds (olive text is AA on it). `blue` = legacy alias.
-    accent: 'bg-olive/10 text-olive border-olive/25',
-    blue: 'bg-olive/10 text-olive border-olive/25',
+    // Tonal dark theme: accent yellow text on a faint yellow tint. `blue` = legacy alias.
+    accent: 'bg-accent/10 text-accent border-accent/30',
+    blue: 'bg-accent/10 text-accent border-accent/30',
     // On dark backgrounds: accent yellow text on a faint yellow tint.
     'accent-dark': 'bg-accent/10 text-accent border-accent/30',
     // Quiet label on dark backgrounds (not an accent: yellow is kept for important / clickable).
     'neutral-dark': 'bg-white/5 text-muted-dark border-white/10',
-    navy: 'bg-slate-100 text-brand-navy border-slate-300',
-    amber: 'bg-amber-50 text-amber-800 border-amber-200',
-    slate: 'bg-slate-50 text-brand-slate border-slate-200',
-    success: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-    warning: 'bg-amber-50 text-amber-800 border-amber-200',
-    error: 'bg-rose-50 text-rose-800 border-rose-200',
-    neutral: 'bg-white text-brand-slate border-brand-border',
+    navy: 'bg-white/5 text-body border-white/10',
+    amber: 'bg-amber-400/10 text-amber-200 border-amber-400/30',
+    slate: 'bg-white/5 text-body border-white/10',
+    success: 'bg-emerald-400/10 text-emerald-200 border-emerald-400/30',
+    warning: 'bg-amber-400/10 text-amber-200 border-amber-400/30',
+    error: 'bg-rose-500/10 text-rose-200 border-rose-400/30',
+    neutral: 'bg-white/5 text-body border-white/10',
   };
 
   const sizeStyles = {

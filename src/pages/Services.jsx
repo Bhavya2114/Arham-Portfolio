@@ -124,7 +124,7 @@ export const Services = () => {
   ];
 
   return (
-    <div className="w-full bg-brand-bg min-h-screen">
+    <div className="w-full bg-navy-800 min-h-screen">
       <PageHero breadcrumb="Services">
         <header className="space-y-4 max-w-4xl">
           <SectionHeading
@@ -155,7 +155,7 @@ export const Services = () => {
               <section
                 key={service.id}
                 id={service.id}
-                className="bg-white rounded-2xl border border-brand-border p-6 sm:p-8 lg:p-10 shadow-subtle scroll-mt-24 space-y-8"
+                className="bg-card rounded-2xl border border-brand-border p-6 sm:p-8 lg:p-10 shadow-subtle scroll-mt-24 space-y-8"
                 aria-labelledby={`service-heading-${service.id}`}
               >
                 <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center ${isReversed ? 'lg:flex-row-reverse' : ''}`}>
@@ -175,7 +175,7 @@ export const Services = () => {
                       {service.title}
                     </h2>
 
-                    <p className="text-sm sm:text-base text-brand-slate leading-relaxed">
+                    <p className="text-base text-brand-slate leading-[1.65]">
                       {service.summary}
                     </p>
 
@@ -187,7 +187,7 @@ export const Services = () => {
                       <ul className="space-y-2 text-xs sm:text-sm text-brand-slate">
                         {service.activities.map((act, aIdx) => (
                           <li key={aIdx} className="flex items-start gap-2.5">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" aria-hidden="true" />
+                            <CheckCircle2 className="w-4 h-4 text-emerald-300 shrink-0 mt-0.5" aria-hidden="true" />
                             <span className="leading-relaxed">{act}</span>
                           </li>
                         ))}
@@ -222,12 +222,12 @@ export const Services = () => {
 
                   {/* Illustrative Technical Imagery Panel (5 cols) */}
                   <div className={`lg:col-span-5 w-full ${isReversed ? 'lg:order-1' : 'lg:order-2'}`}>
-                    <div className="rounded-2xl bg-brand-bg p-2.5 border border-brand-border shadow-card space-y-2">
-                      <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-100">
+                    <div className="rounded-2xl bg-navy-800 p-2.5 border border-brand-border shadow-card space-y-2">
+                      <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-white/[0.06]">
                         <img
                           src={service.image}
                           alt={service.alt}
-                          className="w-full h-full object-cover object-center"
+                          className="w-full h-full object-cover object-center rounded-xl border border-white/[0.08]"
                           loading="lazy"
                         />
                         <div className="absolute top-3 left-3">
@@ -270,15 +270,15 @@ export const Services = () => {
                   key={idx}
                   variant="default"
                   padding="lg"
-                  className="bg-white border border-brand-border space-y-3"
+                  className="bg-card border border-brand-border space-y-3"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-olive/10 border border-olive/15 flex items-center justify-center text-olive">
+                  <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/15 flex items-center justify-center text-accent">
                     <Icon className="w-5 h-5" aria-hidden="true" />
                   </div>
                   <h3 className="text-base font-bold font-heading text-brand-navy">
                     {principle.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-brand-slate leading-relaxed">
+                  <p className="text-base text-brand-slate leading-[1.65]">
                     {principle.description}
                   </p>
                 </Card>
@@ -288,7 +288,7 @@ export const Services = () => {
         </section>
 
         {/* 4. Scope Confirmation Notice */}
-        <div className="p-4 rounded-xl bg-white border border-brand-border text-left">
+        <div className="p-4 rounded-xl bg-card border border-brand-border text-left">
           <p className="text-xs text-brand-slate leading-relaxed">
             <span className="font-semibold text-brand-navy">Service Scope Notice:</span> The engineering disciplines and work scopes outlined above represent provisional business domains. Specific load ratings, single-line diagrams, voltage limits, and equipment specifications are determined on a per-project basis according to signed client contracts and municipal authority guidelines.
           </p>
@@ -296,7 +296,7 @@ export const Services = () => {
 
         {/* 5. Bottom Callout Banner */}
         <section 
-          className="rounded-2xl bg-gradient-to-br from-navy-900 to-navy-950 border border-white/[0.08] text-white p-6 sm:p-8 lg:p-10 shadow-elevated"
+          className="rounded-2xl bg-card border border-white/[0.07] text-white p-6 sm:p-8 lg:p-10 shadow-elevated"
           aria-labelledby="services-cta-heading"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -304,10 +304,10 @@ export const Services = () => {
               <Badge variant="neutral-dark" icon={PhoneCall}>
                 Project Consultations
               </Badge>
-              <h2 id="services-cta-heading" className="text-xl sm:text-2xl font-bold font-heading text-white">
+              <h2 id="services-cta-heading" className="text-xl sm:text-2xl font-bold font-heading text-heading">
                 Discuss Your Facility's Electrical Requirements
               </h2>
-              <p className="text-sm text-muted-dark leading-relaxed max-w-2xl">
+              <p className="text-base text-body leading-[1.65] max-w-2xl">
                 Whether planning power distribution switchgear, structured cable tray containment, or commercial architectural lighting, our engineering team is ready to review project drawings and specifications.
               </p>
             </div>
