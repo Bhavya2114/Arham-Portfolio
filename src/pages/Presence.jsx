@@ -5,7 +5,6 @@ import Button from '../components/ui/Button';
 import PresenceMap, { PAGE_NAVY } from '../components/map/PresenceMap';
 import BottomSheet, { PEEK_HEIGHT } from '../components/presence/BottomSheet';
 import CampusCard from '../components/presence/CampusCard';
-import { StateStatus } from '../components/presence/CityStatus';
 import { ProjectDetails, ProjectChooser, CityProjectList } from '../components/presence/ProjectDetails';
 import { getPresenceStateCodes, getPresenceState } from '../data/presenceCoverage.js';
 import {
@@ -284,7 +283,6 @@ export const Presence = () => {
                   if (showcaseId) showShowcaseProject(showcaseId);
                   else dispatch({ type: 'showCluster', projectIds });
                 }}
-                footer={selectedState && !selectedCity ? <StateStatus stateName={selectedState.name} cityCount={selectedState.cities.length} /> : null}
                 overlay={
                   projectCardOnly && cardProject ? (
                     <CampusCard

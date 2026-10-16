@@ -88,10 +88,16 @@ const fade = (mapSrc.match(/const EDGE_FADE = \[([\s\S]*?)\]\.join/) || [])[1] |
 assert((fade.match(/linear-gradient\(to (bottom|top|right|left), \$\{PAGE_NAVY\}, transparent\)/g) || []).length === 4 && /<div className="absolute inset-0 z-10 pointer-events-none" style=\{\{ background: EDGE_FADE \}\} aria-hidden="true" data-layer="edge-fade" \/>/.test(mapSrc), 'Edges hidden by one pointer-events-none overlay: four plain linear gradients, page navy → transparent');
 assert(/margin: 'calc\(-1 \* var\(--map-fade\)\)',\s*padding: 'var\(--map-fade\)',/.test(mapSrc) && /overflow-visible/.test(mapSrc), 'Fade band sits outside the content area, so the map itself is never faded (svg spills into it when zoomed)');
 assert(/style=\{\{ inset: 'var\(--map-fade\)' \}\} data-map-frame/.test(mapSrc) && /const w = \(card\.offsetParent \|\| wrapper\)\.getBoundingClientRect\(\);/.test(mapSrc), 'Card and scale bar anchored to the map content area (card offsets measured against it)');
-assert(/<div className="relative z-20 mb-2 flex/.test(mapSrc) && /<div className="relative z-20 mt-3 space-y-1\.5 text-center">/.test(mapSrc), 'State chip above and legend below float on the page background');
+assert(/<div className="relative z-20 mb-2 flex/.test(mapSrc) && !/mt-3 space-y-1\.5 text-center/.test(mapSrc), 'State chip above the map; no text under it');
 assert(!/Map legend|Worked locations|Other states|Selected city|Project site/.test(mapSrc) && !/<ul/.test(mapCode), 'Legend row and its code removed');
-assert(/\{isZoomed && \(\s*<p className="inline-flex items-center gap-1\.5 text-\[11px\] text-slate-500">[\s\S]*?Drag to pan · pinch to zoom/.test(mapSrc), 'Pan hint kept while zoomed');
-assert(/<p className="text-\[11px\] text-slate-500">\s*City locations ©/.test(mapSrc) && /href="https:\/\/www\.openstreetmap\.org\/copyright"/.test(mapSrc) && (mapSrc.match(/href="https:\/\/www\.geoboundaries\.org\/"/g) || []).length === 2, 'Attribution (OpenStreetMap / geoBoundaries) kept as small, low-contrast text');
+assert(!/Drag to pan/.test(mapSrc), 'No "Drag to pan · pinch to zoom" hint');
+const creditsSrc = read('../src/components/map/MapCredits.jsx');
+assert(/City locations ©/.test(creditsSrc) && /href="https:\/\/www\.openstreetmap\.org\/copyright"/.test(creditsSrc) && /href="https:\/\/www\.geoboundaries\.org\/"/.test(creditsSrc) && /\/ LGD \(ODbL\)/.test(creditsSrc) && /\(ODbL\) and Wikipedia/.test(creditsSrc), 'Credits kept, with the same links, in the "Map data" popover');
+assert(/className="absolute right-0 top-0 z-30 flex flex-col items-end pointer-events-auto"/.test(creditsSrc) && /<MapCredits cities=/.test(mapSrc), '"ⓘ Map data" in the top-right corner of the map area (never over the bottom-anchored card)');
+assert(/inline-flex h-11 min-w-\[44px\] items-center justify-center gap-1 rounded-md px-2 text-\[11px\] text-slate-500/.test(creditsSrc) && /<Info className="h-3 w-3" aria-hidden="true" \/>\s*Map data/.test(creditsSrc), 'Tiny (11 px), low-contrast grey button with a 44 px tap target');
+assert(/onClick=\{\(\) => setOpen\(\(v\) => !v\)\}/.test(creditsSrc) && /aria-expanded=\{open\}/.test(creditsSrc), 'Tap toggles the popover (a second tap closes it)');
+assert(/window\.addEventListener\('keydown', onKey, true\);/.test(creditsSrc) && /e\.key !== 'Escape'/.test(creditsSrc) && /e\.stopPropagation\(\);\s*setOpen\(false\);/.test(creditsSrc), 'Escape closes it (and only it)');
+assert(/document\.addEventListener\('pointerdown', onPointerDown, true\);/.test(creditsSrc) && /if \(!rootRef\.current\?\.contains\(e\.target\)\) setOpen\(false\);/.test(creditsSrc), 'A tap outside closes it');
 
 console.log('\n2e. Quiet islands');
 assert(/const ISLAND_IDS = new Set\(\['IN-LD', 'IN-AN'\]\);/.test(svgSrc) && /const ISLAND_LINE = \{ width: 0\.8, opacity: 0\.3 \};/.test(svgSrc), 'Lakshadweep and Andaman & Nicobar: faint cyan outline, 0.8 px at 30 %');

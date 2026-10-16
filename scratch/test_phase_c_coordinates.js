@@ -130,8 +130,9 @@ const consumers = srcFiles
 assert(consumers.join(',') === 'pages/Presence.jsx', `Only pages/Presence.jsx reads cityCoordinates.js (got ${consumers.join(', ')})`);
 const read = (rel) => fs.readFileSync(path.resolve(__dirname, rel), 'utf-8');
 const mapSrc = read('../src/components/map/PresenceMap.jsx');
-assert(mapSrc.includes('https://www.openstreetmap.org/copyright') && mapSrc.includes('OpenStreetMap contributors'), 'Map shows OpenStreetMap attribution');
-assert(/markers\.length > 0 && \(\s*<p/.test(mapSrc), 'Attribution is shown whenever markers are visible');
+const creditsSrc = read('../src/components/map/MapCredits.jsx');
+assert(creditsSrc.includes('https://www.openstreetmap.org/copyright') && creditsSrc.includes('OpenStreetMap contributors'), 'Map shows OpenStreetMap attribution (Map data popover)');
+assert(/<MapCredits cities=\{markers\.length > 0\}/.test(mapSrc) && /if \(!cities && !districts\) return null;/.test(creditsSrc), 'Attribution is available whenever markers are visible');
 
 console.log('\n4. Phase C Marker Wiring:');
 // Mirrors the marker derivation in Presence.jsx

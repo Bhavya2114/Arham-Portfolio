@@ -84,7 +84,7 @@ const cities = getPresenceStateCodes().flatMap((s) => getPresenceState(s).cities
 assert(cities.every(([s, c]) => data.getShowcaseProjectsForCity(s, c).every((p) => (p.city === c && p.stateCode === s) || p.placeholder)), 'A city shows only its own projects, or the placeholders');
 assert(/const index = Math\.max\(0, locations\.findIndex\(\(p\) => p\.id === currentId\)\);/.test(cardSrc) && /currentId=\{cardProject\.id\}/.test(pageSrc) && /onChange=\{setCardProjectId\}/.test(pageSrc), 'Card is controlled by the page (shown project known to the map)');
 assert(/cityBeacon=\{!highlightedProjectId\}/.test(pageSrc) && /data-project-beacon=""/.test(mapSrc) && /if \(showShowcaseProject\(projectId\)\) return;/.test(pageSrc), 'Card <-> map: the shown project\'s pin (or the city pin) is highlighted; a pin tap switches the card');
-assert(/footer=\{selectedState && !selectedCity \? <StateStatus/.test(pageSrc) && /data-state-hint=""/.test(statusSrc) && !/rounded-xl border/.test(statusSrc), 'Plain-text hint kept (state selected, no city)');
+assert(!/StateStatus|footer=|Select a city marker/.test(pageSrc), 'No "Select a city marker…" hint under the map');
 
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
-import { MousePointerClick, Move } from 'lucide-react';
+import { MousePointerClick } from 'lucide-react';
 import IndiaMapSvg, { MAP_COLORS } from './IndiaMapSvg';
+import MapCredits from './MapCredits';
 import { startOverlayEntrance, OVERLAY_ENTER } from '../../lib/overlayEntrance.js';
 import { isMapBackgroundTap } from '../../lib/mapBackgroundTap.js';
 import { createSettleQueue } from '../../lib/viewSettle.js';
@@ -748,8 +749,10 @@ export const PresenceMap = ({
 
         <div className="absolute inset-0 z-10 pointer-events-none" style={{ background: EDGE_FADE }} aria-hidden="true" data-layer="edge-fade" />
 
-        {/* Content frame (the map area without the fade band): the scale bar and the card anchor here. */}
+        {/* Content frame (the map area without the fade band): the scale bar, the card and the map-data
+            credits anchor here. */}
         <div className="absolute z-20 pointer-events-none" style={{ inset: 'var(--map-fade)' }} data-map-frame="">
+          <MapCredits cities={markers.length > 0} districts={geography?.districts?.length > 0} />
           {scaleBar && !overlay && (
             <div className="absolute bottom-2 left-2 z-10 rounded-md bg-brand-navy-dark/80 px-2 py-1 text-[10px] text-slate-300 pointer-events-none" aria-hidden="true">
               <div className="h-1.5 border-x border-b border-slate-300" style={{ width: scaleBar.px }} />
@@ -776,59 +779,6 @@ export const PresenceMap = ({
       </div>
 
       {footer && <div className="relative z-20 mt-3">{footer}</div>}
-
-      {/* Pan hint and data attribution (required by the licences): small, low-contrast text floating
-          on the page background, above the map's fade band. No legend. */}
-      <div className="relative z-20 mt-3 space-y-1.5 text-center">
-        {isZoomed && (
-          <p className="inline-flex items-center gap-1.5 text-[11px] text-slate-500">
-            <Move className="w-3 h-3" aria-hidden="true" />
-            Drag to pan · pinch to zoom
-          </p>
-        )}
-        {markers.length > 0 && (
-          <p className="text-[11px] text-slate-500">
-            City locations ©{' '}
-            <a
-              href="https://www.openstreetmap.org/copyright"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline decoration-slate-600 underline-offset-2 hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent rounded"
-            >
-              OpenStreetMap contributors
-            </a>{' '}
-            (ODbL) and Wikipedia
-            {geography?.districts?.length > 0 && (
-              <>
-                {' · '}District boundaries:{' '}
-                <a
-                  href="https://www.geoboundaries.org/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline decoration-slate-600 underline-offset-2 hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent rounded"
-                >
-                  geoBoundaries
-                </a>{' '}
-                / LGD (ODbL)
-              </>
-            )}
-          </p>
-        )}
-        {markers.length === 0 && geography?.districts?.length > 0 && (
-          <p className="text-[11px] text-slate-500">
-            District boundaries:{' '}
-            <a
-              href="https://www.geoboundaries.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline decoration-slate-600 underline-offset-2 hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent rounded"
-            >
-              geoBoundaries
-            </a>{' '}
-            / LGD (ODbL)
-          </p>
-        )}
-      </div>
     </div>
   );
 };

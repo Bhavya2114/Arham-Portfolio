@@ -178,9 +178,10 @@ assert(!mapSrc.includes('data-city-area') && !mapSrc.includes('data-layer="city-
 assert(!/CITY_VIEW|CITY_AREA_PADDING|cityBBoxKey|focusPoint/.test(mapSrc), 'Map has no city zoom / city-fit logic');
 assert(!pageSrc.includes('focusPoint') && !pageSrc.includes('cityArea'), 'Page passes no city focus or city area to the map');
 assert(!/BOUNDARY_NOTES|boundaryStatus/.test(statusSrc + pageSrc), 'No city-boundary notes remain in the UI');
-assert(mapSrc.includes('geoBoundaries') && mapSrc.includes('OpenStreetMap contributors'), 'District and city-area attribution shown');
+const creditsSrc = read('../src/components/map/MapCredits.jsx');
+assert(creditsSrc.includes('geoBoundaries') && creditsSrc.includes('OpenStreetMap contributors') && /<MapCredits cities=\{markers\.length > 0\} districts=\{geography\?\.districts\?\.length > 0\} \/>/.test(mapSrc), 'District and city-area attribution available (Map data popover)');
 assert(!mapSrc.includes('data-credit="city-area"'), 'No city-area credit line (no city-area data is displayed)');
-assert(/City locations ©/.test(mapSrc), 'OSM credit refers to city locations only');
+assert(/City locations ©/.test(creditsSrc), 'OSM credit refers to city locations only');
 assert(read('../src/data/geo/SOURCES.md').includes('ShareAlike notice: `states/IN-GJ.js`'), 'SOURCES.md documents the Gujarat ShareAlike licence');
 assert(pageSrc.includes('loadStateGeography(nav.stateCode)') && pageSrc.includes("status: 'error'"), 'Page lazy-loads geography and tolerates load failure');
 const mapSvgSrc = read('../src/components/map/IndiaMapSvg.jsx');
