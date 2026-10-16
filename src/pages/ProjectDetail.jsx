@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Container from '../components/ui/Container';
+import PageHero from '../components/ui/PageHero';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
@@ -55,28 +56,28 @@ export const ProjectDetail = () => {
   // Handle Project Not Found or Unpublished ID
   if (!project) {
     return (
-      <div className="w-full bg-brand-bg min-h-[70vh] py-16 flex items-center">
+      <div className="w-full bg-gradient-to-b from-navy-900 to-navy-950 min-h-[70vh] py-16 flex items-center">
         <Container size="default">
           <Card
-            variant="default"
+            variant="dark"
             padding="lg"
-            className="max-w-2xl mx-auto text-center bg-white border border-brand-border py-12 px-6 sm:px-10 space-y-6 shadow-subtle"
+            className="max-w-2xl mx-auto text-center py-12 px-6 sm:px-10 space-y-6"
           >
-            <div className="w-16 h-16 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 mx-auto">
-              <AlertCircle className="w-8 h-8 text-amber-600" aria-hidden="true" />
+            <div className="w-16 h-16 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-center text-muted-dark mx-auto">
+              <AlertCircle className="w-8 h-8 text-accent" aria-hidden="true" />
             </div>
 
             <div className="space-y-3">
-              <Badge variant="neutral" size="sm" className="mx-auto">
+              <Badge variant="neutral-dark" size="sm" className="mx-auto">
                 Record Status: Not Found or Unverified
               </Badge>
-              <h1 className="text-2xl sm:text-3xl font-bold font-heading text-brand-navy">
+              <h1 className="text-2xl sm:text-3xl font-bold font-heading text-white">
                 Project Profile Not Available
               </h1>
-              <p className="text-sm text-brand-slate leading-relaxed max-w-lg mx-auto">
-                The requested project identifier (<code className="bg-slate-100 text-brand-navy px-1.5 py-0.5 rounded text-xs font-mono">{id || 'unknown'}</code>) does not correspond to an active, publicly released project record.
+              <p className="text-sm text-muted-dark leading-relaxed max-w-lg mx-auto">
+                The requested project identifier (<code className="bg-white/10 text-white px-1.5 py-0.5 rounded text-xs font-mono">{id || 'unknown'}</code>) does not correspond to an active, publicly released project record.
               </p>
-              <p className="text-xs text-slate-500 max-w-md mx-auto italic">
+              <p className="text-xs text-muted-dark max-w-md mx-auto italic">
                 Project profiles are published exclusively after rigorous authentication against executive work orders and client nondisclosure requirements.
               </p>
             </div>
@@ -95,6 +96,7 @@ export const ProjectDetail = () => {
               </Button>
               <Button
                 variant="outline"
+                onDark
                 size="md"
                 as="a"
                 href="/#presence"
@@ -137,47 +139,47 @@ export const ProjectDetail = () => {
   const currentImage = hasValidImages ? images[activeImageIdx] || images[0] : null;
 
   return (
-    <div className="w-full bg-brand-bg min-h-screen py-10 sm:py-14 lg:py-18">
-      <Container size="default" className="space-y-10 sm:space-y-12">
-        
-        {/* Navigation Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500">
-          <Link to="/" className="hover:text-olive transition-colors">Home</Link>
+    <div className="w-full bg-brand-bg min-h-screen">
+      <PageHero>
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-muted-dark">
+          <Link to="/" className="hover:text-accent transition-colors">Home</Link>
           <span aria-hidden="true">/</span>
-          <Link to="/projects" className="hover:text-olive transition-colors">Projects</Link>
+          <Link to="/projects" className="hover:text-accent transition-colors">Projects</Link>
           <span aria-hidden="true">/</span>
-          <span className="text-brand-navy font-semibold line-clamp-1" aria-current="page">
+          <span className="text-white font-semibold line-clamp-1" aria-current="page">
             {name}
           </span>
         </nav>
-
-        {/* Project Header Banner */}
         <header className="space-y-4 max-w-4xl">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant={categoryConfig.badgeVariant} icon={CategoryIcon}>
+            <Badge variant="neutral-dark" icon={CategoryIcon}>
               {categoryConfig.label}
             </Badge>
-            <Badge variant="neutral" icon={MapPin}>
+            <Badge variant="neutral-dark" icon={MapPin}>
               {city}, {stateName}
             </Badge>
             {completionYear && (
-              <Badge variant="neutral" icon={Calendar}>
+              <Badge variant="neutral-dark" icon={Calendar}>
                 Completed {completionYear}
               </Badge>
             )}
-            <Badge variant="blue" icon={CheckCircle2}>
+            <Badge variant="neutral-dark" icon={CheckCircle2}>
               Authenticated Record
             </Badge>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading text-brand-navy tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold font-heading text-white tracking-tight leading-tight">
             {name}
           </h1>
 
-          <p className="text-sm sm:text-base text-brand-slate leading-relaxed">
+          <p className="text-sm sm:text-base text-muted-dark leading-relaxed">
             Verified corporate installation record under Arham's {categoryConfig.label.toLowerCase()} discipline in {city}, {stateName}.
           </p>
         </header>
+      </PageHero>
+
+      <Container size="default" className="space-y-10 sm:space-y-12 py-10 sm:py-14 lg:py-18">
+        
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">

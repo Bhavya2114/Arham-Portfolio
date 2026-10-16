@@ -10,7 +10,7 @@ import { Zap, ArrowRight, MessageSquare, ShieldCheck, Sparkles } from 'lucide-re
  */
 export const Hero = ({ onOpenEnquiry }) => {
   return (
-    <section className="relative w-full py-12 sm:py-16 lg:py-20 overflow-hidden bg-brand-bg">
+    <section className="relative w-full py-12 sm:py-16 lg:py-20 overflow-hidden bg-gradient-to-b from-navy-900 to-navy-950">
       <Container size="default">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
           
@@ -19,18 +19,18 @@ export const Hero = ({ onOpenEnquiry }) => {
             
             {/* Eyebrow Badge */}
             <div className="inline-flex">
-              <Badge variant="blue" icon={Zap}>
+              <Badge variant="neutral-dark" icon={Zap}>
                 Electrical Engineering & Lighting Solutions
               </Badge>
             </div>
 
             {/* Primary Headline */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.85rem] font-extrabold font-heading text-brand-navy tracking-tight leading-[1.18]">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.85rem] font-bold font-heading text-white tracking-tight leading-[1.1]">
               High-Precision Electrical Infrastructure & Architectural Lighting
             </h1>
 
             {/* Supporting Paragraph */}
-            <p className="text-base sm:text-lg text-brand-slate leading-relaxed max-w-2xl">
+            <p className="text-base sm:text-lg text-muted-dark leading-relaxed max-w-2xl">
               Arham delivers specialized electrical engineering, industrial infrastructure wiring, power distribution systems, and architectural lighting installations for commercial and industrial facilities.
             </p>
 
@@ -50,6 +50,7 @@ export const Hero = ({ onOpenEnquiry }) => {
 
               <Button
                 variant="outline"
+                onDark
                 size="lg"
                 icon={MessageSquare}
                 iconPosition="left"
@@ -61,13 +62,13 @@ export const Hero = ({ onOpenEnquiry }) => {
             </div>
 
             {/* Neutral Engineering Verification Cues */}
-            <div className="pt-4 border-t border-brand-border grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-brand-slate">
+            <div className="pt-4 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-muted-dark">
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-olive shrink-0" aria-hidden="true" />
+                <span className="w-1.5 h-1.5 rounded-full bg-muted-dark shrink-0" aria-hidden="true" />
                 <span>Commercial & Industrial Contracting</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-accent shrink-0" aria-hidden="true" />
+                <span className="w-1.5 h-1.5 rounded-full bg-muted-dark shrink-0" aria-hidden="true" />
                 <span>Code-Compliant Engineering Standards</span>
               </div>
             </div>
@@ -76,7 +77,7 @@ export const Hero = ({ onOpenEnquiry }) => {
 
           {/* Right Visual Area (5 columns on large screens) */}
           <div className="lg:col-span-5 w-full">
-            <div className="relative rounded-2xl bg-white p-2 sm:p-2.5 border border-brand-border shadow-card">
+            <div className="relative rounded-2xl bg-surface p-2 sm:p-2.5 border border-white/[0.08] shadow-card">
               
               {/* Architectural Image Container */}
               <div className="relative w-full aspect-[4/3] sm:aspect-[16/11] lg:aspect-[4/3] rounded-xl overflow-hidden bg-slate-100">
@@ -89,8 +90,8 @@ export const Hero = ({ onOpenEnquiry }) => {
 
                 {/* Status Overlay Pill */}
                 <div className="absolute top-3 left-3">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-brand-navy/85 text-white backdrop-blur-sm border border-white/10 shadow-sm">
-                    <Sparkles className="w-3 h-3 text-brand-accent" aria-hidden="true" />
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-navy-950/85 text-white border border-white/10 shadow-sm">
+                    <Sparkles className="w-3 h-3 text-white/80" aria-hidden="true" />
                     Architectural Illumination
                   </span>
                 </div>
@@ -98,8 +99,8 @@ export const Hero = ({ onOpenEnquiry }) => {
 
               {/* Transparent Placeholder Label */}
               <div className="mt-2.5 px-1 pb-1">
-                <p className="text-[11px] text-brand-slate leading-snug">
-                  <span className="font-semibold text-brand-navy">Illustrative Visualization:</span> Modern commercial infrastructure and lighting. Verified project photography will be featured upon corporate verification.
+                <p className="text-[11px] text-muted-dark leading-snug">
+                  <span className="font-semibold text-white">Illustrative Visualization:</span> Modern commercial infrastructure and lighting. Verified project photography will be featured upon corporate verification.
                 </p>
               </div>
 

@@ -6,7 +6,7 @@ import React from 'react';
  *  - default: Pure white background with architectural border and subtle card shadow
  *  - muted: Subtle slate/canvas background for inset content
  *  - interactive: Card with gentle hover state and cursor pointer
- *  - dark: Deep navy container with muted border
+ *  - dark: card on dark backgrounds: surface #111733 with a thin white/8 % border
  */
 export const Card = ({
   children,
@@ -22,7 +22,7 @@ export const Card = ({
     default: 'bg-white border border-brand-border shadow-card text-brand-navy',
     muted: 'bg-brand-bg border border-brand-border text-brand-navy',
     interactive: 'bg-white border border-brand-border hover:border-olive/40 hover:shadow-elevated cursor-pointer text-brand-navy',
-    dark: 'bg-brand-navy border border-brand-navy-light text-white shadow-card',
+    dark: 'bg-surface border border-white/[0.08] text-white shadow-card',
   };
 
   const paddingStyles = {

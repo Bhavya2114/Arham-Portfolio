@@ -90,8 +90,8 @@ export const CompanyIntroduction = () => {
 
                 {/* Subdued Status Tag */}
                 <div className="absolute top-3 left-3">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-brand-navy/85 text-white backdrop-blur-sm border border-white/10 shadow-sm">
-                    <Sparkles className="w-3 h-3 text-brand-accent" aria-hidden="true" />
+                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-navy-950/85 text-white backdrop-blur-sm border border-white/10 shadow-sm">
+                    <Sparkles className="w-3 h-3 text-white/80" aria-hidden="true" />
                     Power Distribution & Controls
                   </span>
                 </div>
@@ -115,7 +115,7 @@ export const CompanyIntroduction = () => {
             <h3 className="text-xs font-bold uppercase tracking-wider text-brand-slate font-heading">
               Core Technical Capabilities
             </h3>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-muted">
               * Provisional business categories subject to official company confirmation.
             </p>
           </div>
@@ -133,7 +133,7 @@ export const CompanyIntroduction = () => {
               <p className="text-xs sm:text-sm text-brand-slate leading-relaxed">
                 Turnkey execution of industrial raceways, structured cable trays, conduits, and heavy-duty wiring networks engineered for sustained mechanical and thermal durability.
               </p>
-              <div className="pt-1 text-[11px] font-mono text-slate-400">
+              <div className="pt-1 text-[11px] font-mono text-muted">
                 Provisional Category
               </div>
             </Card>
@@ -149,7 +149,7 @@ export const CompanyIntroduction = () => {
               <p className="text-xs sm:text-sm text-brand-slate leading-relaxed">
                 Installation, busbar trunking, panel erection, and termination for main switchboards, distribution boards, and motor control centers (MCC).
               </p>
-              <div className="pt-1 text-[11px] font-mono text-slate-400">
+              <div className="pt-1 text-[11px] font-mono text-muted">
                 Provisional Category
               </div>
             </Card>
@@ -165,7 +165,7 @@ export const CompanyIntroduction = () => {
               <p className="text-xs sm:text-sm text-brand-slate leading-relaxed">
                 Tailored illumination solutions including exterior building facade highlights, energy-efficient commercial layouts, and industrial high-bay lighting.
               </p>
-              <div className="pt-1 text-[11px] font-mono text-slate-400">
+              <div className="pt-1 text-[11px] font-mono text-muted">
                 Provisional Category
               </div>
             </Card>

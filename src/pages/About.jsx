@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Container from '../components/ui/Container';
+import PageHero from '../components/ui/PageHero';
 import SectionHeading from '../components/ui/SectionHeading';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
@@ -121,22 +122,14 @@ export const About = () => {
   ];
 
   return (
-    <div className="w-full bg-brand-bg min-h-screen py-10 sm:py-14 lg:py-18">
-      <Container size="default" className="space-y-12 sm:space-y-16">
-        
-        {/* Breadcrumb Navigation */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500">
-          <Link to="/" className="hover:text-olive transition-colors">Home</Link>
-          <span aria-hidden="true">/</span>
-          <span className="text-brand-navy font-semibold" aria-current="page">About</span>
-        </nav>
-
-        {/* 1. Page Header & Introduction */}
+    <div className="w-full bg-brand-bg min-h-screen">
+      <PageHero breadcrumb="About">
         <header className="space-y-4 max-w-4xl">
           <SectionHeading
+            tone="dark"
             as="h1"
             badge={
-              <Badge variant="navy" icon={Building2}>
+              <Badge variant="neutral-dark" icon={Building2}>
                 Company Profile & Principles
               </Badge>
             }
@@ -145,6 +138,10 @@ export const About = () => {
             align="left"
           />
         </header>
+      </PageHero>
+
+      <Container size="default" className="space-y-12 sm:space-y-16 py-10 sm:py-14 lg:py-18">
+        
 
         {/* 2. Who Arham Is: Company Overview & Image Composition */}
         <section aria-labelledby="company-overview-heading" className="space-y-8">
@@ -164,7 +161,7 @@ export const About = () => {
                 We work closely with project managers, general contractors, and facility engineers to ensure installations satisfy both aesthetic objectives and stringent electrical code mandates. Every cable pathway, distribution switchboard, and lighting luminaire is installed with deliberate care for longevity, serviceability, and maintenance safety.
               </p>
 
-              <div className="p-4 rounded-xl bg-olive/10 border border-olive/15 flex items-start gap-3 text-xs text-brand-slate">
+              <div className="p-4 rounded-xl bg-olive/10 border border-olive/15 flex items-start gap-3 text-xs text-slate-600">
                 <ShieldCheck className="w-4 h-4 text-olive shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
                   <span className="font-semibold text-brand-navy block">
@@ -188,8 +185,8 @@ export const About = () => {
                     loading="lazy"
                   />
                   <div className="absolute top-3 left-3">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-brand-navy/85 text-white backdrop-blur-sm border border-white/10 shadow-sm">
-                      <Sparkles className="w-3 h-3 text-brand-accent" aria-hidden="true" />
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-navy-950/85 text-white backdrop-blur-sm border border-white/10 shadow-sm">
+                      <Sparkles className="w-3 h-3 text-white/80" aria-hidden="true" />
                       Engineering & Contracting
                     </span>
                   </div>
@@ -270,7 +267,7 @@ export const About = () => {
                 padding="md"
                 className="bg-white border border-brand-border space-y-3 relative overflow-hidden"
               >
-                <div className="text-2xl font-extrabold font-mono text-olive/25">
+                <div className="text-2xl font-bold font-mono text-olive/70">
                   {step.step}
                 </div>
                 <h3 className="text-sm font-bold font-heading text-brand-navy leading-snug">
@@ -324,18 +321,18 @@ export const About = () => {
 
         {/* 6. Action Callout: Project Gallery & Enquiries */}
         <section 
-          className="rounded-2xl bg-brand-navy text-white p-6 sm:p-8 lg:p-10 shadow-elevated"
+          className="rounded-2xl bg-gradient-to-br from-navy-900 to-navy-950 border border-white/[0.08] text-white p-6 sm:p-8 lg:p-10 shadow-elevated"
           aria-labelledby="explore-projects-cta-heading"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-3">
-              <Badge variant="blue" icon={CheckCircle2}>
+              <Badge variant="neutral-dark" icon={CheckCircle2}>
                 Verified Portfolio
               </Badge>
               <h2 id="explore-projects-cta-heading" className="text-xl sm:text-2xl font-bold font-heading text-white">
                 Inspect Our Authenticated Projects & Case Studies
               </h2>
-              <p className="text-sm text-slate-300 leading-relaxed max-w-2xl">
+              <p className="text-sm text-muted-dark leading-relaxed max-w-2xl">
                 Review our published installation profiles across power infrastructure, electrical switchgear, and architectural lighting. Each published profile is filtered for client confidentiality and authenticated against company documentation.
               </p>
             </div>
@@ -354,10 +351,11 @@ export const About = () => {
               </Button>
               <Button
                 variant="outline"
+                onDark
                 size="md"
                 as="a"
                 href="/#contact"
-                className="w-full justify-center bg-transparent text-white border-white/20 hover:bg-white/10"
+                className="w-full justify-center"
               >
                 Discuss a Project
               </Button>

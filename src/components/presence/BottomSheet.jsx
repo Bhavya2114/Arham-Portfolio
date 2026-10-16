@@ -78,7 +78,7 @@ export const BottomSheet = ({ open, resetKey, title, subtitle, onClose, label = 
   return (
     <section
       aria-label={label}
-      className={`lg:hidden fixed inset-x-0 bottom-0 z-30 flex flex-col rounded-t-2xl border-t border-white/15 bg-brand-navy shadow-[0_-12px_40px_rgba(0,0,0,0.45)] ${
+      className={`lg:hidden fixed inset-x-0 bottom-0 z-30 flex flex-col rounded-t-2xl border-t border-white/[0.08] bg-surface shadow-[0_-12px_40px_rgba(0,0,0,0.45)] ${
         isDragging ? '' : 'transition-[height] duration-300 ease-corporate'
       }`}
       style={{ height: visibleHeight }}

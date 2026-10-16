@@ -240,7 +240,7 @@ export const Presence = () => {
         <Container size="default" className="relative pt-10 sm:pt-14 lg:pt-16 pb-16 sm:pb-24 lg:pb-28 space-y-8 sm:space-y-10">
           {/* Page Header */}
           <header className="max-w-2xl space-y-3">
-            <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-brand-accent">
+            <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-muted-dark">
               <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
               Our Work
             </p>
@@ -300,7 +300,7 @@ export const Presence = () => {
             {/* Desktop panel — rendered only while a city, project or cluster is selected */}
             {detailsOpen && (
               <aside
-                className="hidden lg:block relative z-30 w-[22rem] shrink-0 lg:sticky lg:top-24 rounded-2xl border border-white/10 bg-brand-navy/80 p-5"
+                className="hidden lg:block relative z-30 w-[22rem] shrink-0 lg:sticky lg:top-24 rounded-2xl border border-white/[0.08] bg-surface p-5"
                 aria-label={`${detailsTitle} details`}
               >
                 <div className="flex items-start justify-between gap-2 mb-4">
@@ -339,7 +339,7 @@ export const Presence = () => {
           </div>
           <div className="flex flex-wrap gap-3">
             {publishedCount > 0 && (
-              <Button as={Link} to="/projects" variant="outline" icon={ArrowRight} iconPosition="right" className="min-h-[44px]">
+              <Button as={Link} to="/projects" variant="outline" onDark icon={ArrowRight} iconPosition="right" className="min-h-[44px]">
                 View projects
               </Button>
             )}

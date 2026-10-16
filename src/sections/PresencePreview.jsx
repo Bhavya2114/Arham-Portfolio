@@ -217,9 +217,9 @@ export const PresencePreview = ({ projects } = {}) => {
                   value={selectedStateCode || ''}
                   onChange={(e) => handleSelectState(e.target.value || null)}
                   disabled={!hasActiveStates}
-                  className={`w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border border-brand-border bg-white text-brand-navy focus:outline-none focus:ring-2 focus:ring-olive focus:border-olive transition-colors appearance-none ${
+                  className={`w-full px-3.5 py-2 text-xs sm:text-sm rounded-lg border border-brand-border bg-white text-brand-navy focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent focus:border-olive transition-colors appearance-none ${
                     !hasActiveStates 
-                      ? 'cursor-not-allowed bg-slate-50 text-slate-400' 
+                      ? 'cursor-not-allowed bg-slate-50 text-muted' 
                       : 'cursor-pointer hover:border-slate-300'
                   }`}
                   aria-describedby="state-select-hint"
@@ -242,7 +242,7 @@ export const PresencePreview = ({ projects } = {}) => {
                   )}
                 </select>
 
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-muted">
                   <Filter className="w-3.5 h-3.5" aria-hidden="true" />
                 </div>
               </div>
@@ -281,7 +281,7 @@ export const PresencePreview = ({ projects } = {}) => {
 
             {/* Base Spec Footnote */}
             <div className="relative z-10 pt-3 border-t border-brand-border text-xs text-brand-slate flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <span className="font-mono text-[11px] text-slate-400">
+              <span className="font-mono text-[11px] text-muted">
                 GEOMETRY: 36 STATES &amp; UTs VERIFIED
               </span>
               <span className="text-[11px] text-slate-500">
@@ -317,7 +317,7 @@ export const PresencePreview = ({ projects } = {}) => {
                   >
                     All India
                   </button>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden="true" />
+                  <ChevronRight className="w-3.5 h-3.5 text-muted shrink-0" aria-hidden="true" />
                   <button 
                     type="button"
                     onClick={() => setSelectedCity(null)} 
@@ -329,7 +329,7 @@ export const PresencePreview = ({ projects } = {}) => {
                   </button>
                   {selectedCity && (
                     <>
-                      <ChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" aria-hidden="true" />
+                      <ChevronRight className="w-3.5 h-3.5 text-muted shrink-0" aria-hidden="true" />
                       <span className="text-brand-navy font-semibold" aria-current="page">
                         {selectedCity}
                       </span>
@@ -345,7 +345,7 @@ export const PresencePreview = ({ projects } = {}) => {
                         <Badge variant="blue" size="sm">
                           {selectedStateDetails.type}
                         </Badge>
-                        <span className="text-xs font-mono text-slate-400">
+                        <span className="text-xs font-mono text-muted">
                           {selectedStateDetails.code}
                         </span>
                       </div>
@@ -422,7 +422,7 @@ export const PresencePreview = ({ projects } = {}) => {
                             >
                               <span>{cityName}</span>
                               {cityProjects.length > 0 && (
-                                <span className={`text-[10px] ${isCityActive ? 'text-olive/30' : 'text-slate-400'}`}>
+                                <span className={`text-[10px] ${isCityActive ? 'text-olive/30' : 'text-muted'}`}>
                                   ({cityProjects.length})
                                 </span>
                               )}
@@ -487,7 +487,7 @@ export const PresencePreview = ({ projects } = {}) => {
                 </div>
 
                 {/* Regional Enquiry Action Card */}
-                <div className="p-5 rounded-xl bg-brand-navy text-white space-y-3">
+                <div className="p-5 rounded-xl bg-gradient-to-br from-navy-900 to-navy-950 border border-white/[0.08] text-white space-y-3">
                   <div className="space-y-1">
                     <h4 className="text-sm font-bold font-heading text-white">
                       Planning Work in {selectedStateDetails.name}?
@@ -575,7 +575,7 @@ export const PresencePreview = ({ projects } = {}) => {
                 </Card>
 
                 {/* Direct Action Card linking to Contact */}
-                <div className="p-5 rounded-xl bg-brand-navy text-white space-y-3">
+                <div className="p-5 rounded-xl bg-gradient-to-br from-navy-900 to-navy-950 border border-white/[0.08] text-white space-y-3">
                   <div className="space-y-1">
                     <h4 className="text-sm font-bold font-heading text-white">
                       Planning an Upcoming Project?
@@ -652,7 +652,7 @@ export const PresencePreview = ({ projects } = {}) => {
                 </Card>
 
                 {/* Direct Action Card linking to Contact */}
-                <div className="p-5 rounded-xl bg-brand-navy text-white space-y-3">
+                <div className="p-5 rounded-xl bg-gradient-to-br from-navy-900 to-navy-950 border border-white/[0.08] text-white space-y-3">
                   <div className="space-y-1">
                     <h4 className="text-sm font-bold font-heading text-white">
                       Planning an Upcoming Project?

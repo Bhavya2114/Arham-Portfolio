@@ -693,8 +693,8 @@ export const PresenceMap = ({
       <div className="relative z-20 mb-2 flex flex-wrap items-center justify-between gap-2">
         {selectedState ? (
           <div className="flex flex-wrap items-center gap-2 min-w-0">
-            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-brand-navy-dark/90 px-3 py-1.5 text-sm font-semibold text-emerald-200 max-w-full">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" aria-hidden="true" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-brand-navy-dark/90 px-3 py-1.5 text-sm font-semibold text-white max-w-full">
+              <span className="w-2 h-2 rounded-full bg-accent shrink-0" aria-hidden="true" />
               <span className="truncate">
                 {selectedState.name}
                 {selectedCity && <span className="text-brand-accent"> · {selectedCity}</span>}

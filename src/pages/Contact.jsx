@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import Container from '../components/ui/Container';
+import PageHero from '../components/ui/PageHero';
 import SectionHeading from '../components/ui/SectionHeading';
 import Badge from '../components/ui/Badge';
 import Card from '../components/ui/Card';
@@ -43,22 +44,14 @@ export const Contact = () => {
   );
 
   return (
-    <div className="w-full bg-brand-bg min-h-screen py-10 sm:py-14 lg:py-18">
-      <Container size="default" className="space-y-12 sm:space-y-16">
-        
-        {/* Breadcrumb Navigation */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500">
-          <Link to="/" className="hover:text-olive transition-colors">Home</Link>
-          <span aria-hidden="true">/</span>
-          <span className="text-brand-navy font-semibold" aria-current="page">Contact</span>
-        </nav>
-
-        {/* 1. Page Header */}
+    <div className="w-full bg-brand-bg min-h-screen">
+      <PageHero breadcrumb="Contact">
         <header className="space-y-4 max-w-4xl">
           <SectionHeading
+            tone="dark"
             as="h1"
             badge={
-              <Badge variant="blue" icon={MessageSquare}>
+              <Badge variant="neutral-dark" icon={MessageSquare}>
                 Commercial Inquiries
               </Badge>
             }
@@ -67,6 +60,10 @@ export const Contact = () => {
             align="left"
           />
         </header>
+      </PageHero>
+
+      <Container size="default" className="space-y-12 sm:space-y-16 py-10 sm:py-14 lg:py-18">
+        
 
         {/* 2. Main Two-Column Contact Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
@@ -251,7 +248,7 @@ export const Contact = () => {
             </Card>
 
             {/* Confidentiality Notice */}
-            <div className="p-4 rounded-xl bg-olive/10 border border-olive/15 flex items-start gap-2.5 text-xs text-brand-slate text-left">
+            <div className="p-4 rounded-xl bg-olive/10 border border-olive/15 flex items-start gap-2.5 text-xs text-slate-600 text-left">
               <ShieldCheck className="w-4 h-4 text-olive shrink-0 mt-0.5" aria-hidden="true" />
               <p className="leading-relaxed">
                 <strong className="font-semibold text-brand-navy">Privacy Assurance:</strong> Arham does not distribute or sell commercial enquiry details. All shared drawings and project specifications remain protected under corporate nondisclosure principles.

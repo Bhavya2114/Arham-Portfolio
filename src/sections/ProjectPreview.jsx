@@ -102,7 +102,7 @@ export const ProjectPreview = () => {
                   
                   {/* Category Chip */}
                   <div className="absolute top-3 left-3">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-brand-navy/85 text-white backdrop-blur-sm border border-white/10 shadow-sm">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-navy-950/85 text-white backdrop-blur-sm border border-white/10 shadow-sm">
                       <Icon className="w-3 h-3 text-white" aria-hidden="true" />
                       {item.tag}
                     </span>
@@ -126,7 +126,7 @@ export const ProjectPreview = () => {
                       <span className="w-1.5 h-1.5 rounded-full bg-slate-400" aria-hidden="true" />
                       {item.category}
                     </span>
-                    <span className="text-[11px] text-slate-400 font-medium">
+                    <span className="text-[11px] text-muted font-medium">
                       Illustrative Visualization
                     </span>
                   </div>

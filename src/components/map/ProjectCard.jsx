@@ -107,7 +107,7 @@ export const ProjectCard = ({ project, stateName = '' }) => {
             <p className="relative z-10 text-xs font-semibold text-brand-navy font-heading">
               {categoryConfig.label}
             </p>
-            <span className="relative z-10 text-[10px] text-slate-400 mt-0.5">
+            <span className="relative z-10 text-[10px] text-muted mt-0.5">
               Verified Project Record
             </span>
           </div>
@@ -171,7 +171,7 @@ export const ProjectCard = ({ project, stateName = '' }) => {
         {/* Engineering Scope (if cataloged) */}
         {scope && (
           <div className="pt-3 border-t border-slate-100 flex items-start gap-2 text-xs text-slate-600">
-            <FileText className="w-3.5 h-3.5 text-slate-400 shrink-0 mt-0.5" aria-hidden="true" />
+            <FileText className="w-3.5 h-3.5 text-muted shrink-0 mt-0.5" aria-hidden="true" />
             <span className="line-clamp-1">
               <strong className="text-brand-navy font-semibold">Scope:</strong> {scope}
             </span>
@@ -179,7 +179,7 @@ export const ProjectCard = ({ project, stateName = '' }) => {
         )}
 
         {/* Authentication Badge & Profile Link */}
-        <div className="pt-3 flex items-center justify-between text-[11px] text-slate-400 border-t border-brand-border">
+        <div className="pt-3 flex items-center justify-between text-[11px] text-muted border-t border-brand-border">
           <span className="inline-flex items-center gap-1 text-slate-500 font-mono text-[10px]">
             <CheckCircle2 className="w-3 h-3 text-emerald-600" aria-hidden="true" />
             AUTHENTICATED

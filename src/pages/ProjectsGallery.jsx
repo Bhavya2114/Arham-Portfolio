@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Container from '../components/ui/Container';
+import PageHero from '../components/ui/PageHero';
 import SectionHeading from '../components/ui/SectionHeading';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
@@ -103,22 +104,15 @@ export const ProjectsGallery = () => {
   };
 
   return (
-    <div className="w-full bg-brand-bg min-h-screen py-10 sm:py-14 lg:py-18">
-      <Container size="default" className="space-y-10 sm:space-y-12">
-        
-        {/* Page Header */}
+    <div className="w-full bg-brand-bg min-h-screen">
+      <PageHero breadcrumb="Projects">
         <header className="space-y-4 max-w-4xl">
-          {/* Breadcrumb Navigation */}
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500">
-            <Link to="/" className="hover:text-olive transition-colors">Home</Link>
-            <span aria-hidden="true">/</span>
-            <span className="text-brand-navy font-semibold" aria-current="page">Projects</span>
-          </nav>
 
           <SectionHeading
+            tone="dark"
             as="h1"
             badge={
-              <Badge variant="blue" icon={Briefcase}>
+              <Badge variant="neutral-dark" icon={Briefcase}>
                 Corporate Portfolio
               </Badge>
             }
@@ -127,6 +121,10 @@ export const ProjectsGallery = () => {
             align="left"
           />
         </header>
+      </PageHero>
+
+      <Container size="default" className="space-y-10 sm:space-y-12 py-10 sm:py-14 lg:py-18">
+        
 
         {/* Filter Controls Bar (Visible even if empty, to reflect available criteria) */}
         <div className="bg-white rounded-2xl border border-brand-border p-5 sm:p-6 shadow-subtle space-y-5">
@@ -226,7 +224,7 @@ export const ProjectsGallery = () => {
                     value={selectedState}
                     onChange={(e) => setSelectedState(e.target.value)}
                     disabled={activeStateCodes.length === 0}
-                    className="w-full text-xs font-medium bg-slate-50 border border-brand-border rounded-lg px-3 py-2 text-brand-navy focus:outline-none focus:ring-2 focus:ring-olive focus:border-olive disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                    className="w-full text-xs font-medium bg-slate-50 border border-brand-border rounded-lg px-3 py-2 text-brand-navy focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent focus:border-olive disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                   >
                     <option value="">All States ({activeStateCodes.length})</option>
                     {activeStateCodes.map((code) => {
@@ -252,7 +250,7 @@ export const ProjectsGallery = () => {
                     value={selectedCity}
                     onChange={(e) => setSelectedCity(e.target.value)}
                     disabled={availableCities.length === 0}
-                    className="w-full text-xs font-medium bg-slate-50 border border-brand-border rounded-lg px-3 py-2 text-brand-navy focus:outline-none focus:ring-2 focus:ring-olive focus:border-olive disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                    className="w-full text-xs font-medium bg-slate-50 border border-brand-border rounded-lg px-3 py-2 text-brand-navy focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent focus:border-olive disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                   >
                     <option value="">All Cities ({availableCities.length})</option>
                     {availableCities.map((cityName) => (

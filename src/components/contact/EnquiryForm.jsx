@@ -287,7 +287,7 @@ export const EnquiryForm = ({
             <div>
               <label 
                 htmlFor={`${idPrefix}-name`} 
-                className="block text-xs font-semibold text-brand-navy mb-1.5"
+                className="block text-sm font-semibold text-ink mb-1.5"
               >
                 Full Name <span className="text-rose-600" aria-hidden="true">*</span>
               </label>
@@ -302,7 +302,7 @@ export const EnquiryForm = ({
                 aria-invalid={Boolean(errors.name)}
                 aria-describedby={errors.name ? `${idPrefix}-name-error` : undefined}
                 placeholder="e.g. Rahul Sharma"
-                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-olive transition-colors ${
+                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-muted focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors ${
                   errors.name ? 'border-rose-500 bg-rose-50/20' : 'border-brand-border'
                 }`}
               />
@@ -318,9 +318,9 @@ export const EnquiryForm = ({
             <div>
               <label 
                 htmlFor={`${idPrefix}-company`} 
-                className="block text-xs font-semibold text-brand-navy mb-1.5"
+                className="block text-sm font-semibold text-ink mb-1.5"
               >
-                Company / Organization <span className="text-slate-400 font-normal">(Optional)</span>
+                Company / Organization <span className="text-muted font-normal">(Optional)</span>
               </label>
               <input
                 type="text"
@@ -330,7 +330,7 @@ export const EnquiryForm = ({
                 onChange={handleChange}
                 onBlur={handleBlur}
                 placeholder="e.g. Infrastructure EPC Ltd."
-                className="w-full text-xs sm:text-sm bg-white border border-brand-border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-olive transition-colors"
+                className="w-full text-xs sm:text-sm bg-white border border-brand-border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-muted focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors"
               />
             </div>
 
@@ -343,7 +343,7 @@ export const EnquiryForm = ({
             <div>
               <label 
                 htmlFor={`${idPrefix}-email`} 
-                className="block text-xs font-semibold text-brand-navy mb-1.5"
+                className="block text-sm font-semibold text-ink mb-1.5"
               >
                 Business Email <span className="text-rose-600" aria-hidden="true">*</span>
               </label>
@@ -358,7 +358,7 @@ export const EnquiryForm = ({
                 aria-invalid={Boolean(errors.email)}
                 aria-describedby={errors.email ? `${idPrefix}-email-error` : undefined}
                 placeholder="e.g. name@company.com"
-                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-olive transition-colors ${
+                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-muted focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors ${
                   errors.email ? 'border-rose-500 bg-rose-50/20' : 'border-brand-border'
                 }`}
               />
@@ -374,9 +374,9 @@ export const EnquiryForm = ({
             <div>
               <label 
                 htmlFor={`${idPrefix}-phone`} 
-                className="block text-xs font-semibold text-brand-navy mb-1.5"
+                className="block text-sm font-semibold text-ink mb-1.5"
               >
-                Telephone / Mobile <span className="text-slate-400 font-normal">(Optional)</span>
+                Telephone / Mobile <span className="text-muted font-normal">(Optional)</span>
               </label>
               <input
                 type="tel"
@@ -388,7 +388,7 @@ export const EnquiryForm = ({
                 aria-invalid={Boolean(errors.phone)}
                 aria-describedby={errors.phone ? `${idPrefix}-phone-error` : undefined}
                 placeholder="e.g. +91 98765 43210"
-                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-olive transition-colors ${
+                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-muted focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors ${
                   errors.phone ? 'border-rose-500 bg-rose-50/20' : 'border-brand-border'
                 }`}
               />
@@ -409,7 +409,7 @@ export const EnquiryForm = ({
             <div>
               <label 
                 htmlFor={`${idPrefix}-enquiryType`} 
-                className="block text-xs font-semibold text-brand-navy mb-1.5"
+                className="block text-sm font-semibold text-ink mb-1.5"
               >
                 Enquiry Category <span className="text-rose-600" aria-hidden="true">*</span>
               </label>
@@ -422,7 +422,7 @@ export const EnquiryForm = ({
                 aria-required="true"
                 aria-invalid={Boolean(errors.enquiryType)}
                 aria-describedby={errors.enquiryType ? `${idPrefix}-enquiryType-error` : undefined}
-                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy focus:outline-none focus:ring-2 focus:ring-olive transition-colors cursor-pointer ${
+                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors cursor-pointer ${
                   errors.enquiryType ? 'border-rose-500 bg-rose-50/20' : 'border-brand-border'
                 }`}
               >
@@ -444,9 +444,9 @@ export const EnquiryForm = ({
             <div>
               <label 
                 htmlFor={`${idPrefix}-projectLocation`} 
-                className="block text-xs font-semibold text-brand-navy mb-1.5"
+                className="block text-sm font-semibold text-ink mb-1.5"
               >
-                Project Site Location <span className="text-slate-400 font-normal">(Optional)</span>
+                Project Site Location <span className="text-muted font-normal">(Optional)</span>
               </label>
               <input
                 type="text"
@@ -456,7 +456,7 @@ export const EnquiryForm = ({
                 onChange={handleChange}
                 onBlur={handleBlur}
                 placeholder="e.g. Mumbai, Maharashtra"
-                className="w-full text-xs sm:text-sm bg-white border border-brand-border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-olive transition-colors"
+                className="w-full text-xs sm:text-sm bg-white border border-brand-border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-muted focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors"
               />
             </div>
 
@@ -466,7 +466,7 @@ export const EnquiryForm = ({
           <div className="text-left">
             <label 
               htmlFor={`${idPrefix}-message`} 
-              className="block text-xs font-semibold text-brand-navy mb-1.5"
+              className="block text-sm font-semibold text-ink mb-1.5"
             >
               Project Scope & Requirements <span className="text-rose-600" aria-hidden="true">*</span>
             </label>
@@ -481,7 +481,7 @@ export const EnquiryForm = ({
               aria-invalid={Boolean(errors.message)}
               aria-describedby={errors.message ? `${idPrefix}-message-error` : undefined}
               placeholder="Please describe project scope, estimated capacity, containment requirements, or schedule expectations..."
-              className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-olive transition-colors ${
+              className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-muted focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors ${
                 errors.message ? 'border-rose-500 bg-rose-50/20' : 'border-brand-border'
               }`}
             />
@@ -505,7 +505,7 @@ export const EnquiryForm = ({
             >
               Formulate Commercial Enquiry
             </Button>
-            <p className="mt-2 text-[11px] text-slate-400">
+            <p className="mt-2 text-[11px] text-muted">
               * Validating this form prepares your enquiry draft directly without third-party tracking cookies or external ad networks.
             </p>
           </div>

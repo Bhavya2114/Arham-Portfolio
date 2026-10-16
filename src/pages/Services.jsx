@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Container from '../components/ui/Container';
+import PageHero from '../components/ui/PageHero';
 import SectionHeading from '../components/ui/SectionHeading';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
@@ -123,22 +124,14 @@ export const Services = () => {
   ];
 
   return (
-    <div className="w-full bg-brand-bg min-h-screen py-10 sm:py-14 lg:py-18">
-      <Container size="default" className="space-y-12 sm:space-y-16">
-        
-        {/* Breadcrumb Navigation */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500">
-          <Link to="/" className="hover:text-olive transition-colors">Home</Link>
-          <span aria-hidden="true">/</span>
-          <span className="text-brand-navy font-semibold" aria-current="page">Services</span>
-        </nav>
-
-        {/* 1. Page Header & Introduction */}
+    <div className="w-full bg-brand-bg min-h-screen">
+      <PageHero breadcrumb="Services">
         <header className="space-y-4 max-w-4xl">
           <SectionHeading
+            tone="dark"
             as="h1"
             badge={
-              <Badge variant="blue" icon={Layers}>
+              <Badge variant="neutral-dark" icon={Layers}>
                 Engineering Capabilities & Scope
               </Badge>
             }
@@ -147,6 +140,10 @@ export const Services = () => {
             align="left"
           />
         </header>
+      </PageHero>
+
+      <Container size="default" className="space-y-12 sm:space-y-16 py-10 sm:py-14 lg:py-18">
+        
 
         {/* 2. Three Detailed Service Disciplines */}
         <main aria-label="Detailed Services" className="space-y-12 sm:space-y-16">
@@ -169,7 +166,7 @@ export const Services = () => {
                       <Badge variant={service.badgeVariant} icon={Icon}>
                         {service.tag}
                       </Badge>
-                      <span className="text-xs font-mono font-semibold text-slate-400">
+                      <span className="text-xs font-mono font-semibold text-muted">
                         DISCIPLINE 0{index + 1}
                       </span>
                     </div>
@@ -234,8 +231,8 @@ export const Services = () => {
                           loading="lazy"
                         />
                         <div className="absolute top-3 left-3">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-brand-navy/85 text-white backdrop-blur-sm border border-white/10 shadow-sm">
-                            <Sparkles className="w-3 h-3 text-brand-accent" aria-hidden="true" />
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-navy-950/85 text-white backdrop-blur-sm border border-white/10 shadow-sm">
+                            <Sparkles className="w-3 h-3 text-white/80" aria-hidden="true" />
                             {service.tag}
                           </span>
                         </div>
@@ -299,18 +296,18 @@ export const Services = () => {
 
         {/* 5. Bottom Callout Banner */}
         <section 
-          className="rounded-2xl bg-brand-navy text-white p-6 sm:p-8 lg:p-10 shadow-elevated"
+          className="rounded-2xl bg-gradient-to-br from-navy-900 to-navy-950 border border-white/[0.08] text-white p-6 sm:p-8 lg:p-10 shadow-elevated"
           aria-labelledby="services-cta-heading"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-3">
-              <Badge variant="blue" icon={PhoneCall}>
+              <Badge variant="neutral-dark" icon={PhoneCall}>
                 Project Consultations
               </Badge>
               <h2 id="services-cta-heading" className="text-xl sm:text-2xl font-bold font-heading text-white">
                 Discuss Your Facility's Electrical Requirements
               </h2>
-              <p className="text-sm text-slate-300 leading-relaxed max-w-2xl">
+              <p className="text-sm text-muted-dark leading-relaxed max-w-2xl">
                 Whether planning power distribution switchgear, structured cable tray containment, or commercial architectural lighting, our engineering team is ready to review project drawings and specifications.
               </p>
             </div>
@@ -329,10 +326,11 @@ export const Services = () => {
               </Button>
               <Button
                 variant="outline"
+                onDark
                 size="md"
                 as={Link}
                 to="/projects"
-                className="w-full justify-center bg-transparent text-white border-white/20 hover:bg-white/10"
+                className="w-full justify-center"
               >
                 Inspect Project Gallery
               </Button>

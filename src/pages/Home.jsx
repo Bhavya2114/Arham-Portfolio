@@ -45,29 +45,29 @@ export const Home = () => {
       {/* 6. Commercial Enquiry Section (Phase 7) */}
       <section 
         id="contact" 
-        className="w-full py-16 sm:py-20 border-t border-brand-border bg-brand-navy text-white scroll-mt-20"
+        className="w-full py-16 sm:py-20 border-t border-white/[0.08] bg-gradient-to-b from-navy-900 to-navy-950 text-white scroll-mt-20"
         aria-labelledby="home-contact-heading"
       >
         <Container size="default" className="space-y-10">
           <div className="max-w-2xl mx-auto text-center space-y-3">
             <div className="inline-flex">
-              <Badge variant="blue" icon={MessageSquare}>
+              <Badge variant="neutral-dark" icon={MessageSquare}>
                 Commercial Consultations
               </Badge>
             </div>
-            <h2 id="home-contact-heading" className="text-2xl sm:text-3xl md:text-4xl font-extrabold font-heading text-white tracking-tight">
+            <h2 id="home-contact-heading" className="text-2xl sm:text-3xl md:text-4xl font-bold font-heading text-white tracking-tight">
               Ready to Discuss Your Project Requirements?
             </h2>
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
+            <p className="text-sm sm:text-base text-muted-dark leading-relaxed">
               Connect with our electrical engineering and lighting team to discuss facility drawings, power distribution requirements, or tender specifications.
             </p>
           </div>
 
-          <div className="max-w-3xl mx-auto bg-white rounded-2xl p-6 sm:p-8 lg:p-10 text-brand-navy shadow-elevated">
+          <div className="max-w-3xl mx-auto bg-white rounded-2xl p-6 sm:p-8 lg:p-10 text-ink shadow-elevated">
             <EnquiryForm idPrefix="home-contact" />
           </div>
 
-          <p className="text-center text-xs text-slate-400 max-w-xl mx-auto">
+          <p className="text-center text-xs text-muted-dark max-w-xl mx-auto">
             * Direct corporate telephone, email, and WhatsApp coordinates are available on our Contact page. Automated enquiry delivery remains unconfigured pending executive routing decisions.
           </p>
         </Container>
