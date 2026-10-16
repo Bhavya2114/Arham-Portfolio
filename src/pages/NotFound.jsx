@@ -24,7 +24,7 @@ export const NotFound = () => {
           </div>
 
           <div className="space-y-2">
-            <span className="text-4xl sm:text-5xl font-extrabold text-brand-blue font-heading tracking-tight">404</span>
+            <span className="text-4xl sm:text-5xl font-extrabold text-olive font-heading tracking-tight">404</span>
             <h1 className="text-xl sm:text-2xl font-bold font-heading text-brand-navy">Route Not Found</h1>
             <p className="text-xs sm:text-sm text-brand-slate leading-relaxed">
               The requested URL path does not correspond to an active page on the Arham corporate website.

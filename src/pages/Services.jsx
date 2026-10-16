@@ -128,7 +128,7 @@ export const Services = () => {
         
         {/* Breadcrumb Navigation */}
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500">
-          <Link to="/" className="hover:text-brand-blue transition-colors">Home</Link>
+          <Link to="/" className="hover:text-olive transition-colors">Home</Link>
           <span aria-hidden="true">/</span>
           <span className="text-brand-navy font-semibold" aria-current="page">Services</span>
         </nav>
@@ -275,7 +275,7 @@ export const Services = () => {
                   padding="lg"
                   className="bg-white border border-brand-border space-y-3"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-brand-blue">
+                  <div className="w-10 h-10 rounded-xl bg-olive/10 border border-olive/15 flex items-center justify-center text-olive">
                     <Icon className="w-5 h-5" aria-hidden="true" />
                   </div>
                   <h3 className="text-base font-bold font-heading text-brand-navy">

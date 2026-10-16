@@ -274,7 +274,7 @@ export const EnquiryForm = ({
         >
           {/* Top Informational Notice */}
           <div className="p-3.5 rounded-xl bg-slate-50 border border-brand-border flex items-start gap-2.5 text-xs text-brand-slate text-left">
-            <Info className="w-4 h-4 text-brand-blue shrink-0 mt-0.5" aria-hidden="true" />
+            <Info className="w-4 h-4 text-olive shrink-0 mt-0.5" aria-hidden="true" />
             <p className="leading-relaxed">
               Submit your project scope, drawings, or engineering specifications. All enquiries are handled in accordance with strict client nondisclosure and confidentiality standards.
             </p>
@@ -302,7 +302,7 @@ export const EnquiryForm = ({
                 aria-invalid={Boolean(errors.name)}
                 aria-describedby={errors.name ? `${idPrefix}-name-error` : undefined}
                 placeholder="e.g. Rahul Sharma"
-                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue transition-colors ${
+                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-olive transition-colors ${
                   errors.name ? 'border-rose-500 bg-rose-50/20' : 'border-brand-border'
                 }`}
               />
@@ -330,7 +330,7 @@ export const EnquiryForm = ({
                 onChange={handleChange}
                 onBlur={handleBlur}
                 placeholder="e.g. Infrastructure EPC Ltd."
-                className="w-full text-xs sm:text-sm bg-white border border-brand-border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue transition-colors"
+                className="w-full text-xs sm:text-sm bg-white border border-brand-border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-olive transition-colors"
               />
             </div>
 
@@ -358,7 +358,7 @@ export const EnquiryForm = ({
                 aria-invalid={Boolean(errors.email)}
                 aria-describedby={errors.email ? `${idPrefix}-email-error` : undefined}
                 placeholder="e.g. name@company.com"
-                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue transition-colors ${
+                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-olive transition-colors ${
                   errors.email ? 'border-rose-500 bg-rose-50/20' : 'border-brand-border'
                 }`}
               />
@@ -388,7 +388,7 @@ export const EnquiryForm = ({
                 aria-invalid={Boolean(errors.phone)}
                 aria-describedby={errors.phone ? `${idPrefix}-phone-error` : undefined}
                 placeholder="e.g. +91 98765 43210"
-                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue transition-colors ${
+                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-olive transition-colors ${
                   errors.phone ? 'border-rose-500 bg-rose-50/20' : 'border-brand-border'
                 }`}
               />
@@ -422,7 +422,7 @@ export const EnquiryForm = ({
                 aria-required="true"
                 aria-invalid={Boolean(errors.enquiryType)}
                 aria-describedby={errors.enquiryType ? `${idPrefix}-enquiryType-error` : undefined}
-                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-blue transition-colors cursor-pointer ${
+                className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy focus:outline-none focus:ring-2 focus:ring-olive transition-colors cursor-pointer ${
                   errors.enquiryType ? 'border-rose-500 bg-rose-50/20' : 'border-brand-border'
                 }`}
               >
@@ -456,7 +456,7 @@ export const EnquiryForm = ({
                 onChange={handleChange}
                 onBlur={handleBlur}
                 placeholder="e.g. Mumbai, Maharashtra"
-                className="w-full text-xs sm:text-sm bg-white border border-brand-border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue transition-colors"
+                className="w-full text-xs sm:text-sm bg-white border border-brand-border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-olive transition-colors"
               />
             </div>
 
@@ -481,7 +481,7 @@ export const EnquiryForm = ({
               aria-invalid={Boolean(errors.message)}
               aria-describedby={errors.message ? `${idPrefix}-message-error` : undefined}
               placeholder="Please describe project scope, estimated capacity, containment requirements, or schedule expectations..."
-              className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue transition-colors ${
+              className={`w-full text-xs sm:text-sm bg-white border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-olive transition-colors ${
                 errors.message ? 'border-rose-500 bg-rose-50/20' : 'border-brand-border'
               }`}
             />

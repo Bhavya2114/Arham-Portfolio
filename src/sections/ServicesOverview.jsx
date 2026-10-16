@@ -20,7 +20,7 @@ export const ServicesOverview = () => {
       description:
         'Installation of electrical wiring systems, structured cable routing, conduits, and containment infrastructure designed for dependable, long-term operational continuity.',
       icon: Cable,
-      iconColor: 'text-brand-blue bg-blue-50 border-blue-100',
+      iconColor: 'text-olive bg-olive/10 border-olive/15',
     },
     {
       id: 'power-distribution',
@@ -28,7 +28,7 @@ export const ServicesOverview = () => {
       description:
         'Placement, configuration, and integration of electrical distribution equipment, main panels, and sub-distribution units for stable and secure facility power delivery.',
       icon: Zap,
-      iconColor: 'text-brand-blue bg-blue-50 border-blue-100',
+      iconColor: 'text-olive bg-olive/10 border-olive/15',
     },
     {
       id: 'architectural-lighting',
@@ -72,7 +72,7 @@ export const ServicesOverview = () => {
                 key={service.id}
                 variant="default"
                 padding="lg"
-                className="flex flex-col justify-between space-y-6 border border-brand-border hover:border-blue-300 hover:shadow-elevated transition-all duration-200 group"
+                className="flex flex-col justify-between space-y-6 border border-brand-border hover:border-olive/40 hover:shadow-elevated transition-all duration-200 group"
               >
                 <div className="space-y-4">
                   {/* Icon & Category Indicator */}

@@ -55,14 +55,14 @@ export const Footer = () => {
                     {item.isAvailable ? (
                       <Link
                         to={item.path}
-                        className="text-brand-slate hover:text-brand-blue transition-colors flex items-center gap-1.5"
+                        className="text-brand-slate hover:text-olive transition-colors flex items-center gap-1.5"
                       >
                         <span>{item.name}</span>
                       </Link>
                     ) : anchor ? (
                       <a
                         href={anchor}
-                        className="text-brand-slate hover:text-brand-blue transition-colors flex items-center justify-between text-xs"
+                        className="text-brand-slate hover:text-olive transition-colors flex items-center justify-between text-xs"
                       >
                         <span>{item.name}</span>
                         <span className="text-[10px] text-slate-400 font-mono">Preview</span>
@@ -90,7 +90,7 @@ export const Footer = () => {
             <ul className="space-y-2 text-xs text-brand-slate">
               {CORE_DISCIPLINES.map((discipline, idx) => (
                 <li key={idx} className="flex items-start gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-brand-blue shrink-0 mt-1.5" aria-hidden="true" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-olive shrink-0 mt-1.5" aria-hidden="true" />
                   <span className="leading-snug">{discipline}</span>
                 </li>
               ))}
@@ -105,7 +105,7 @@ export const Footer = () => {
             
             <div className="space-y-2.5 text-xs text-brand-slate">
               <div className="flex items-start gap-2.5 p-2 rounded-lg bg-slate-50 border border-brand-border">
-                <MapPin className="w-4 h-4 text-brand-blue shrink-0 mt-0.5" aria-hidden="true" />
+                <MapPin className="w-4 h-4 text-olive shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
                   <span className="font-semibold text-brand-navy block">Registered Office:</span>
                   <span className="text-brand-slate">{COMPANY_CONTACT.address}</span>
@@ -113,21 +113,21 @@ export const Footer = () => {
               </div>
 
               <div className="flex items-start gap-2.5 p-2 rounded-lg bg-slate-50 border border-brand-border">
-                <Mail className="w-4 h-4 text-brand-blue shrink-0 mt-0.5" aria-hidden="true" />
+                <Mail className="w-4 h-4 text-olive shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
                   <span className="font-semibold text-brand-navy block">Commercial Inquiries:</span>
-                  <a href={`mailto:${COMPANY_CONTACT.email}`} className="text-brand-blue hover:underline font-medium">
+                  <a href={`mailto:${COMPANY_CONTACT.email}`} className="text-olive hover:underline font-medium">
                     {COMPANY_CONTACT.email}
                   </a>
                 </div>
               </div>
 
               <div className="flex items-start gap-2.5 p-2 rounded-lg bg-slate-50 border border-brand-border">
-                <Phone className="w-4 h-4 text-brand-blue shrink-0 mt-0.5" aria-hidden="true" />
+                <Phone className="w-4 h-4 text-olive shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
                   <span className="font-semibold text-brand-navy block">Telephone / WhatsApp:</span>
                   <div className="flex items-center gap-2">
-                    <a href={`tel:${COMPANY_CONTACT.phone}`} className="text-brand-blue hover:underline font-medium">
+                    <a href={`tel:${COMPANY_CONTACT.phone}`} className="text-olive hover:underline font-medium">
                       {COMPANY_CONTACT.phone}
                     </a>
                     {COMPANY_CONTACT.isWhatsAppConfigured && (
@@ -148,7 +148,7 @@ export const Footer = () => {
               </div>
 
               <div className="flex items-start gap-2.5 p-2 rounded-lg bg-slate-50 border border-brand-border">
-                <Clock className="w-4 h-4 text-brand-blue shrink-0 mt-0.5" aria-hidden="true" />
+                <Clock className="w-4 h-4 text-olive shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
                   <span className="font-semibold text-brand-navy block">Operational Hours:</span>
                   <span className="text-brand-slate">{COMPANY_CONTACT.businessHours}</span>

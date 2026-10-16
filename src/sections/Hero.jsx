@@ -63,7 +63,7 @@ export const Hero = ({ onOpenEnquiry }) => {
             {/* Neutral Engineering Verification Cues */}
             <div className="pt-4 border-t border-brand-border grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-brand-slate">
               <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-brand-blue shrink-0" aria-hidden="true" />
+                <span className="w-1.5 h-1.5 rounded-full bg-olive shrink-0" aria-hidden="true" />
                 <span>Commercial & Industrial Contracting</span>
               </div>
               <div className="flex items-center gap-2">

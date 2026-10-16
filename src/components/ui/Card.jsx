@@ -21,7 +21,7 @@ export const Card = ({
   const variantStyles = {
     default: 'bg-white border border-brand-border shadow-card text-brand-navy',
     muted: 'bg-brand-bg border border-brand-border text-brand-navy',
-    interactive: 'bg-white border border-brand-border hover:border-blue-300 hover:shadow-elevated cursor-pointer text-brand-navy',
+    interactive: 'bg-white border border-brand-border hover:border-olive/40 hover:shadow-elevated cursor-pointer text-brand-navy',
     dark: 'bg-brand-navy border border-brand-navy-light text-white shadow-card',
   };
 

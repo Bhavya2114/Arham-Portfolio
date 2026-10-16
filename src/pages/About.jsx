@@ -126,7 +126,7 @@ export const About = () => {
         
         {/* Breadcrumb Navigation */}
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500">
-          <Link to="/" className="hover:text-brand-blue transition-colors">Home</Link>
+          <Link to="/" className="hover:text-olive transition-colors">Home</Link>
           <span aria-hidden="true">/</span>
           <span className="text-brand-navy font-semibold" aria-current="page">About</span>
         </nav>
@@ -164,8 +164,8 @@ export const About = () => {
                 We work closely with project managers, general contractors, and facility engineers to ensure installations satisfy both aesthetic objectives and stringent electrical code mandates. Every cable pathway, distribution switchboard, and lighting luminaire is installed with deliberate care for longevity, serviceability, and maintenance safety.
               </p>
 
-              <div className="p-4 rounded-xl bg-blue-50/70 border border-blue-100 flex items-start gap-3 text-xs text-brand-slate">
-                <ShieldCheck className="w-4 h-4 text-brand-blue shrink-0 mt-0.5" aria-hidden="true" />
+              <div className="p-4 rounded-xl bg-olive/10 border border-olive/15 flex items-start gap-3 text-xs text-brand-slate">
+                <ShieldCheck className="w-4 h-4 text-olive shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
                   <span className="font-semibold text-brand-navy block">
                     Corporate Verification Standard:
@@ -224,10 +224,10 @@ export const About = () => {
                   key={idx}
                   variant="default"
                   padding="lg"
-                  className="bg-white border border-brand-border hover:border-blue-300 hover:shadow-elevated transition-all flex flex-col justify-between space-y-4"
+                  className="bg-white border border-brand-border hover:border-olive/40 hover:shadow-elevated transition-all flex flex-col justify-between space-y-4"
                 >
                   <div className="space-y-3">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-brand-blue">
+                    <div className="w-10 h-10 rounded-xl bg-olive/10 border border-olive/15 flex items-center justify-center text-olive">
                       <Icon className="w-5 h-5" aria-hidden="true" />
                     </div>
                     <h3 className="text-base font-bold font-heading text-brand-navy leading-snug">
@@ -270,7 +270,7 @@ export const About = () => {
                 padding="md"
                 className="bg-white border border-brand-border space-y-3 relative overflow-hidden"
               >
-                <div className="text-2xl font-extrabold font-mono text-blue-600/25">
+                <div className="text-2xl font-extrabold font-mono text-olive/25">
                   {step.step}
                 </div>
                 <h3 className="text-sm font-bold font-heading text-brand-navy leading-snug">
@@ -306,7 +306,7 @@ export const About = () => {
                   className="bg-white border border-brand-border flex items-start gap-4"
                 >
                   <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-brand-navy shrink-0 mt-0.5">
-                    <Icon className="w-5 h-5 text-brand-blue" aria-hidden="true" />
+                    <Icon className="w-5 h-5 text-olive" aria-hidden="true" />
                   </div>
                   <div className="space-y-1.5">
                     <h3 className="text-base font-bold font-heading text-brand-navy">

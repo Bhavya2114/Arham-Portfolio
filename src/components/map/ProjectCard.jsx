@@ -76,7 +76,7 @@ export const ProjectCard = ({ project, stateName = '' }) => {
       key={id}
       variant="default"
       padding="none"
-      className="overflow-hidden border border-brand-border hover:border-blue-300 hover:shadow-elevated transition-all duration-200 flex flex-col group"
+      className="overflow-hidden border border-brand-border hover:border-olive/40 hover:shadow-elevated transition-all duration-200 flex flex-col group"
     >
       {/* Visual Asset or Architectural Engineering Placeholder */}
       <div className="relative w-full h-44 sm:h-48 bg-slate-100 overflow-hidden border-b border-brand-border">
@@ -102,7 +102,7 @@ export const ProjectCard = ({ project, stateName = '' }) => {
               }}
             />
             <div className="relative z-10 w-10 h-10 rounded-full bg-white shadow-subtle border border-brand-border flex items-center justify-center text-brand-navy mb-2 group-hover:scale-110 transition-transform">
-              <CategoryIcon className="w-5 h-5 text-brand-blue" />
+              <CategoryIcon className="w-5 h-5 text-olive" />
             </div>
             <p className="relative z-10 text-xs font-semibold text-brand-navy font-heading">
               {categoryConfig.label}
@@ -145,7 +145,7 @@ export const ProjectCard = ({ project, stateName = '' }) => {
         <div className="space-y-2">
           {/* Geographic Location Label */}
           <div className="flex items-center gap-1.5 text-xs text-brand-slate font-medium">
-            <MapPin className="w-3.5 h-3.5 text-brand-blue shrink-0" aria-hidden="true" />
+            <MapPin className="w-3.5 h-3.5 text-olive shrink-0" aria-hidden="true" />
             <span>
               {city}
               {stateName ? `, ${stateName}` : ''}
@@ -156,7 +156,7 @@ export const ProjectCard = ({ project, stateName = '' }) => {
           <h4 className="text-base font-bold font-heading text-brand-navy leading-snug line-clamp-2">
             <Link 
               to={`/projects/${id}`} 
-              className="hover:text-brand-blue transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue rounded"
+              className="hover:text-olive transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-olive rounded"
             >
               {name}
             </Link>
@@ -186,7 +186,7 @@ export const ProjectCard = ({ project, stateName = '' }) => {
           </span>
           <Link
             to={`/projects/${id}`}
-            className="inline-flex items-center gap-1 text-xs font-semibold text-brand-blue hover:text-brand-navy transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-brand-blue rounded"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-olive hover:text-brand-navy transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-olive rounded"
             aria-label={`View project profile for ${name}`}
           >
             <span>View Profile</span>

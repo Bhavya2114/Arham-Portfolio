@@ -18,7 +18,7 @@ const PageFallback = () => (
     role="status"
     aria-label="Loading page content"
   >
-    <div className="w-8 h-8 rounded-full border-2 border-brand-blue border-t-transparent animate-spin" />
+    <div className="w-8 h-8 rounded-full border-2 border-olive border-t-transparent animate-spin" />
   </div>
 );
 

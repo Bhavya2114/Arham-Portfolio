@@ -1,12 +1,13 @@
 import React from 'react';
 
 /**
- * Reusable Button component
- * Variants:
- *  - primary: Solid electric blue with high contrast white text
- *  - secondary: Dark navy authority button
- *  - outline: Subtle architectural border on clean white
- *  - ghost: Minimal transparent action
+ * Reusable Button component — two styles only ("Light in the dark" theme):
+ *  - primary:   accent yellow background, dark text (#14180A), rounded-xl.
+ *  - secondary: transparent with a thin border; ink text on light backgrounds, white text on dark
+ *               ones (`onDark`).
+ * `outline` is an alias of `secondary`; `ghost` is the same transparent style without a border (for
+ * low-emphasis text actions). Focus: a yellow ring outside a thin dark ring, visible on light and
+ * dark backgrounds.
  */
 export const Button = ({
   children,
@@ -16,17 +17,23 @@ export const Button = ({
   iconPosition = 'left',
   disabled = false,
   type = 'button',
+  onDark = false,
   className = '',
   as: Component = 'button',
   ...props
 }) => {
-  const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors duration-150 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue focus-visible:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none select-none';
+  const baseStyles = 'inline-flex items-center justify-center font-sans font-semibold rounded-xl transition-colors duration-150 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-accent-ink disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none select-none';
 
+  const secondary = onDark
+    ? 'bg-transparent text-white border border-white/30 hover:bg-white/10 hover:border-white/50 active:bg-white/15'
+    : 'bg-transparent text-ink border border-ink/20 hover:bg-ink/5 hover:border-ink/40 active:bg-ink/10';
   const variantStyles = {
-    primary: 'bg-brand-blue text-white hover:bg-brand-blue-hover active:bg-blue-800 shadow-subtle',
-    secondary: 'bg-brand-navy text-white hover:bg-brand-navy-light active:bg-slate-900 shadow-subtle',
-    outline: 'bg-white text-brand-navy border border-brand-border hover:bg-brand-blue-light hover:border-blue-300 hover:text-brand-blue active:bg-blue-100',
-    ghost: 'bg-transparent text-brand-slate hover:bg-slate-100 hover:text-brand-navy active:bg-slate-200',
+    primary: 'bg-accent text-accent-ink hover:bg-accent-hover active:bg-accent shadow-subtle',
+    secondary,
+    outline: secondary,
+    ghost: onDark
+      ? 'bg-transparent text-white hover:bg-white/10 active:bg-white/15'
+      : 'bg-transparent text-ink hover:bg-ink/5 active:bg-ink/10',
   };
 
   const sizeStyles = {

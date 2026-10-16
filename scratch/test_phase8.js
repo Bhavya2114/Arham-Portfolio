@@ -51,11 +51,11 @@ assert(appCode.includes('path="*"'), 'Wildcard 404 Route "*" registered');
 
 // 3. Design System & Token Integrity
 console.log('\n3. Design System & Token Integrity:');
-assert(DESIGN_TOKENS.palette.primaryNavy === '#101D2C', 'Primary navy is #101D2C');
-assert(DESIGN_TOKENS.palette.primaryBlue === '#2563EB', 'Electric blue is #2563EB');
-assert(DESIGN_TOKENS.palette.background === '#F8FAFC', 'Warm white background is #F8FAFC');
-assert(DESIGN_TOKENS.palette.secondaryText === '#64748B', 'Slate text is #64748B');
-assert(DESIGN_TOKENS.palette.warmAccent === '#F5B544', 'Amber accent is #F5B544');
+assert(DESIGN_TOKENS.palette.navy950 === '#070A1F', 'Dark base (navy-950) is #070A1F');
+assert(DESIGN_TOKENS.palette.accent === '#D9E35A' && DESIGN_TOKENS.palette.accentInk === '#14180A', 'One accent: #D9E35A, with dark text #14180A on it');
+assert(DESIGN_TOKENS.palette.light === '#F7F8FA', 'Light section background is #F7F8FA');
+assert(DESIGN_TOKENS.palette.muted === '#627289' && DESIGN_TOKENS.palette.mutedDark === '#9AA3B8', 'Muted text: #627289 on light (AA on #F7F8FA), #9AA3B8 on dark');
+assert(!Object.values(DESIGN_TOKENS.palette).includes('#2563EB'), 'No old brand blue in the palette');
 
 // 4. CSS Accessibility & Reduced Motion
 console.log('\n4. CSS Accessibility & Motion Rules:');

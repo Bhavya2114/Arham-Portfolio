@@ -48,7 +48,7 @@ export const Contact = () => {
         
         {/* Breadcrumb Navigation */}
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500">
-          <Link to="/" className="hover:text-brand-blue transition-colors">Home</Link>
+          <Link to="/" className="hover:text-olive transition-colors">Home</Link>
           <span aria-hidden="true">/</span>
           <span className="text-brand-navy font-semibold" aria-current="page">Contact</span>
         </nav>
@@ -105,7 +105,7 @@ export const Contact = () => {
               className="bg-white border border-brand-border space-y-5 text-left shadow-subtle"
             >
               <div className="flex items-center gap-2 pb-3 border-b border-brand-border">
-                <Building2 className="w-4 h-4 text-brand-blue" aria-hidden="true" />
+                <Building2 className="w-4 h-4 text-olive" aria-hidden="true" />
                 <h2 className="text-sm font-bold font-heading uppercase tracking-wider text-brand-navy">
                   Corporate Coordinates
                 </h2>
@@ -115,7 +115,7 @@ export const Contact = () => {
                 
                 {/* Telephone */}
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-blue-100/70 text-brand-blue flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-lg bg-olive/15/70 text-olive flex items-center justify-center shrink-0 mt-0.5">
                     <Phone className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <div className="space-y-0.5">
@@ -123,7 +123,7 @@ export const Contact = () => {
                     {COMPANY_CONTACT.isPhoneConfigured ? (
                       <a 
                         href={`tel:${COMPANY_CONTACT.phone}`} 
-                        className="text-brand-blue font-medium hover:underline text-xs"
+                        className="text-olive font-medium hover:underline text-xs"
                       >
                         {COMPANY_CONTACT.phone}
                       </a>
@@ -159,7 +159,7 @@ export const Contact = () => {
 
                 {/* Email */}
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-blue-100/70 text-brand-blue flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-lg bg-olive/15/70 text-olive flex items-center justify-center shrink-0 mt-0.5">
                     <Mail className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <div className="space-y-0.5">
@@ -167,7 +167,7 @@ export const Contact = () => {
                     {COMPANY_CONTACT.hasEmail ? (
                       <a 
                         href={`mailto:${COMPANY_CONTACT.email}`} 
-                        className="text-brand-blue font-medium hover:underline text-xs"
+                        className="text-olive font-medium hover:underline text-xs"
                       >
                         {COMPANY_CONTACT.email}
                       </a>
@@ -181,7 +181,7 @@ export const Contact = () => {
 
                 {/* Registered Office */}
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-blue-100/70 text-brand-blue flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-lg bg-olive/15/70 text-olive flex items-center justify-center shrink-0 mt-0.5">
                     <MapPin className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <div className="space-y-0.5">
@@ -200,7 +200,7 @@ export const Contact = () => {
 
                 {/* Operational Hours */}
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-blue-100/70 text-brand-blue flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-lg bg-olive/15/70 text-olive flex items-center justify-center shrink-0 mt-0.5">
                     <Clock className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <div className="space-y-0.5">
@@ -227,7 +227,7 @@ export const Contact = () => {
               className="bg-white border border-brand-border space-y-4 text-left shadow-subtle"
             >
               <div className="flex items-center gap-2 pb-2 border-b border-brand-border">
-                <FileText className="w-4 h-4 text-brand-blue" aria-hidden="true" />
+                <FileText className="w-4 h-4 text-olive" aria-hidden="true" />
                 <h3 className="text-xs font-bold font-heading uppercase tracking-wider text-brand-navy">
                   Tender & RFP Submissions
                 </h3>
@@ -251,8 +251,8 @@ export const Contact = () => {
             </Card>
 
             {/* Confidentiality Notice */}
-            <div className="p-4 rounded-xl bg-blue-50/50 border border-blue-100 flex items-start gap-2.5 text-xs text-brand-slate text-left">
-              <ShieldCheck className="w-4 h-4 text-brand-blue shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="p-4 rounded-xl bg-olive/10 border border-olive/15 flex items-start gap-2.5 text-xs text-brand-slate text-left">
+              <ShieldCheck className="w-4 h-4 text-olive shrink-0 mt-0.5" aria-hidden="true" />
               <p className="leading-relaxed">
                 <strong className="font-semibold text-brand-navy">Privacy Assurance:</strong> Arham does not distribute or sell commercial enquiry details. All shared drawings and project specifications remain protected under corporate nondisclosure principles.
               </p>

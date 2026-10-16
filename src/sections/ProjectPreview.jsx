@@ -89,7 +89,7 @@ export const ProjectPreview = () => {
                 key={item.id}
                 variant="default"
                 padding="none"
-                className="overflow-hidden border border-brand-border hover:border-blue-300 hover:shadow-elevated transition-all duration-200 flex flex-col group"
+                className="overflow-hidden border border-brand-border hover:border-olive/40 hover:shadow-elevated transition-all duration-200 flex flex-col group"
               >
                 {/* Visual Imagery Panel */}
                 <div className="relative w-full aspect-[16/10] bg-slate-100 overflow-hidden">
@@ -103,7 +103,7 @@ export const ProjectPreview = () => {
                   {/* Category Chip */}
                   <div className="absolute top-3 left-3">
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-brand-navy/85 text-white backdrop-blur-sm border border-white/10 shadow-sm">
-                      <Icon className="w-3 h-3 text-brand-blue-light" aria-hidden="true" />
+                      <Icon className="w-3 h-3 text-white" aria-hidden="true" />
                       {item.tag}
                     </span>
                   </div>
@@ -112,7 +112,7 @@ export const ProjectPreview = () => {
                 {/* Card Content */}
                 <div className="p-5 sm:p-6 space-y-3 flex-1 flex flex-col justify-between">
                   <div className="space-y-2">
-                    <h3 className="text-lg font-bold font-heading text-brand-navy leading-snug group-hover:text-brand-blue transition-colors duration-150">
+                    <h3 className="text-lg font-bold font-heading text-brand-navy leading-snug group-hover:text-olive transition-colors duration-150">
                       {item.title}
                     </h3>
                     <p className="text-sm text-brand-slate leading-relaxed">
@@ -140,7 +140,7 @@ export const ProjectPreview = () => {
         <div className="p-6 sm:p-8 rounded-2xl bg-brand-bg border border-brand-border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="space-y-1.5 max-w-xl">
             <div className="inline-flex items-center gap-2 text-xs font-bold font-heading uppercase tracking-wider text-brand-navy">
-              <MapPin className="w-4 h-4 text-brand-blue" aria-hidden="true" />
+              <MapPin className="w-4 h-4 text-olive" aria-hidden="true" />
               Geographic Project Locations
             </div>
             <p className="text-sm text-brand-slate leading-relaxed">

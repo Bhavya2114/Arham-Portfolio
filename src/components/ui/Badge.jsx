@@ -5,13 +5,19 @@ import React from 'react';
  */
 export const Badge = ({
   children,
-  variant = 'blue',
+  variant = 'accent',
   size = 'md',
   className = '',
   icon: Icon,
 }) => {
   const variantStyles = {
-    blue: 'bg-blue-50 text-brand-blue border-blue-200',
+    // One accent: an olive tint on light backgrounds (olive text is AA on it). `blue` = legacy alias.
+    accent: 'bg-olive/10 text-olive border-olive/25',
+    blue: 'bg-olive/10 text-olive border-olive/25',
+    // On dark backgrounds: accent yellow text on a faint yellow tint.
+    'accent-dark': 'bg-accent/10 text-accent border-accent/30',
+    // Quiet label on dark backgrounds (not an accent: yellow is kept for important / clickable).
+    'neutral-dark': 'bg-white/5 text-muted-dark border-white/10',
     navy: 'bg-slate-100 text-brand-navy border-slate-300',
     amber: 'bg-amber-50 text-amber-800 border-amber-200',
     slate: 'bg-slate-50 text-brand-slate border-slate-200',
@@ -34,7 +40,7 @@ export const Badge = ({
   return (
     <span
       className={`inline-flex items-center gap-1.5 font-medium rounded-full border ${
-        variantStyles[variant] || variantStyles.blue
+        variantStyles[variant] || variantStyles.accent
       } ${sizeStyles[size] || sizeStyles.md} ${className}`}
     >
       {Icon && <Icon className={`${iconSizes[size] || iconSizes.md} shrink-0`} aria-hidden="true" />}

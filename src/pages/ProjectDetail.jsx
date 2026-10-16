@@ -142,9 +142,9 @@ export const ProjectDetail = () => {
         
         {/* Navigation Breadcrumb */}
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500">
-          <Link to="/" className="hover:text-brand-blue transition-colors">Home</Link>
+          <Link to="/" className="hover:text-olive transition-colors">Home</Link>
           <span aria-hidden="true">/</span>
-          <Link to="/projects" className="hover:text-brand-blue transition-colors">Projects</Link>
+          <Link to="/projects" className="hover:text-olive transition-colors">Projects</Link>
           <span aria-hidden="true">/</span>
           <span className="text-brand-navy font-semibold line-clamp-1" aria-current="page">
             {name}
@@ -206,8 +206,8 @@ export const ProjectDetail = () => {
                           key={idx}
                           type="button"
                           onClick={() => setActiveImageIdx(idx)}
-                          className={`relative w-20 h-14 rounded-lg overflow-hidden border-2 transition-all shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue ${
-                            activeImageIdx === idx ? 'border-brand-blue ring-1 ring-brand-blue' : 'border-brand-border opacity-70 hover:opacity-100'
+                          className={`relative w-20 h-14 rounded-lg overflow-hidden border-2 transition-all shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-olive ${
+                            activeImageIdx === idx ? 'border-olive ring-1 ring-olive' : 'border-brand-border opacity-70 hover:opacity-100'
                           }`}
                           aria-label={`View photo ${idx + 1}`}
                           aria-current={activeImageIdx === idx}
@@ -234,7 +234,7 @@ export const ProjectDetail = () => {
                     }}
                   />
                   <div className="relative z-10 w-16 h-16 rounded-2xl bg-white shadow-subtle border border-brand-border flex items-center justify-center text-brand-navy mb-3">
-                    <CategoryIcon className="w-8 h-8 text-brand-blue" />
+                    <CategoryIcon className="w-8 h-8 text-olive" />
                   </div>
                   <h2 className="relative z-10 text-base font-bold text-brand-navy font-heading">
                     {categoryConfig.label} Installation
@@ -249,7 +249,7 @@ export const ProjectDetail = () => {
             {/* Approved Project Description */}
             <Card variant="default" padding="lg" className="bg-white border border-brand-border space-y-4">
               <div className="flex items-center gap-2 pb-3 border-b border-brand-border">
-                <FileText className="w-4 h-4 text-brand-blue" aria-hidden="true" />
+                <FileText className="w-4 h-4 text-olive" aria-hidden="true" />
                 <h2 className="text-base font-bold font-heading text-brand-navy">
                   Approved Project Summary
                 </h2>
@@ -263,7 +263,7 @@ export const ProjectDetail = () => {
             {scope && (
               <Card variant="default" padding="lg" className="bg-white border border-brand-border space-y-3">
                 <div className="flex items-center gap-2 pb-2 border-b border-brand-border">
-                  <CategoryIcon className="w-4 h-4 text-brand-blue" aria-hidden="true" />
+                  <CategoryIcon className="w-4 h-4 text-olive" aria-hidden="true" />
                   <h2 className="text-base font-bold font-heading text-brand-navy">
                     Technical Scope & Execution
                   </h2>
@@ -275,8 +275,8 @@ export const ProjectDetail = () => {
             )}
 
             {/* Confidentiality & Verification Disclosure */}
-            <div className="p-4 rounded-xl bg-blue-50/50 border border-blue-100 flex items-start gap-3 text-xs text-brand-slate">
-              <Info className="w-4 h-4 text-brand-blue shrink-0 mt-0.5" aria-hidden="true" />
+            <div className="p-4 rounded-xl bg-olive/10 border border-olive/15 flex items-start gap-3 text-xs text-brand-slate">
+              <Info className="w-4 h-4 text-olive shrink-0 mt-0.5" aria-hidden="true" />
               <div className="space-y-1">
                 <span className="font-semibold text-brand-navy block">
                   Confidentiality & Public Release Policy:

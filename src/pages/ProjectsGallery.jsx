@@ -110,7 +110,7 @@ export const ProjectsGallery = () => {
         <header className="space-y-4 max-w-4xl">
           {/* Breadcrumb Navigation */}
           <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500">
-            <Link to="/" className="hover:text-brand-blue transition-colors">Home</Link>
+            <Link to="/" className="hover:text-olive transition-colors">Home</Link>
             <span aria-hidden="true">/</span>
             <span className="text-brand-navy font-semibold" aria-current="page">Projects</span>
           </nav>
@@ -132,7 +132,7 @@ export const ProjectsGallery = () => {
         <div className="bg-white rounded-2xl border border-brand-border p-5 sm:p-6 shadow-subtle space-y-5">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-4 border-b border-brand-border">
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-brand-blue" aria-hidden="true" />
+              <Filter className="w-4 h-4 text-olive" aria-hidden="true" />
               <h2 className="text-sm font-bold font-heading uppercase tracking-wider text-brand-navy">
                 Filter Portfolio
               </h2>
@@ -162,7 +162,7 @@ export const ProjectsGallery = () => {
                   onClick={handleResetFilters}
                   icon={RotateCcw}
                   iconPosition="left"
-                  className="text-xs text-brand-blue hover:text-brand-navy"
+                  className="text-xs text-olive hover:text-brand-navy"
                   aria-label="Clear all active filters"
                 >
                   Reset Filters
@@ -179,7 +179,7 @@ export const ProjectsGallery = () => {
               <button
                 type="button"
                 onClick={() => setSelectedCategory('all')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-olive ${
                   selectedCategory === 'all'
                     ? 'bg-brand-navy text-white shadow-subtle'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -199,9 +199,9 @@ export const ProjectsGallery = () => {
                     key={catKey}
                     type="button"
                     onClick={() => setSelectedCategory(catKey)}
-                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue ${
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-olive ${
                       isSelected
-                        ? 'bg-brand-blue text-white shadow-subtle'
+                        ? 'bg-accent text-accent-ink shadow-subtle'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                     aria-pressed={isSelected}
@@ -226,7 +226,7 @@ export const ProjectsGallery = () => {
                     value={selectedState}
                     onChange={(e) => setSelectedState(e.target.value)}
                     disabled={activeStateCodes.length === 0}
-                    className="w-full text-xs font-medium bg-slate-50 border border-brand-border rounded-lg px-3 py-2 text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-brand-blue disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                    className="w-full text-xs font-medium bg-slate-50 border border-brand-border rounded-lg px-3 py-2 text-brand-navy focus:outline-none focus:ring-2 focus:ring-olive focus:border-olive disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                   >
                     <option value="">All States ({activeStateCodes.length})</option>
                     {activeStateCodes.map((code) => {
@@ -252,7 +252,7 @@ export const ProjectsGallery = () => {
                     value={selectedCity}
                     onChange={(e) => setSelectedCity(e.target.value)}
                     disabled={availableCities.length === 0}
-                    className="w-full text-xs font-medium bg-slate-50 border border-brand-border rounded-lg px-3 py-2 text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-brand-blue disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                    className="w-full text-xs font-medium bg-slate-50 border border-brand-border rounded-lg px-3 py-2 text-brand-navy focus:outline-none focus:ring-2 focus:ring-olive focus:border-olive disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                   >
                     <option value="">All Cities ({availableCities.length})</option>
                     {availableCities.map((cityName) => (
@@ -278,7 +278,7 @@ export const ProjectsGallery = () => {
               padding="lg"
               className="bg-white border border-brand-border text-center py-12 px-6 sm:px-10 max-w-3xl mx-auto space-y-6"
             >
-              <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-brand-blue mx-auto shadow-subtle">
+              <div className="w-16 h-16 rounded-2xl bg-olive/10 border border-olive/15 flex items-center justify-center text-olive mx-auto shadow-subtle">
                 <ShieldCheck className="w-8 h-8" aria-hidden="true" />
               </div>
 
@@ -374,7 +374,7 @@ export const ProjectsGallery = () => {
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-3">
-              <div className="inline-flex items-center gap-2 text-xs font-bold font-heading uppercase tracking-wider text-brand-blue">
+              <div className="inline-flex items-center gap-2 text-xs font-bold font-heading uppercase tracking-wider text-olive">
                 <Building2 className="w-4 h-4" aria-hidden="true" />
                 Regional Execution Footprint
               </div>

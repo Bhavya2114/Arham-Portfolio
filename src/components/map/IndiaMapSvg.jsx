@@ -171,13 +171,13 @@ export const IndiaMapSvg = ({
     let cursorClass = 'cursor-default';
 
     if (isSelected) {
-      fillClass = 'fill-brand-blue';
+      fillClass = 'fill-[#2563EB]'; // old brand blue, kept until the homepage map is reviewed (stage 2)
       strokeClass = 'stroke-brand-navy';
       strokeWidth = 1.5;
       cursorClass = 'cursor-pointer';
     } else if (isActive) {
       fillClass = 'fill-blue-50 hover:fill-blue-100';
-      strokeClass = 'stroke-brand-blue';
+      strokeClass = 'stroke-[#2563EB]';
       strokeWidth = 1.2;
       cursorClass = 'cursor-pointer';
     }
