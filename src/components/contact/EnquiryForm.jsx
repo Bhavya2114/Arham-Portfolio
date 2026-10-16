@@ -210,7 +210,7 @@ export const EnquiryForm = ({
         <Card
           variant="default"
           padding="lg"
-          className="bg-amber-400/10/80 border border-amber-400/30 text-left space-y-4 shadow-subtle"
+          className="bg-amber-400/10 border border-amber-400/30 text-left space-y-4 shadow-subtle"
           role="status"
           aria-live="polite"
         >
@@ -237,7 +237,7 @@ export const EnquiryForm = ({
           </div>
 
           {/* Formatted Text Box */}
-          <div className="p-3 rounded-lg bg-white/90 border border-amber-400/30/80 text-xs font-mono text-body whitespace-pre-wrap max-h-48 overflow-y-auto">
+          <div className="p-3 rounded-lg bg-navy-900 border border-white/[0.14] text-xs font-mono text-body whitespace-pre-wrap max-h-48 overflow-y-auto">
             {formattedDraft}
           </div>
 
@@ -303,7 +303,7 @@ export const EnquiryForm = ({
                 aria-describedby={errors.name ? `${idPrefix}-name-error` : undefined}
                 placeholder="e.g. Rahul Sharma"
                 className={`w-full text-base bg-navy-900 [color-scheme:dark] border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-muted focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors ${
-                  errors.name ? 'border-rose-500 bg-rose-500/10/20' : 'border-white/[0.12]'
+                  errors.name ? 'border-rose-500 bg-rose-500/10' : 'border-white/[0.14]'
                 }`}
               />
               {errors.name && (
@@ -330,7 +330,7 @@ export const EnquiryForm = ({
                 onChange={handleChange}
                 onBlur={handleBlur}
                 placeholder="e.g. Infrastructure EPC Ltd."
-                className="w-full text-base bg-navy-900 [color-scheme:dark] border border-white/[0.12] rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-muted focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors"
+                className="w-full text-base bg-navy-900 [color-scheme:dark] border border-white/[0.14] rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-muted focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors"
               />
             </div>
 
@@ -359,7 +359,7 @@ export const EnquiryForm = ({
                 aria-describedby={errors.email ? `${idPrefix}-email-error` : undefined}
                 placeholder="e.g. name@company.com"
                 className={`w-full text-base bg-navy-900 [color-scheme:dark] border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-muted focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors ${
-                  errors.email ? 'border-rose-500 bg-rose-500/10/20' : 'border-white/[0.12]'
+                  errors.email ? 'border-rose-500 bg-rose-500/10' : 'border-white/[0.14]'
                 }`}
               />
               {errors.email && (
@@ -389,7 +389,7 @@ export const EnquiryForm = ({
                 aria-describedby={errors.phone ? `${idPrefix}-phone-error` : undefined}
                 placeholder="e.g. +91 98765 43210"
                 className={`w-full text-base bg-navy-900 [color-scheme:dark] border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-muted focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors ${
-                  errors.phone ? 'border-rose-500 bg-rose-500/10/20' : 'border-white/[0.12]'
+                  errors.phone ? 'border-rose-500 bg-rose-500/10' : 'border-white/[0.14]'
                 }`}
               />
               {errors.phone && (
@@ -423,7 +423,7 @@ export const EnquiryForm = ({
                 aria-invalid={Boolean(errors.enquiryType)}
                 aria-describedby={errors.enquiryType ? `${idPrefix}-enquiryType-error` : undefined}
                 className={`w-full text-base bg-navy-900 [color-scheme:dark] border rounded-lg px-3.5 py-2.5 text-brand-navy focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors cursor-pointer ${
-                  errors.enquiryType ? 'border-rose-500 bg-rose-500/10/20' : 'border-white/[0.12]'
+                  errors.enquiryType ? 'border-rose-500 bg-rose-500/10' : 'border-white/[0.14]'
                 }`}
               >
                 {ENQUIRY_TYPES.map((type) => (
@@ -456,7 +456,7 @@ export const EnquiryForm = ({
                 onChange={handleChange}
                 onBlur={handleBlur}
                 placeholder="e.g. Mumbai, Maharashtra"
-                className="w-full text-base bg-navy-900 [color-scheme:dark] border border-white/[0.12] rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-muted focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors"
+                className="w-full text-base bg-navy-900 [color-scheme:dark] border border-white/[0.14] rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-muted focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors"
               />
             </div>
 
@@ -482,7 +482,7 @@ export const EnquiryForm = ({
               aria-describedby={errors.message ? `${idPrefix}-message-error` : undefined}
               placeholder="Please describe project scope, estimated capacity, containment requirements, or schedule expectations..."
               className={`w-full text-base bg-navy-900 [color-scheme:dark] border rounded-lg px-3.5 py-2.5 text-brand-navy placeholder:text-muted focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent transition-colors ${
-                errors.message ? 'border-rose-500 bg-rose-500/10/20' : 'border-white/[0.12]'
+                errors.message ? 'border-rose-500 bg-rose-500/10' : 'border-white/[0.14]'
               }`}
             />
             {errors.message && (

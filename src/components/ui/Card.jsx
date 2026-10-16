@@ -3,7 +3,7 @@ import React from 'react';
 /**
  * Reusable Card primitive for structural surfaces, widgets, and content groupings.
  * Variants:
- * Tonal dark theme: every variant is a card #151C3D with a 1px white / 7 % border.
+ * Graphite theme: every variant is a card #1B1D21 with a 1px white / 7 % border.
  *  - default / dark / muted: the card
  *  - interactive: the card with a gentle hover state and cursor pointer
  */

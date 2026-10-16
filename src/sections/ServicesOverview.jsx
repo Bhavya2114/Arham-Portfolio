@@ -20,7 +20,7 @@ export const ServicesOverview = () => {
       description:
         'Installation of electrical wiring systems, structured cable routing, conduits, and containment infrastructure designed for dependable, long-term operational continuity.',
       icon: Cable,
-      iconColor: 'text-white bg-white/[0.06] border-white/10',
+      iconColor: 'text-accent bg-accent/10 border-transparent',
     },
     {
       id: 'power-distribution',
@@ -28,7 +28,7 @@ export const ServicesOverview = () => {
       description:
         'Placement, configuration, and integration of electrical distribution equipment, main panels, and sub-distribution units for stable and secure facility power delivery.',
       icon: Zap,
-      iconColor: 'text-white bg-white/[0.06] border-white/10',
+      iconColor: 'text-accent bg-accent/10 border-transparent',
     },
     {
       id: 'architectural-lighting',
@@ -36,7 +36,7 @@ export const ServicesOverview = () => {
       description:
         'Engineered lighting installations for commercial spaces, offices, and built environments, balancing visual aesthetics, safety standards, and energy efficiency.',
       icon: Lightbulb,
-      iconColor: 'text-white bg-white/[0.06] border-white/10',
+      iconColor: 'text-accent bg-accent/10 border-transparent',
     },
   ];
 

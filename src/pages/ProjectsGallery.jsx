@@ -327,7 +327,7 @@ export const ProjectsGallery = () => {
               padding="lg"
               className="bg-card border border-brand-border text-center py-12 px-6 space-y-4 max-w-lg mx-auto"
             >
-              <div className="w-12 h-12 rounded-full bg-white/[0.06] flex items-center justify-center text-muted mx-auto">
+              <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent mx-auto">
                 <Search className="w-6 h-6" aria-hidden="true" />
               </div>
               <h3 className="text-lg font-bold font-heading text-brand-navy">

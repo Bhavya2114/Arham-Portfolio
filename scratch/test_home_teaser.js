@@ -60,10 +60,10 @@ if (process.env.BUILD_DIR) {
   assert(homeChunk && !/india-states-layer|INDIA_MAP_STATES|regionEdges|india-map-worked-fill/.test(code), `Home chunk (${homeChunk}) carries no map code`);
 }
 
-console.log('\n4. Tonal dark rhythm (navy-950 / navy-800, no light sections)');
+console.log('\n4. Graphite rhythm (bg / bg2 = navy-950 / navy-800 tokens, no light sections)');
 const sections = [...home.matchAll(/<(Hero|CompanyIntroduction|ServicesOverview|ProjectPreview|PresenceTeaser)\b|<section[\s\S]*?className="([^"]+)"/g)].map((m) => m[1] || 'EnquirySection');
 const sectionClass = (src) => (src.match(/<section[\s\S]*?className="([^"]+)"/) || ['', ''])[1];
-const shadeOf = (cls) => (/\bbg-navy-950\b/.test(cls) ? '950' : /\bbg-navy-800\b/.test(cls) ? '800' : `other(${cls.match(/\bbg-[\w-]+/)?.[0] || 'none'})`);
+const shadeOf = (cls) => (/\bbg-navy-950\b/.test(cls) ? '950' : /\bbg-navy-800\b/.test(cls) ? '800' : /\bbg-footer\b/.test(cls) ? 'footer' : `other(${cls.match(/\bbg-[\w-]+/)?.[0] || 'none'})`);
 const shades = {
   Hero: shadeOf(sectionClass(read('../src/sections/Hero.jsx'))),
   CompanyIntroduction: shadeOf(sectionClass(read('../src/sections/CompanyIntroduction.jsx'))),
@@ -74,8 +74,8 @@ const shades = {
 };
 const order = sections.map((name) => shades[name]);
 const footerShade = shadeOf((read('../src/components/layout/Footer.jsx').match(/<footer className="([^"]+)"/) || ['', ''])[1]);
-assert(sections.join(',') === 'Hero,CompanyIntroduction,ServicesOverview,ProjectPreview,PresenceTeaser,EnquirySection' && order.join(',') === '950,800,950,800,950,800' && footerShade === '950',
-  `Sections alternate navy-950 / navy-800 (${sections.map((n, i) => `${n}:${order[i]}`).join(' ')}), then the navy-950 footer`);
+assert(sections.join(',') === 'Hero,CompanyIntroduction,ServicesOverview,ProjectPreview,PresenceTeaser,EnquirySection' && order.join(',') === '950,800,950,800,950,800' && footerShade === 'footer',
+  `Sections alternate navy-950 / navy-800 (${sections.map((n, i) => `${n}:${order[i]}`).join(' ')}), then the #08090A footer`);
 assert(!/\bbg-(white|light|slate-50|slate-100)\b(?!\/)/.test(home + teaser + read('../src/sections/Hero.jsx') + read('../src/sections/CompanyIntroduction.jsx') + read('../src/sections/ServicesOverview.jsx') + read('../src/sections/ProjectPreview.jsx')), 'No white / light backgrounds on the homepage');
 
 console.log(`\n${passes} passed, ${failures} failed`);

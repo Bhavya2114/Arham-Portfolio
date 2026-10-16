@@ -112,7 +112,7 @@ export const Contact = () => {
                 
                 {/* Telephone */}
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-accent/15/70 text-accent flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 mt-0.5">
                     <Phone className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <div className="space-y-0.5">
@@ -135,7 +135,7 @@ export const Contact = () => {
                 {/* WhatsApp */}
                 {COMPANY_CONTACT.isWhatsAppConfigured && (
                   <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-brand-border">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-400/15 text-emerald-300 flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 mt-0.5">
                       <MessageCircle className="w-4 h-4" aria-hidden="true" />
                     </div>
                     <div className="space-y-0.5">
@@ -156,7 +156,7 @@ export const Contact = () => {
 
                 {/* Email */}
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-accent/15/70 text-accent flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 mt-0.5">
                     <Mail className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <div className="space-y-0.5">
@@ -178,7 +178,7 @@ export const Contact = () => {
 
                 {/* Registered Office */}
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-accent/15/70 text-accent flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 mt-0.5">
                     <MapPin className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <div className="space-y-0.5">
@@ -197,7 +197,7 @@ export const Contact = () => {
 
                 {/* Operational Hours */}
                 <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-accent/15/70 text-accent flex items-center justify-center shrink-0 mt-0.5">
+                  <div className="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 mt-0.5">
                     <Clock className="w-4 h-4" aria-hidden="true" />
                   </div>
                   <div className="space-y-0.5">

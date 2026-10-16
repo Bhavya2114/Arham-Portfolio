@@ -41,7 +41,7 @@ assert(/\{L\.otherStates\}/.test(svgSrc) && /<g \{\.\.\.deco\} data-layer="edges
 assert(/const overviewCityLayer = !selectedCode && !moving && overviewCities\.length > 0 &&/.test(mapSrc), 'Overview city dots hidden while moving');
 
 console.log('\n2. Styles');
-assert(/cyan: '#3FD0E6'/.test(svgSrc) && /land: '#070A1F'/.test(svgSrc) && /const OTHER_FILL_OPACITY = 0\.45;/.test(svgSrc) && /stroke=\{MAP_COLORS\.cyan\}\s*strokeWidth=\{1\.5\}/.test(svgSrc), 'Other states: cyan 1.5 px outline over #070A1F at 45 %');
+assert(/cyan: '#3FD0E6'/.test(svgSrc) && /land: '#0C0D0F'/.test(svgSrc) && /const OTHER_FILL_OPACITY = 0\.45;/.test(svgSrc) && /stroke=\{MAP_COLORS\.cyan\}\s*strokeWidth=\{1\.5\}/.test(svgSrc), 'Other states: cyan 1.5 px outline over the graphite page colour #0C0D0F at 45 %');
 assert(/const ECHO = \{ offsetPx: 3, opacity: 0\.22 \};/.test(svgSrc) && /transform=\{`translate\(0 \$\{ECHO\.offsetPx \* unit\}\)`\}/.test(svgSrc), 'Faint second cyan outline 3 px lower (22 %)');
 assert(/workedCenter: '#5C7E1C'/.test(svgSrc) && /workedEdge: '#2F4A10'/.test(svgSrc) && /<radialGradient id="india-map-worked-fill-hover"/.test(svgSrc) && /el\.setAttribute\('fill', `url\(#india-map-worked-fill-\$\{kind\}\)`\);/.test(svgSrc), 'Worked states: dark olive fill, lighter in the centre; brighter on hover (highlight path)');
 assert(/const FILL_GRADIENT = \{ cx: 481, cy: 496, r: 440 \};/.test(svgSrc)
@@ -77,7 +77,7 @@ assert(/\{isSelected && cityBeacon && !moving && \(\s*<g className="presence-bea
 const beacon = (css.match(/@keyframes presence-beacon \{([\s\S]*?)\n\}/) || [])[1] || '';
 assert(/0% \{ transform: scale\(1\); opacity: 0\.6; \}/.test(beacon) && /100% \{ transform: scale\(2\.4\); opacity: 0; \}/.test(beacon) && !/(^|[\s{;])(r|stroke-width)\s*:/.test(beacon) && /transform-box: fill-box;\s*transform-origin: center;[\s\S]*?animation: presence-beacon 2s ease-out infinite;/.test(css), 'Pulse: scale 1 to 2.4 while fading 60 % to 0, every 2 s ease-out; animates only transform and opacity');
 assert(/@media \(prefers-reduced-motion: reduce\) \{\s*\.presence-beacon \{ animation: none; display: none; \}/.test(css), 'Pulse disabled under prefers-reduced-motion');
-assert(/export const PAGE_NAVY = '#070A1F';/.test(mapSrc) && /const MAP_BACKGROUND = `radial-gradient\(ellipse farthest-side at 50% 50%, #0B1030 0%, \$\{PAGE_NAVY\} 100%\)`;/.test(mapSrc) && /style=\{\{\s*background: MAP_BACKGROUND,/.test(mapSrc) && !/dot-grid|DOT_GRID/.test(mapSrc), 'Plain navy radial CSS background (#0B1030 → #070A1F) ending in the page navy, no dot grid');
+assert(/export const PAGE_NAVY = '#0C0D0F';/.test(mapSrc) && /const MAP_BACKGROUND = `radial-gradient\(ellipse farthest-side at 50% 50%, #141518 0%, \$\{PAGE_NAVY\} 100%\)`;/.test(mapSrc) && /style=\{\{\s*background: MAP_BACKGROUND,/.test(mapSrc) && !/dot-grid|DOT_GRID/.test(mapSrc), 'Plain graphite radial CSS background (#141518 → #0C0D0F) ending in the page background, no dot grid');
 
 console.log('\n2d. No boxes around the map');
 const presenceCode = code(presenceSrc);

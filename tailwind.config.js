@@ -7,17 +7,18 @@ export default {
   theme: {
     extend: {
       colors: {
-        // "Light in the dark" palette, tonal dark (no light sections). One accent only: yellow =
-        // important / clickable.
+        // "Graphite" palette: all dark, no light sections. One accent only: yellow = important / clickable.
+        // The navy-* names are kept (now graphite) so components need no class changes.
         navy: {
-          950: "#070A1F", // dark base (sections alternate 950 / 800)
-          900: "#0B1030", // dark gradient top; form inputs
-          800: "#0E1430", // the lighter of the two section shades
+          950: "#0C0D0F", // bg: main page background, header (sections alternate 950 / 800)
+          900: "#101114", // form inputs
+          800: "#141518", // bg2: alternating section background
         },
-        surface: "#111733", // /presence panels
-        card: "#151C3D", // cards on both section shades (1px white/7 % border)
-        heading: "#EEF1F7", // headings (not pure white)
-        body: "#B9C1D3", // body text
+        surface: "#1B1D21", // panels (= card)
+        footer: "#08090A",
+        card: "#1B1D21", // cards, form box, panels (1px white/7 % border)
+        heading: "#F1F1EF", // headings (not pure white)
+        body: "#B4B6BA", // body text
         accent: {
           DEFAULT: "#D9E35A", // buttons, highlights, active states
           hover: "#E6EE7A",
@@ -26,23 +27,23 @@ export default {
         olive: "#3F5A14", // secondary (also links / icons / focus rings on light: AA on white)
         cyan: "#3FD0E6", // thin detail lines only, sparingly
         // Legacy names from the light theme, now pointing at their tonal-dark equivalents.
-        light: "#0E1430", // = navy-800 (was the light section background)
-        ink: "#EEF1F7", // = heading (was text on light)
+        light: "#141518", // = navy-800 (was the light section background)
+        ink: "#F1F1EF", // = heading (was text on light)
         muted: {
-          DEFAULT: "#9AA3B8", // muted text
-          dark: "#9AA3B8", // muted text on dark
+          DEFAULT: "#8F9298", // muted text
+          dark: "#8F9298", // muted text on dark
         },
         // Legacy names, kept as aliases onto the new palette until the pages are restyled (stage 2).
         // The old brand blue is gone; its uses were moved to accent / olive.
         brand: {
-          navy: "#EEF1F7", // = heading
-          "navy-dark": "#070A1F", // = navy-950
-          "navy-light": "#111733", // = surface
-          bg: "#0E1430", // = navy-800
-          "warm-white": "#0E1430",
-          slate: "#B9C1D3", // = body
-          "slate-light": "#9AA3B8", // = muted
-          "slate-dark": "#B9C1D3",
+          navy: "#F1F1EF", // = heading
+          "navy-dark": "#0C0D0F", // = navy-950
+          "navy-light": "#1B1D21", // = surface
+          bg: "#141518", // = navy-800
+          "warm-white": "#141518",
+          slate: "#B4B6BA", // = body
+          "slate-light": "#8F9298", // = muted
+          "slate-dark": "#B4B6BA",
           accent: "#D9E35A", // = accent
           border: "#FFFFFF12", // white / 7 %
           "border-subtle": "#FFFFFF0A",

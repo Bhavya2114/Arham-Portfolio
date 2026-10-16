@@ -3,20 +3,21 @@
 @tailwind utilities;
 
 :root {
-  /* Color Palette — "Light in the dark" (same values as tailwind.config.js) */
-  --color-navy-950: #070A1F;
-  --color-navy-900: #0B1030;
-  --color-surface: #111733;
+  /* Color Palette — "Graphite" (same values as tailwind.config.js) */
+  --color-navy-950: #0C0D0F;
+  --color-navy-900: #101114;
+  --color-surface: #1B1D21;
+  --color-footer: #08090A;
   --color-accent: #D9E35A;
   --color-accent-ink: #14180A;
   --color-olive: #3F5A14;
   --color-cyan: #3FD0E6;
-  --color-navy-800: #0E1430;
-  --color-card: #151C3D;
-  --color-heading: #EEF1F7;
-  --color-body: #B9C1D3;
-  --color-muted: #9AA3B8;
-  --color-muted-dark: #9AA3B8;
+  --color-navy-800: #141518;
+  --color-card: #1B1D21;
+  --color-heading: #F1F1EF;
+  --color-body: #B4B6BA;
+  --color-muted: #8F9298;
+  --color-muted-dark: #8F9298;
   --color-border: rgba(255, 255, 255, 0.07);
 
   /* Typography (self-hosted via @fontsource, see src/main.jsx) */

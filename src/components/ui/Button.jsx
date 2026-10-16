@@ -25,15 +25,15 @@ export const Button = ({
   const baseStyles = 'inline-flex items-center justify-center font-sans font-semibold rounded-xl transition-colors duration-150 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-accent-ink disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none select-none';
 
   const secondary = onDark
-    ? 'bg-transparent text-white border border-white/30 hover:bg-white/10 hover:border-white/50 active:bg-white/15'
-    : 'bg-transparent text-ink border border-ink/20 hover:bg-ink/5 hover:border-ink/40 active:bg-ink/10';
+    ? 'bg-transparent text-heading border border-white/[0.14] hover:bg-white/5 hover:border-white/30 active:bg-white/10'
+    : 'bg-transparent text-heading border border-white/[0.14] hover:bg-white/5 hover:border-white/30 active:bg-white/10';
   const variantStyles = {
     primary: 'bg-accent text-accent-ink hover:bg-accent-hover active:bg-accent shadow-subtle',
     secondary,
     outline: secondary,
     ghost: onDark
-      ? 'bg-transparent text-white hover:bg-white/10 active:bg-white/15'
-      : 'bg-transparent text-ink hover:bg-ink/5 active:bg-ink/10',
+      ? 'bg-transparent text-heading hover:bg-white/10 active:bg-white/15'
+      : 'bg-transparent text-heading hover:bg-white/5 active:bg-white/10',
   };
 
   const sizeStyles = {

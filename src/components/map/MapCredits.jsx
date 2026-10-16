@@ -59,7 +59,7 @@ export const MapCredits = ({ cities = false, districts = false }) => {
           id="presence-map-credits"
           role="region"
           aria-label="Map data credits"
-          className="mr-1 w-64 max-w-[calc(100vw-3rem)] rounded-lg border border-white/10 bg-[#0B1A24]/95 p-3 text-left text-[11px] leading-relaxed text-slate-400 shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
+          className="mr-1 w-64 max-w-[calc(100vw-3rem)] rounded-lg border border-white/10 bg-card/95 p-3 text-left text-[11px] leading-relaxed text-slate-400 shadow-[0_8px_24px_rgba(0,0,0,0.45)]"
         >
           {cities && (
             <p>

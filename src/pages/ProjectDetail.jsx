@@ -63,7 +63,7 @@ export const ProjectDetail = () => {
             padding="lg"
             className="max-w-2xl mx-auto text-center py-12 px-6 sm:px-10 space-y-6"
           >
-            <div className="w-16 h-16 rounded-2xl bg-white/[0.06] border border-white/10 flex items-center justify-center text-muted-dark mx-auto">
+            <div className="w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center text-accent mx-auto">
               <AlertCircle className="w-8 h-8 text-accent" aria-hidden="true" />
             </div>
 
@@ -235,7 +235,7 @@ export const ProjectDetail = () => {
                       backgroundSize: '16px 16px'
                     }}
                   />
-                  <div className="relative z-10 w-16 h-16 rounded-2xl bg-card shadow-subtle border border-brand-border flex items-center justify-center text-brand-navy mb-3">
+                  <div className="relative z-10 w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center text-accent mb-3">
                     <CategoryIcon className="w-8 h-8 text-accent" />
                   </div>
                   <h2 className="relative z-10 text-base font-bold text-brand-navy font-heading">

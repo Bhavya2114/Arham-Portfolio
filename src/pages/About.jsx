@@ -49,21 +49,21 @@ export const About = () => {
       title: 'Electrical Infrastructure & Cabling',
       description:
         'Industrial cable trays, ladder racks, conduit routing, and heavy-duty containment networks engineered for lasting physical protection and operational durability.',
-      badgeVariant: 'amber',
+      badgeVariant: 'accent',
     },
     {
       icon: Zap,
       title: 'Power Distribution & Switchboards',
       description:
         'Main switchboards, motor control centers (MCC), sub-distribution panels, busbar trunking, and protection coordination built for steady facility electrification.',
-      badgeVariant: 'blue',
+      badgeVariant: 'accent',
     },
     {
       icon: Lightbulb,
       title: 'Architectural & Commercial Lighting',
       description:
         'Engineered commercial interior layouts, facade accent illumination, and energy-efficient LED luminaires designed to balance visual comfort and structural elegance.',
-      badgeVariant: 'amber',
+      badgeVariant: 'accent',
     },
   ];
 
@@ -302,7 +302,7 @@ export const About = () => {
                   padding="lg"
                   className="bg-card border border-brand-border flex items-start gap-4"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-white/[0.06] border border-white/10 flex items-center justify-center text-brand-navy shrink-0 mt-0.5">
+                  <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent shrink-0 mt-0.5">
                     <Icon className="w-5 h-5 text-accent" aria-hidden="true" />
                   </div>
                   <div className="space-y-1.5">

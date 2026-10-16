@@ -35,7 +35,7 @@ export const EDGE_YELLOW = '#D9E35A';
 export const MAP_COLORS = Object.freeze({
   edge: EDGE_YELLOW,
   cyan: '#3FD0E6',
-  land: '#070A1F',
+  land: '#0C0D0F', // = the page background
   workedCenter: '#5C7E1C',
   workedEdge: '#2F4A10',
   hoverCenter: '#6A8F22',

@@ -2,7 +2,7 @@ import React from 'react';
 
 /**
  * Reusable SectionHeading primitive for consistent title and subtitle hierarchy.
- * Tonal dark theme: heading #EEF1F7, subtitle in body #B9C1D3 on both section shades (`tone` kept for
+ * Graphite theme: heading #F1F1EF, subtitle in body #B4B6BA on both section shades (`tone` kept for
  * compatibility).
  */
 export const SectionHeading = ({

@@ -51,10 +51,10 @@ assert(appCode.includes('path="*"'), 'Wildcard 404 Route "*" registered');
 
 // 3. Design System & Token Integrity
 console.log('\n3. Design System & Token Integrity:');
-assert(DESIGN_TOKENS.palette.navy950 === '#070A1F', 'Dark base (navy-950) is #070A1F');
+assert(DESIGN_TOKENS.palette.navy950 === '#0C0D0F', 'Dark base (navy-950) is graphite #0C0D0F');
 assert(DESIGN_TOKENS.palette.accent === '#D9E35A' && DESIGN_TOKENS.palette.accentInk === '#14180A', 'One accent: #D9E35A, with dark text #14180A on it');
 assert(DESIGN_TOKENS.palette.light === '#F7F8FA', 'Light section background is #F7F8FA');
-assert(DESIGN_TOKENS.palette.muted === '#627289' && DESIGN_TOKENS.palette.mutedDark === '#9AA3B8', 'Muted text: #627289 on light (AA on #F7F8FA), #9AA3B8 on dark');
+assert(DESIGN_TOKENS.palette.muted === '#627289' && DESIGN_TOKENS.palette.mutedDark === '#8F9298', 'Muted text: #627289 on light (AA on #F7F8FA), #8F9298 on dark');
 assert(!Object.values(DESIGN_TOKENS.palette).includes('#2563EB'), 'No old brand blue in the palette');
 
 // 4. CSS Accessibility & Reduced Motion

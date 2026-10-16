@@ -7,12 +7,14 @@
  */
 
 export const DESIGN_TOKENS = {
-  // "Light in the dark" palette (same values as tailwind.config.js). One accent: yellow = important /
+  // "Graphite" palette (same values as tailwind.config.js). One accent: yellow = important /
   // clickable; text on yellow is always dark.
   palette: {
-    navy950: '#070A1F',           // Dark base
-    navy900: '#0B1030',           // Dark gradient top
-    surface: '#111733',           // Cards on dark
+    navy950: '#0C0D0F',           // Dark base (bg)
+    navy900: '#101114',           // Form inputs
+    navy800: '#141518',           // bg2: alternating sections
+    footer: '#08090A',            // Footer
+    surface: '#1B1D21',           // Cards on dark
     accent: '#D9E35A',            // Buttons, highlights, active states
     accentHover: '#E6EE7A',       // Accent hover
     accentInk: '#14180A',         // Text on accent
@@ -21,7 +23,7 @@ export const DESIGN_TOKENS = {
     light: '#F7F8FA',             // Light section background
     ink: '#0F172A',               // Text on light
     muted: '#627289',             // Muted text on light (AA 4.6:1 on #F7F8FA)
-    mutedDark: '#9AA3B8',         // Muted text on dark
+    mutedDark: '#8F9298',         // Muted text on dark
     white: '#FFFFFF',             // Cards on light
     mainBorder: '#E2E8F0',        // Borders and dividers on light
     borderSubtle: '#F1F5F9',      // Subtle dividers on light
@@ -33,7 +35,7 @@ export const DESIGN_TOKENS = {
       primary: '#0F172A',
       secondary: '#627289',
       onDark: '#FFFFFF',
-      onDarkMuted: '#9AA3B8',
+      onDarkMuted: '#8F9298',
       onAccent: '#14180A',
       link: '#3F5A14',
       accent: '#D9E35A',
@@ -41,9 +43,9 @@ export const DESIGN_TOKENS = {
     background: {
       page: '#F7F8FA',
       card: '#FFFFFF',
-      dark: '#070A1F',
-      darkGradientTop: '#0B1030',
-      cardOnDark: '#111733',
+      dark: '#0C0D0F',
+      darkGradientTop: '#141518',
+      cardOnDark: '#1B1D21',
     },
     action: {
       primary: '#D9E35A',

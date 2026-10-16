@@ -11,7 +11,7 @@ export const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full bg-navy-950 border-t border-white/[0.08] text-white">
+    <footer className="w-full bg-footer border-t border-white/[0.08] text-white">
       <Container size="default" className="py-12 md:py-16">
         
         {/* Main Footer Grid */}
@@ -19,7 +19,7 @@ export const Footer = () => {
           
           {/* Column 1: Brand & Profile Description (4 cols) */}
           <div className="lg:col-span-4 space-y-4">
-            <Link to="/" className="inline-block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-navy-950" aria-label="Arham Home">
+            <Link to="/" className="inline-block rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-footer" aria-label="Arham Home">
               <BrandLogo variant="light" size="default" />
             </Link>
             

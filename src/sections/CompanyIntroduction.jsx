@@ -124,7 +124,7 @@ export const CompanyIntroduction = () => {
             
             {/* Highlight 1: Electrical Infrastructure & Wiring */}
             <Card variant="muted" padding="md" className="space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-accent/15 text-accent flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-accent/10 text-accent flex items-center justify-center">
                 <Cable className="w-5 h-5" aria-hidden="true" />
               </div>
               <h4 className="text-base font-bold text-brand-navy font-heading">
@@ -140,7 +140,7 @@ export const CompanyIntroduction = () => {
 
             {/* Highlight 2: Power Distribution & Engineering Systems */}
             <Card variant="muted" padding="md" className="space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-accent/15 text-accent flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-accent/10 text-accent flex items-center justify-center">
                 <Cpu className="w-5 h-5" aria-hidden="true" />
               </div>
               <h4 className="text-base font-bold text-brand-navy font-heading">
@@ -156,7 +156,7 @@ export const CompanyIntroduction = () => {
 
             {/* Highlight 3: Architectural & Commercial Lighting */}
             <Card variant="muted" padding="md" className="space-y-3">
-              <div className="w-10 h-10 rounded-lg bg-amber-400/15 text-amber-200 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-lg bg-accent/10 text-accent flex items-center justify-center">
                 <Lightbulb className="w-5 h-5" aria-hidden="true" />
               </div>
               <h4 className="text-base font-bold text-brand-navy font-heading">

@@ -50,12 +50,12 @@ const MARKER_RADIUS_PX = 5;
 const OVERVIEW_CITY = { dotPx: 1.5, opacity: 0.9 };
 // Soft halo behind each zoomed city pin: white, ~2.2× the dot, no blur.
 const PIN_HALO = { scale: 2.2, opacity: 0.18 };
-// Plain navy radial background behind the map (CSS only, static).
-// Page navy behind the whole /presence map section; the map's radial glow ends exactly in it at the
+// Plain graphite radial background behind the map (CSS only, static).
+// Page background (graphite) behind the whole /presence map section; the map's radial glow ends exactly in it at the
 // wrapper's sides, so there is no visible rectangle.
-export const PAGE_NAVY = '#070A1F';
-const MAP_BACKGROUND = `radial-gradient(ellipse farthest-side at 50% 50%, #0B1030 0%, ${PAGE_NAVY} 100%)`;
-// Soft edge fade over the map wrapper's clipped edges: page navy → transparent on all four sides,
+export const PAGE_NAVY = '#0C0D0F'; // page background (Graphite bg)
+const MAP_BACKGROUND = `radial-gradient(ellipse farthest-side at 50% 50%, #141518 0%, ${PAGE_NAVY} 100%)`;
+// Soft edge fade over the map wrapper's clipped edges: page background → transparent on all four sides,
 // sized by --map-fade (40 px phone, 80 px desktop). Plain linear gradients, no mask.
 const EDGE_FADE = [
   `linear-gradient(to bottom, ${PAGE_NAVY}, transparent) top / 100% var(--map-fade) no-repeat`,

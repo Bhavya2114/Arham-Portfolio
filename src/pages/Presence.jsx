@@ -233,7 +233,7 @@ export const Presence = () => {
 
   return (
     <div className="flex-1 w-full bg-brand-navy-dark text-slate-100">
-      {/* One background for the map section: page navy, with the map's own radial glow fading into it.
+      {/* One background for the map section: page background (graphite), with the map's own radial glow fading into it.
           overflow-x clip: the map wrapper's fade band may extend past the page gutter. */}
       <section aria-labelledby="presence-heading" className="relative overflow-x-clip" style={{ background: PAGE_NAVY }}>
         {/* Bottom padding ≥ the map's fade band (40 / 80 px), so the band stays inside this section. */}

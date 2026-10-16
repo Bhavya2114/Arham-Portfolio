@@ -48,7 +48,7 @@ export const Services = () => {
       title: 'Electrical Infrastructure & Industrial Cabling',
       icon: Cable,
       tag: 'Cabling & Containment',
-      badgeVariant: 'amber',
+      badgeVariant: 'accent',
       image: '/images/project-infrastructure.jpg',
       alt: 'Illustrative technical view of organized overhead industrial cable trays and wiring networks',
       summary:
@@ -67,7 +67,7 @@ export const Services = () => {
       title: 'HT/LT Power Distribution & Switchboards',
       icon: Zap,
       tag: 'Panels & Distribution',
-      badgeVariant: 'blue',
+      badgeVariant: 'accent',
       image: '/images/project-distribution.jpg',
       alt: 'Illustrative engineering view of industrial switchgear panels and electrical control room',
       summary:
@@ -86,7 +86,7 @@ export const Services = () => {
       title: 'Architectural & Commercial Lighting Solutions',
       icon: Lightbulb,
       tag: 'Commercial Lighting',
-      badgeVariant: 'amber',
+      badgeVariant: 'accent',
       image: '/images/project-lighting.jpg',
       alt: 'Illustrative architectural view of commercial building lobby and linear LED lighting installation',
       summary:

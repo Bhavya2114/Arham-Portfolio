@@ -7,7 +7,7 @@ import Badge from '../ui/Badge';
 import { NAV_ITEMS } from '../../data/navigation';
 import { Menu, X, ArrowRight, Info } from 'lucide-react';
 
-// Dark header ("Light in the dark"): solid navy #070A1F (no backdrop blur), white links, the
+// Dark header (Graphite): solid #0C0D0F with a white/7 % bottom border (no backdrop blur), white links, the
 // active page in accent yellow with a yellow underline.
 const FOCUS_ON_DARK = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-navy-950';
 const ACTIVE_UNDERLINE = 'relative after:absolute after:left-3 after:right-3 after:bottom-0.5 after:h-0.5 after:rounded-full after:bg-accent';
@@ -84,7 +84,7 @@ export const Header = () => {
 
   return (
     <>
-      <header className="w-full bg-navy-950 border-b border-white/10 sticky top-0 z-40 transition-colors">
+      <header className="w-full bg-navy-950 border-b border-white/[0.07] sticky top-0 z-40 transition-colors">
         <Container size="default">
           <div className="h-20 flex items-center justify-between gap-4">
             
@@ -245,9 +245,9 @@ export const Header = () => {
           aria-modal="true"
           aria-labelledby="notice-dialog-title"
         >
-          <div className="bg-white rounded-xl shadow-elevated border border-brand-border max-w-md w-full p-6 space-y-4">
+          <div className="bg-card rounded-xl shadow-elevated border border-white/[0.07] max-w-md w-full p-6 space-y-4">
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-olive/10 text-olive shrink-0">
+              <div className="p-2 rounded-lg bg-accent/10 text-accent shrink-0">
                 <Info className="w-5 h-5" />
               </div>
               <div className="space-y-1">
