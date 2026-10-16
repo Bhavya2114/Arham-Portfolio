@@ -6,7 +6,7 @@
  * radial fill for the whole map, a bright outer outline with quieter shared borders, a fake glow made
  * of two faint strokes, 35 % dimming per path, overview city dots,
  * white pins with a yellow ring when selected, a plain CSS navy background and the legend. The
- * homepage light variant keeps its original rendering.
+ * light variant is gone: the homepage shows a static image of the /presence overview.
  */
 
 import fs from 'fs';
@@ -106,7 +106,7 @@ assert(/<g \{\.\.\.deco\} data-layer="islands">\{L\.islands\}<\/g>/.test(svgSrc)
 assert(!/texture|slab|SLAB/i.test(svgCode + mapCode), 'No texture lines or slab');
 
 console.log('\n3. Structure kept');
-assert(/const renderLightState = /.test(svgSrc) && /'fill-blue-50 hover:fill-blue-100'/.test(svgSrc) && /\{!isDark && INDIA_MAP_STATES\.map\(renderLightState\)\}/.test(svgSrc), 'Homepage light variant rendered by its original code path');
+assert(!/renderLightState|fill-blue/.test(svgSrc) && /variant = 'dark'/.test(svgSrc), 'Light (homepage) variant removed: the map is dark-only and lives on /presence');
 assert(/role="button"\s*tabIndex=\{0\}\s*aria-label=\{`\$\{state\.name\} \(\$\{state\.type\}\)`\}\s*aria-pressed=\{selectedStateCode === state\.id\}/.test(svgSrc), 'Worked states keep button role, focus and aria-pressed');
 assert(/live\.current = \{ activeSet, onSelectState, onSelectInactiveState, selectedStateCode \};/.test(svgSrc) && /const L = useMemo\(/.test(svgSrc), 'Static layers memoised; handlers read through a ref');
 

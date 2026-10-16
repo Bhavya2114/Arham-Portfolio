@@ -124,11 +124,11 @@ assert(read('../public/sitemap.xml').includes('<loc>/presence</loc>'), 'Sitemap 
 
 console.log('\n7. Homepage Map Preservation:');
 const mapSrc = read('../src/components/map/IndiaMapSvg.jsx');
-assert(mapSrc.includes("variant = 'light'"), 'IndiaMapSvg defaults to the light variant');
+assert(mapSrc.includes("variant = 'dark'") && !/renderLightState/.test(mapSrc), 'IndiaMapSvg is dark-only (the homepage shows a static image of /presence)');
 assert(mapSrc.includes('viewBox = INDIA_MAP_VIEWBOX'), 'IndiaMapSvg defaults to the original viewBox');
-const previewSrc = read('../src/sections/PresencePreview.jsx');
-assert(!previewSrc.includes('variant="dark"'), 'Homepage PresencePreview does not opt into the dark variant');
-assert(previewSrc.includes('getActiveStateCodes'), 'Homepage PresencePreview still uses its existing selectors');
+const previewSrc = read('../src/sections/PresenceTeaser.jsx');
+assert(!/IndiaMapSvg|PresenceMap/.test(previewSrc), 'Homepage teaser renders no map component');
+assert(previewSrc.includes('PRESENCE_TEASER_STATS') && previewSrc.includes('to="/presence"'), 'Homepage teaser shows the stats constant and links to /presence');
 
 console.log('\n8. Single Source of Truth for Coverage:');
 const statesSrc = read('../src/data/states.js');

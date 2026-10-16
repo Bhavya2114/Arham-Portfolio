@@ -164,9 +164,9 @@ const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).forEach((d) =
 });
 walk(path.resolve(__dirname, '../src'));
 assert(srcFiles.every((f) => !/^import [^;]*geo\/states\//m.test(fs.readFileSync(f, 'utf-8'))), 'No static imports of state geography modules');
-const previewSrc = read('../src/sections/PresencePreview.jsx');
+const previewSrc = read('../src/sections/PresenceTeaser.jsx');
 const homeSrc = read('../src/pages/Home.jsx');
-assert(!previewSrc.includes('geo/') && !homeSrc.includes('geo/') && !previewSrc.includes('geography'), 'Homepage does not load geography');
+assert(!previewSrc.includes('geo/') && !homeSrc.includes('geo/') && !previewSrc.includes('geography'), 'Homepage (static /presence teaser) does not load geography');
 
 console.log('\n5. UI Wiring:');
 const mapSrc = read('../src/components/map/PresenceMap.jsx');

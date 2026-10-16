@@ -127,8 +127,8 @@ assert(detailsSrc.includes('project photograph'), 'Gallery provides descriptive 
 const statusSrc = read('../src/components/presence/CityStatus.jsx');
 assert(statusSrc.includes('Project locations will appear here as approved project information becomes available.'), 'City empty state copy');
 assert(!pageSrc.includes('<CityDetails'), 'The removed CityDetails component is not used');
-const previewSrc = read('../src/sections/PresencePreview.jsx');
-assert(!previewSrc.includes('PresenceMap') && !previewSrc.includes('ProjectDetails'), 'Homepage preview keeps its lightweight map');
+const previewSrc = read('../src/sections/PresenceTeaser.jsx');
+assert(!previewSrc.includes('PresenceMap') && !previewSrc.includes('ProjectDetails'), 'Homepage teaser stays lightweight (static image, no map)');
 assert(read('../src/App.jsx').includes("lazy(() => import('./pages/Presence'))"), 'Presence route remains lazy-loaded');
 
 console.log('\n6. City Selection Without Zoom (restored behaviour):');

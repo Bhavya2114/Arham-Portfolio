@@ -22,7 +22,8 @@ import { splitRegionEdges, pathCentreX } from './regionEdges';
  *   · with a state selected, the other worked states are drawn at 35 % (per-path opacity).
  *   Performance rules: no blur filters, patterns, masks or group opacity, no animation; while
  *   `moving` (zoom / pan / drag) only the state fills and their edges are drawn.
- *   The default `variant="light"` rendering is unchanged.
+ *   The map is used only on /presence (the homepage shows a static image of it), so the old
+ *   light variant was removed; `dark` is the only variant.
  * - Dark variant strokes use `non-scaling-stroke` so boundaries stay crisp when the
  *   caller zooms via `viewBox`; `children` render as an overlay (e.g. city markers).
  */
@@ -74,9 +75,9 @@ export const IndiaMapSvg = ({
   onSelectInactiveState = null,
   className = '',
   ariaLabel = 'Map of India - Project Locations',
-  variant = 'light',
+  variant = 'dark',
   viewBox = INDIA_MAP_VIEWBOX,
-  svgClassName = 'w-full h-auto max-h-[580px] drop-shadow-subtle select-none transition-all duration-200',
+  svgClassName = 'w-full h-auto select-none',
   pxUnit = null,
   moving = false,
   children = null,
@@ -157,55 +158,6 @@ export const IndiaMapSvg = ({
         onSel(state.id);
       }
     }
-  };
-
-  // ---- Light variant (homepage): original rendering, unchanged ----
-  const renderLightState = (state) => {
-    const isActive = activeSet.has(state.id);
-    const isSelected = selectedStateCode === state.id;
-
-    // Compute appearance based on publication status
-    let fillClass = 'fill-slate-100 transition-colors duration-150';
-    let strokeClass = 'stroke-slate-300';
-    let strokeWidth = 0.8;
-    let cursorClass = 'cursor-default';
-
-    if (isSelected) {
-      fillClass = 'fill-[#2563EB]'; // old brand blue, kept until the homepage map is reviewed (stage 2)
-      strokeClass = 'stroke-brand-navy';
-      strokeWidth = 1.5;
-      cursorClass = 'cursor-pointer';
-    } else if (isActive) {
-      fillClass = 'fill-blue-50 hover:fill-blue-100';
-      strokeClass = 'stroke-[#2563EB]';
-      strokeWidth = 1.2;
-      cursorClass = 'cursor-pointer';
-    }
-
-    const focusClass = isActive
-      ? 'focus-visible:stroke-amber-500 focus-visible:stroke-2 focus-visible:outline-none'
-      : 'focus:outline-none';
-
-    return (
-      <path
-        key={state.id}
-        id={state.id}
-        d={state.d}
-        className={`${fillClass} ${strokeClass} ${cursorClass} ${focusClass}`}
-        strokeWidth={strokeWidth}
-        strokeLinejoin="round"
-        strokeLinecap="round"
-        role={isActive ? 'button' : undefined}
-        aria-hidden={!isActive ? 'true' : undefined}
-        tabIndex={isActive ? 0 : -1}
-        aria-label={isActive ? `${state.name} (${state.type})` : undefined}
-        aria-pressed={isActive ? isSelected : undefined}
-        onClick={() => handleStateClick(state)}
-        onKeyDown={(e) => handleKeyDown(e, state)}
-      >
-        <title>{`${state.name} (${state.type})${isActive ? ' • Verified Projects' : ''}`}</title>
-      </path>
-    );
   };
 
   // ---- Dark variant (Our Presence): static elements built once per coverage / selection ----
@@ -341,7 +293,6 @@ export const IndiaMapSvg = ({
             selected-state edge. Only worked states are focusable, so their tab order is unchanged.
             Entrance animation: CSS keyed on the map wrapper's data-entrance (styles/index.css). */}
         <g id="india-states-layer">
-          {!isDark && INDIA_MAP_STATES.map(renderLightState)}
           {isDark && (
             <>
               {!moving && <g {...deco} data-layer="outline-echo" transform={`translate(0 ${ECHO.offsetPx * unit})`}>{L.echo}</g>}

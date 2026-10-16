@@ -28,7 +28,7 @@ const assert = (cond, msg) => {
 const mapSrc = read('../src/components/map/PresenceMap.jsx');
 const svgSrc = read('../src/components/map/IndiaMapSvg.jsx');
 const pageSrc = read('../src/pages/Presence.jsx');
-const homeSrc = read('../src/sections/PresencePreview.jsx');
+const homeSrc = read('../src/sections/PresenceTeaser.jsx');
 
 console.log('\n1. No redundant back buttons');
 assert(!/Back to India|Back to \$\{|backLabel|\bonBack\b/.test(mapSrc), 'PresenceMap renders no back button and takes no onBack / backLabel');
@@ -39,7 +39,7 @@ console.log('\n2. Uncovered state returns to India');
 assert(/onSelectInactiveState = null,/.test(svgSrc) && /else if \(!set\.has\(state\.id\) && onInactive\) \{\s*onInactive\(state\.id\);/.test(svgSrc), 'IndiaMapSvg forwards clicks on uncovered states only when a handler is given');
 assert(/onSelectInactiveState=\{onSelectInactiveState\}/.test(mapSrc), 'PresenceMap passes the handler to the SVG');
 assert(pageSrc.includes("onSelectInactiveState={() => dispatch({ type: 'reset' })}"), 'Presence page resets to India on an uncovered state');
-assert(!/onSelectInactiveState/.test(homeSrc), 'Homepage preview unchanged (no inactive-state handler)');
+assert(!/onSelectInactiveState/.test(homeSrc), 'Homepage teaser has no map handlers (static image)');
 
 console.log('\n3. Reducer flows');
 let s = reduce(INIT, { type: 'selectState', stateCode: 'IN-RJ' });

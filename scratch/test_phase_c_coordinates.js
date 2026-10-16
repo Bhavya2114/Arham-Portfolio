@@ -162,8 +162,8 @@ assert(sheetSrc.includes('lg:hidden') && sheetSrc.includes("['peek', 'half', 'fu
 assert(sheetSrc.includes('Expand details') && sheetSrc.includes('Close details'), 'Sheet has expand/collapse and close buttons');
 const statusSrc = read('../src/components/presence/CityStatus.jsx');
 assert(statusSrc.includes('Project locations will appear here as approved project information becomes available.'), 'Selected city shows a compact, honest empty state');
-const previewSrc = read('../src/sections/PresencePreview.jsx');
-assert(!previewSrc.includes('PresenceMap') && !previewSrc.includes('cityCoordinates'), 'Homepage preview does not use markers or the Phase C map');
+const previewSrc = read('../src/sections/PresenceTeaser.jsx');
+assert(!previewSrc.includes('PresenceMap') && !previewSrc.includes('cityCoordinates'), 'Homepage teaser does not use markers or the Phase C map (static image only)');
 
 console.log(`\nResults: ${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);
