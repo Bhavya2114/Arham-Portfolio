@@ -55,6 +55,19 @@ const parseRings = (d) => {
   return rings;
 };
 
+/** Horizontal centre of a path's bounding box (map units), for a rough west → east order. */
+export const pathCentreX = (d) => {
+  let min = Infinity;
+  let max = -Infinity;
+  parseRings(d).forEach((ring) =>
+    ring.forEach(([x]) => {
+      if (x < min) min = x;
+      if (x > max) max = x;
+    })
+  );
+  return (min + max) / 2;
+};
+
 const segmentKey = (p, q) => {
   const a = `${p[0]},${p[1]}`;
   const b = `${q[0]},${q[1]}`;

@@ -1,6 +1,6 @@
 import React, { useMemo, useRef } from 'react';
 import { INDIA_MAP_VIEWBOX, INDIA_MAP_STATES } from './indiaMapGeometry';
-import { splitRegionEdges } from './regionEdges';
+import { splitRegionEdges, pathCentreX } from './regionEdges';
 
 /**
  * Reusable India Map SVG Component — Phase 3.2
@@ -39,6 +39,8 @@ export const MAP_COLORS = Object.freeze({
   workedEdge: '#2F4A10',
   hoverCenter: '#6A8F22',
   hoverEdge: '#385814',
+  tapCenter: '#7EA82A',
+  tapEdge: '#46691A',
 });
 
 const OTHER_FILL_OPACITY = 0.45;
@@ -54,6 +56,14 @@ const ISLAND_LINE = { width: 0.8, opacity: 0.3 };
 // One fill gradient for the whole map, in map coordinates: centred on central India, lighter in the
 // middle and darker toward the outer edges of the worked region.
 const FILL_GRADIENT = { cx: 481, cy: 496, r: 440 };
+
+// Tap feedback: the tapped worked state flashes brighter, and the zoom starts this much later.
+const TAP_FLASH_MS = 120;
+const TAP_SELECT_DELAY_MS = 60;
+
+const prefersReducedMotion = () =>
+  typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+const canHover = () => typeof window !== 'undefined' && !!window.matchMedia?.('(hover: hover)').matches;
 
 const viewBoxWidth = (vb) => Number(String(vb).trim().split(/[\s,]+/)[2]) || 1;
 
@@ -78,7 +88,58 @@ export const IndiaMapSvg = ({
 
   // Latest handlers read through a ref, so the memoised dark-variant paths never call stale ones.
   const live = useRef({});
-  live.current = { activeSet, onSelectState, onSelectInactiveState };
+  live.current = { activeSet, onSelectState, onSelectInactiveState, selectedStateCode };
+
+  // ---- Dark variant: hover / tap highlight ----
+  // One extra path drawn over the hovered or tapped worked state with a brighter fill, updated
+  // through a ref (no React re-render) and faded with a CSS opacity transition. No filters.
+  const highlightRef = useRef(null);
+  const highlight = useRef({ hoverId: null, flashTimer: 0 });
+  const showHighlight = (state, kind) => {
+    const el = highlightRef.current;
+    if (!el) return;
+    const selected = live.current.selectedStateCode;
+    el.setAttribute('d', state.d);
+    el.setAttribute('fill', `url(#india-map-worked-fill-${kind})`);
+    el.setAttribute('fill-opacity', String(selected && selected !== state.id ? DIM : 1));
+  };
+  const handleWorkedPointerEnter = (e, state) => {
+    if (e.pointerType !== 'mouse' || !canHover()) return;
+    highlight.current.hoverId = state.id;
+    if (highlightRef.current?.dataset.flash === 'true') return;
+    showHighlight(state, 'hover');
+    highlightRef.current.dataset.on = 'true';
+  };
+  const handleWorkedPointerLeave = (state) => {
+    if (highlight.current.hoverId !== state.id) return;
+    highlight.current.hoverId = null;
+    if (highlightRef.current && highlightRef.current.dataset.flash !== 'true') highlightRef.current.dataset.on = 'false';
+  };
+  const flashState = (state) => {
+    const el = highlightRef.current;
+    if (!el) return;
+    clearTimeout(highlight.current.flashTimer);
+    showHighlight(state, 'tap');
+    el.dataset.flash = 'true';
+    el.dataset.on = 'false';
+    highlight.current.flashTimer = setTimeout(() => {
+      el.dataset.flash = 'false';
+      const hovered = INDIA_MAP_STATES.find((s) => s.id === highlight.current.hoverId);
+      if (hovered) {
+        showHighlight(hovered, 'hover');
+        el.dataset.on = 'true';
+      }
+    }, TAP_FLASH_MS);
+  };
+  // Tap on a worked state: brighten it briefly, then select (zoom) a moment later.
+  const handleWorkedClick = (state) => {
+    if (prefersReducedMotion()) {
+      handleStateClick(state);
+      return;
+    }
+    flashState(state);
+    setTimeout(() => handleStateClick(state), TAP_SELECT_DELAY_MS);
+  };
   const handleStateClick = (state) => {
     const { activeSet: set, onSelectState: onSel, onSelectInactiveState: onInactive } = live.current;
     if (set.has(state.id) && onSel) {
@@ -160,7 +221,9 @@ export const IndiaMapSvg = ({
     const others = INDIA_MAP_STATES.filter((state) => !set.has(state.id) && !ISLAND_IDS.has(state.id));
     const islands = INDIA_MAP_STATES.filter((state) => !set.has(state.id) && ISLAND_IDS.has(state.id));
     const worked = INDIA_MAP_STATES.filter((state) => set.has(state.id));
-    const hero = selectedStateCode ? worked.find((state) => state.id === selectedStateCode) || null : null;
+    // Entrance order: worked states light up roughly west → east.
+    const enterOrder = new Map([...worked].sort((a, b) => pathCentreX(a.d) - pathCentreX(b.d)).map((state, i) => [state.id, i]));
+    const hero =selectedStateCode ? worked.find((state) => state.id === selectedStateCode) || null : null;
     const dimmed = hero ? worked.filter((state) => state !== hero) : [];
     const lit = hero ? [hero] : worked;
 
@@ -191,10 +254,15 @@ export const IndiaMapSvg = ({
     const workedState = (state, opacity = 1) => (
       <path
         {...common(state)}
+        onClick={() => handleWorkedClick(state)}
+        onPointerEnter={(e) => handleWorkedPointerEnter(e, state)}
+        onPointerLeave={() => handleWorkedPointerLeave(state)}
+        data-worked=""
+        style={{ '--enter-i': enterOrder.get(state.id) }}
         fill="url(#india-map-worked-fill)"
         fillOpacity={opacity}
         stroke="none"
-        className="cursor-pointer hover:[fill:url(#india-map-worked-fill-hover)] outline-none focus-visible:stroke-brand-accent focus-visible:[stroke-width:3]"
+        className="cursor-pointer outline-none focus-visible:stroke-brand-accent focus-visible:[stroke-width:3]"
         role="button"
         tabIndex={0}
         aria-label={`${state.name} (${state.type})`}
@@ -261,21 +329,28 @@ export const IndiaMapSvg = ({
               <stop offset="0%" stopColor={MAP_COLORS.hoverCenter} />
               <stop offset="100%" stopColor={MAP_COLORS.hoverEdge} />
             </radialGradient>
+            <radialGradient id="india-map-worked-fill-tap" gradientUnits="userSpaceOnUse" cx={FILL_GRADIENT.cx} cy={FILL_GRADIENT.cy} r={FILL_GRADIENT.r}>
+              <stop offset="0%" stopColor={MAP_COLORS.tapCenter} />
+              <stop offset="100%" stopColor={MAP_COLORS.tapEdge} />
+            </radialGradient>
           </defs>
         )}
 
         {/* State Boundaries. Dark order: echo outline → other states → worked states (dimmed, then lit)
-            → region lines (quiet shared borders, outer outline) → fake glow → selected-state edge. Only worked states are focusable, so their
-            tab order is unchanged. */}
+            → hover / tap highlight → region lines (quiet shared borders, outer outline) → fake glow →
+            selected-state edge. Only worked states are focusable, so their tab order is unchanged.
+            Entrance animation: CSS keyed on the map wrapper's data-entrance (styles/index.css). */}
         <g id="india-states-layer">
           {!isDark && INDIA_MAP_STATES.map(renderLightState)}
           {isDark && (
             <>
               {!moving && <g {...deco} data-layer="outline-echo" transform={`translate(0 ${ECHO.offsetPx * unit})`}>{L.echo}</g>}
-              {L.otherStates}
+              <g data-layer="other-states">{L.otherStates}</g>
               <g {...deco} data-layer="islands">{L.islands}</g>
               {L.dimmedStates}
               {L.litStates}
+              <path ref={highlightRef} className="presence-highlight pointer-events-none" aria-hidden="true" data-layer="state-highlight" />
+
               <g {...deco} data-layer="region-edges">{L.regionLines}</g>
               {!moving && <g {...deco} data-layer="fake-glow">{L.fakeGlow}</g>}
               <g {...deco} data-layer="edges">{L.heroEdge}</g>

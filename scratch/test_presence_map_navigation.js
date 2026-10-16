@@ -82,7 +82,7 @@ console.log('\n5. Background tap resets; clicks outside the map do not');
   assert(s5.stateCode === null && s5.city === null && s5.projectId === null, 'Reset clears state and city (card closes, map returns to the India view)');
 
   assert(/const handleViewportClick = \(e\) => \{\s*if \(!onBackgroundTap \|\| !selectedState\) return;\s*const svg = wrapperRef\.current\?\.querySelector\('svg'\);\s*if \(isMapBackgroundTap\(\{ target: e\.target, viewport: e\.currentTarget, svg, defaultPrevented: e\.defaultPrevented \}\)\) onBackgroundTap\(\);/.test(mapSrc), 'Map viewport resets on a background tap only while a state is selected');
-  assert(/onClickCapture=\{handleClickCapture\}\s*onClick=\{handleViewportClick\}/.test(mapSrc) && /const handleClickCapture = \(e\) => \{\s*if \(suppressClick\.current\) \{\s*suppressClick\.current = false;\s*e\.stopPropagation\(\);\s*e\.preventDefault\(\);/.test(mapSrc), 'Handler sits on the map viewport only, behind the existing drag guard');
+  assert(/onClickCapture=\{handleClickCapture\}\s*onKeyDownCapture=\{\(\) => stopEntrance\.current\(\)\}\s*onClick=\{handleViewportClick\}/.test(mapSrc) && /const handleClickCapture = \(e\) => \{\s*if \(suppressClick\.current\) \{\s*suppressClick\.current = false;\s*e\.stopPropagation\(\);\s*e\.preventDefault\(\);/.test(mapSrc), 'Handler sits on the map viewport only, behind the existing drag guard');
   assert(pageSrc.includes("onBackgroundTap={() => dispatch({ type: 'reset' })}"), 'Page wires the background tap to the shared reset');
 
   assert(!/document\.addEventListener|createOutsidePress|data-presence-zone/.test(pageSrc) && !/document\.addEventListener/.test(mapSrc), 'No page-level outside-click listener: clicks outside the map leave the selection unchanged');

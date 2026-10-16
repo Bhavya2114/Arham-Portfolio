@@ -122,3 +122,48 @@ p {
 @media (prefers-reduced-motion: reduce) {
   .presence-beacon { animation: none; display: none; }
 }
+
+/* Our Presence map: entrance (once, when the map first scrolls into view). PresenceMap sets
+   data-entrance on the map wrapper: "wait" (hidden until in view) → "play" → removed at the end or
+   on the first tap. Opacity only, per path (no group opacity). --enter-stagger and --enter-dots
+   are set from JS. */
+@keyframes presence-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+[data-entrance="wait"] :is([data-layer="other-states"], [data-layer="outline-echo"], [data-layer="islands"], [data-layer="region-edges"]) > path,
+[data-entrance="wait"] [data-worked],
+[data-entrance="wait"] :is([data-layer="fake-glow"], [data-layer="overview-cities"]) > * {
+  opacity: 0;
+}
+[data-entrance="play"] :is([data-layer="other-states"], [data-layer="outline-echo"], [data-layer="islands"], [data-layer="region-edges"]) > path {
+  animation: presence-enter 400ms ease-out both;
+}
+[data-entrance="play"] [data-worked] {
+  animation: presence-enter 350ms ease-out both;
+  animation-delay: calc(250ms + var(--enter-i, 0) * var(--enter-stagger, 80ms));
+}
+[data-entrance="play"] :is([data-layer="fake-glow"], [data-layer="overview-cities"]) > * {
+  animation: presence-enter 300ms ease-out both;
+  animation-delay: var(--enter-dots, 1100ms);
+}
+
+/* Hover / tap highlight over one worked state (IndiaMapSvg): opacity only. Hover is shown only for
+   a mouse on a device with hover (checked in JS); a tap flashes brighter, then fades. */
+.presence-highlight {
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+}
+.presence-highlight[data-on="true"] { opacity: 1; }
+.presence-highlight[data-flash="true"] { opacity: 1; transition: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* PresenceMap never starts the entrance under reduced motion; this is a CSS fallback. */
+  [data-entrance] :is([data-layer="other-states"], [data-layer="outline-echo"], [data-layer="islands"], [data-layer="region-edges"]) > path,
+  [data-entrance] [data-worked],
+  [data-entrance] :is([data-layer="fake-glow"], [data-layer="overview-cities"]) > * {
+    animation: none;
+    opacity: 1;
+  }
+  .presence-highlight { transition: none; }
+}

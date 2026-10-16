@@ -39,6 +39,14 @@ const STATE_FIT_MAX_ZOOM = 8;
 const PROJECT_PIN_PX = 9;
 const CLUSTER_RADIUS_PX = 36;
 const DRAG_THRESHOLD_PX = 6;
+// Entrance (once, when the map first scrolls into view; CSS in styles/index.css): outlines fade in
+// over 400 ms, worked states light up from 250 ms with an up-to-80 ms stagger (350 ms each), then
+// the fake glow and overview city dots fade in together (300 ms). The stagger shrinks if needed so
+// the whole entrance stays within totalMs.
+const ENTRANCE = { statesFromMs: 250, staggerMs: 80, stateMs: 350, dotsOverlapMs: 150, dotsMs: 300, totalMs: 1500 };
+// Overview rubber band (mouse only): the map follows a drag with resistance, up to RUBBER.maxPx,
+// and springs back on release with a slight overshoot.
+const RUBBER = { maxPx: 30, softnessPx: 120, backMs: 400, easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)' };
 const MARKER_RADIUS_PX = 5;
 // Overview city dots: a small bright white dot, ~3 px across (screen px radius).
 const OVERVIEW_CITY = { dotPx: 1.5, opacity: 0.9 };
@@ -145,12 +153,15 @@ export const PresenceMap = ({
     animationRef.current = null;
     if (onDone) settle.add(onDone);
     const to = clampView(target);
-    if (prefersReducedMotion()) {
+    const from = viewRef.current;
+    // Nothing to animate (e.g. the India view on first load): finish at once, so the map is not
+    // treated as moving and re-rendered per frame for nothing.
+    const same = Math.abs(from.cx - to.cx) < 1e-6 && Math.abs(from.cy - to.cy) < 1e-6 && Math.abs(from.k - to.k) < 1e-9;
+    if (prefersReducedMotion() || same) {
       commitView(to);
       stopAnimation('finished');
       return;
     }
-    const from = viewRef.current;
     const start = performance.now();
     setIsAnimating(true);
     const step = (now) => {
@@ -201,10 +212,80 @@ export const PresenceMap = ({
   // While zooming, panning or dragging the map draws only state fills and their edges.
   const moving = isAnimating || isDragging;
 
+  // ---- Entrance animation (once, the first time the map scrolls into view) ----
+  // Driven by a data attribute on the wrapper (set through the ref, never by React), so no re-render
+  // per frame; CSS in styles/index.css. A tap / key press / selection skips straight to the end.
+  const stopEntrance = useRef(() => {});
+  useLayoutEffect(() => {
+    const el = wrapperRef.current;
+    if (!el || prefersReducedMotion() || typeof IntersectionObserver === 'undefined') return undefined;
+    const count = Math.max(1, (activeStateCodes || []).length);
+    const fixedMs = ENTRANCE.statesFromMs + ENTRANCE.stateMs - ENTRANCE.dotsOverlapMs + ENTRANCE.dotsMs;
+    const stagger = count > 1 ? Math.min(ENTRANCE.staggerMs, (ENTRANCE.totalMs - fixedMs) / (count - 1)) : 0;
+    const dotsAt = ENTRANCE.statesFromMs + (count - 1) * stagger + ENTRANCE.stateMs - ENTRANCE.dotsOverlapMs;
+    el.style.setProperty('--enter-stagger', `${stagger}ms`);
+    el.style.setProperty('--enter-dots', `${dotsAt}ms`);
+    el.dataset.entrance = 'wait';
+    let timer = 0;
+    const io = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      io.disconnect();
+      el.dataset.entrance = 'play';
+      timer = setTimeout(() => stopEntrance.current(), dotsAt + ENTRANCE.dotsMs + 50);
+    }, { threshold: 0.3 });
+    io.observe(el);
+    stopEntrance.current = () => {
+      io.disconnect();
+      clearTimeout(timer);
+      delete el.dataset.entrance;
+      stopEntrance.current = () => {};
+    };
+    return () => stopEntrance.current();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  useEffect(() => {
+    if (selectedCode) stopEntrance.current();
+  }, [selectedCode]);
+
   // ---- Drag / pinch (only while zoomed) ----
   const pointers = useRef(new Map());
   const gesture = useRef(null);
   const suppressClick = useRef(false);
+
+  // ---- Rubber band at the overview (mouse only) ----
+  // Moves the <svg> with a CSS transform through the ref (no React state per frame). Touch never
+  // starts it, so page scrolling is never blocked; a drag never counts as a click.
+  const rubber = useRef(null);
+  const handleRubberMove = (e) => {
+    const r = rubber.current;
+    if (!r || r.id !== e.pointerId) return false;
+    const dx = e.clientX - r.x0;
+    const dy = e.clientY - r.y0;
+    const dist = Math.hypot(dx, dy);
+    if (!r.moved) {
+      if (dist < DRAG_THRESHOLD_PX) return true;
+      r.moved = true;
+      try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* pointer already released */ }
+      r.el.style.transition = 'none';
+    }
+    const k = dist > 0 ? (RUBBER.maxPx * (1 - Math.exp(-dist / RUBBER.softnessPx))) / dist : 0;
+    r.el.style.transform = `translate3d(${dx * k}px, ${dy * k}px, 0)`;
+    return true;
+  };
+  const endRubber = (e) => {
+    const r = rubber.current;
+    if (!r || r.id !== e.pointerId) return false;
+    rubber.current = null;
+    if (r.moved) {
+      suppressClick.current = true;
+      const { el } = r;
+      el.style.transition = `transform ${RUBBER.backMs}ms ${RUBBER.easing}`;
+      el.style.transform = '';
+      const clear = () => { el.style.transition = ''; };
+      el.addEventListener('transitionend', clear, { once: true });
+    }
+    return true;
+  };
 
   const beginGesture = () => {
     const svg = wrapperRef.current?.querySelector('svg');
@@ -233,6 +314,13 @@ export const PresenceMap = ({
   };
 
   const handlePointerDown = (e) => {
+    stopEntrance.current();
+    if (!isZoomed && e.pointerType === 'mouse' && e.button === 0 && !prefersReducedMotion()) {
+      const el = wrapperRef.current?.querySelector('svg');
+      suppressClick.current = false;
+      if (el) rubber.current = { id: e.pointerId, x0: e.clientX, y0: e.clientY, moved: false, el };
+      return;
+    }
     if (!isZoomed || (e.pointerType === 'mouse' && e.button !== 0)) return;
     suppressClick.current = false;
     // A press alone does not stop a running animation (e.g. tapping a city marker during the state
@@ -243,6 +331,7 @@ export const PresenceMap = ({
   };
 
   const handlePointerMove = (e) => {
+    if (handleRubberMove(e)) return;
     if (!pointers.current.has(e.pointerId) || !gesture.current) return;
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
     const g = gesture.current;
@@ -274,6 +363,7 @@ export const PresenceMap = ({
   };
 
   const handlePointerEnd = (e) => {
+    if (endRubber(e)) return;
     if (!pointers.current.has(e.pointerId)) return;
     pointers.current.delete(e.pointerId);
     if (gesture.current?.moved) suppressClick.current = true;
@@ -673,6 +763,7 @@ export const PresenceMap = ({
         onPointerUp={handlePointerEnd}
         onPointerCancel={handlePointerEnd}
         onClickCapture={handleClickCapture}
+        onKeyDownCapture={() => stopEntrance.current()}
         onClick={handleViewportClick}
       >
         <IndiaMapSvg
