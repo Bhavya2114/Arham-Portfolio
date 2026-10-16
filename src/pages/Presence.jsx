@@ -2,7 +2,7 @@ import React, { useReducer, useMemo, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Container from '../components/ui/Container';
 import Button from '../components/ui/Button';
-import PresenceMap from '../components/map/PresenceMap';
+import PresenceMap, { PAGE_NAVY } from '../components/map/PresenceMap';
 import BottomSheet, { PEEK_HEIGHT } from '../components/presence/BottomSheet';
 import CampusCard from '../components/presence/CampusCard';
 import { StateStatus } from '../components/presence/CityStatus';
@@ -221,17 +221,9 @@ export const Presence = () => {
 
   return (
     <div className="flex-1 w-full bg-brand-navy-dark text-slate-100">
-      <section aria-labelledby="presence-heading" className="relative">
-        {/* Restrained ambient lighting */}
-        <div
-          className="absolute inset-0 pointer-events-none overflow-hidden"
-          aria-hidden="true"
-          style={{
-            background:
-              'radial-gradient(60% 50% at 30% 35%, rgba(16,185,129,0.10), transparent 70%), radial-gradient(40% 40% at 85% 10%, rgba(245,181,68,0.06), transparent 70%)',
-          }}
-        />
-
+      {/* One background for the map section: page navy, with the map's own radial glow fading into it.
+          overflow-x clip: the map wrapper's fade band may extend past the page gutter. */}
+      <section aria-labelledby="presence-heading" className="relative overflow-x-clip" style={{ background: PAGE_NAVY }}>
         <Container size="default" className="relative py-10 sm:py-14 lg:py-16 space-y-8 sm:space-y-10">
           {/* Page Header */}
           <header className="max-w-2xl space-y-3">
@@ -284,7 +276,7 @@ export const Presence = () => {
             {/* Desktop panel — rendered only while a city, project or cluster is selected */}
             {detailsOpen && (
               <aside
-                className="hidden lg:block w-[22rem] shrink-0 lg:sticky lg:top-24 rounded-2xl border border-white/10 bg-brand-navy/80 p-5"
+                className="hidden lg:block relative z-30 w-[22rem] shrink-0 lg:sticky lg:top-24 rounded-2xl border border-white/10 bg-brand-navy/80 p-5"
                 aria-label={`${detailsTitle} details`}
               >
                 <div className="flex items-start justify-between gap-2 mb-4">

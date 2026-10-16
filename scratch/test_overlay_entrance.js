@@ -135,7 +135,7 @@ assert(noReflow.transitions === 0, 'Hidden state never committed → no transiti
 console.log('\n4. PresenceMap wiring');
 const mapSrc = read('../src/components/map/PresenceMap.jsx');
 assert(/useLayoutEffect\(\(\) => \{[\s\S]*?return startOverlayEntrance\(\{[\s\S]*?reflow: \(\) => overlayRef\.current\?\.offsetHeight,[\s\S]*?\}, \[overlayKey\]\);/.test(mapSrc), 'Layout effect keyed on the selected city starts the entrance (cleanup cancels the previous one)');
-assert(/'transition-\[transform,opacity\] duration-300 ease-out translate-y-0 opacity-100'/.test(mapSrc) && /'transition-none translate-y-\[calc\(100%\+1rem\)\] opacity-0 pointer-events-none'/.test(mapSrc), 'One slide-up style for every entrance: no transition while hidden, 300 ms ease-out in');
+assert(/'transition-\[transform,opacity\] duration-300 ease-out translate-y-0 opacity-100 pointer-events-auto'/.test(mapSrc) && /'transition-none translate-y-\[calc\(100%\+1rem\)\] opacity-0 pointer-events-none'/.test(mapSrc), 'One slide-up style for every entrance: no transition while hidden, 300 ms ease-out in');
 assert(/const MAP_SHIFT_MS = 240;/.test(mapSrc) && /animateTo\(\{ \.\.\.v, cy: v\.cy \+ shiftUnits \}, \{ duration: MAP_SHIFT_MS, onDone: go \}\);/.test(mapSrc), 'Card enters when the short (240 ms) pan ends — driven by the pan, not a fixed timer');
 assert(!/setTimeout\(/.test(mapSrc.slice(mapSrc.indexOf('const overlayShifted'), mapSrc.indexOf('const controlButton'))), 'No fixed timer in the entrance effect');
 assert(/if \(onDone\) settle\.add\(onDone\);/.test(mapSrc) && /commitView\(to\);\s*stopAnimation\('finished'\);\s*return;/.test(mapSrc) && /settle\.flush\(reason\);/.test(mapSrc), 'animateTo signals completion when finished, interrupted or skipped (reduced motion)');

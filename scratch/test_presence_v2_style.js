@@ -76,7 +76,18 @@ assert(/\{isSelected && !moving && \(\s*<g className="presence-beacon motion-red
 const beacon = (css.match(/@keyframes presence-beacon \{([\s\S]*?)\n\}/) || [])[1] || '';
 assert(/0% \{ transform: scale\(1\); opacity: 0\.6; \}/.test(beacon) && /100% \{ transform: scale\(2\.4\); opacity: 0; \}/.test(beacon) && !/(^|[\s{;])(r|stroke-width)\s*:/.test(beacon) && /transform-box: fill-box;\s*transform-origin: center;[\s\S]*?animation: presence-beacon 2s ease-out infinite;/.test(css), 'Pulse: scale 1 to 2.4 while fading 60 % to 0, every 2 s ease-out; animates only transform and opacity');
 assert(/@media \(prefers-reduced-motion: reduce\) \{\s*\.presence-beacon \{ animation: none; display: none; \}/.test(css), 'Pulse disabled under prefers-reduced-motion');
-assert(/const MAP_BACKGROUND = 'radial-gradient\(ellipse at 50% 45%, #0B1030 0%, #070A1F 100%\)';/.test(mapSrc) && /style=\{\{ background: MAP_BACKGROUND,/.test(mapSrc) && !/dot-grid|DOT_GRID/.test(mapSrc), 'Plain navy radial CSS background, no dot grid');
+assert(/export const PAGE_NAVY = '#070A1F';/.test(mapSrc) && /const MAP_BACKGROUND = `radial-gradient\(ellipse farthest-side at 50% 50%, #0B1030 0%, \$\{PAGE_NAVY\} 100%\)`;/.test(mapSrc) && /style=\{\{\s*background: MAP_BACKGROUND,/.test(mapSrc) && !/dot-grid|DOT_GRID/.test(mapSrc), 'Plain navy radial CSS background (#0B1030 → #070A1F) ending in the page navy, no dot grid');
+
+console.log('\n2d. No boxes around the map');
+const presenceCode = code(presenceSrc);
+assert(/<div className="relative mx-auto max-w-5xl \[--map-fade:40px\] md:\[--map-fade:80px\]">/.test(mapSrc) && !/rounded-2xl|bg-brand-navy\/60|shadow-\[/.test(mapCode), 'Outer card removed (no border, padding, background, shadow); sensible max width on desktop');
+assert(/className=\{`relative overflow-hidden \$\{isZoomed/.test(mapSrc) && !/overflow-hidden rounded-xl/.test(mapSrc), 'Map wrapper keeps overflow-hidden, no rounded box');
+assert(/<section aria-labelledby="presence-heading" className="relative overflow-x-clip" style=\{\{ background: PAGE_NAVY \}\}>/.test(presenceSrc) && !/rgba\(16,185,129/.test(presenceCode), 'One page background for the map section; teal ambient glow removed');
+const fade = (mapSrc.match(/const EDGE_FADE = \[([\s\S]*?)\]\.join/) || [])[1] || '';
+assert((fade.match(/linear-gradient\(to (bottom|top|right|left), \$\{PAGE_NAVY\}, transparent\)/g) || []).length === 4 && /<div className="absolute inset-0 z-10 pointer-events-none" style=\{\{ background: EDGE_FADE \}\} aria-hidden="true" data-layer="edge-fade" \/>/.test(mapSrc), 'Edges hidden by one pointer-events-none overlay: four plain linear gradients, page navy → transparent');
+assert(/margin: 'calc\(-1 \* var\(--map-fade\)\)',\s*padding: 'var\(--map-fade\)',/.test(mapSrc) && /overflow-visible/.test(mapSrc), 'Fade band sits outside the content area, so the map itself is never faded (svg spills into it when zoomed)');
+assert(/style=\{\{ inset: 'var\(--map-fade\)' \}\} data-map-frame/.test(mapSrc) && /const w = \(card\.offsetParent \|\| wrapper\)\.getBoundingClientRect\(\);/.test(mapSrc), 'Card and scale bar anchored to the map content area (card offsets measured against it)');
+assert(/<div className="relative z-20 mb-2 flex/.test(mapSrc) && /<div className="relative z-20 mt-3 space-y-1\.5 text-center">/.test(mapSrc), 'State chip above and legend below float on the page background');
 assert(/>\s*Selected\s*</.test(mapSrc) && /border-\[#D9E35A\]/.test(mapSrc) && /Worked locations/.test(mapSrc) && /Other states/.test(mapSrc) && /bg-white border border-\[#070A1F\]" aria-hidden="true" \/>\s*City\s*</.test(mapSrc) && /bg-\[#D9E35A\] border border-\[#070A1F\]" aria-hidden="true" \/>\s*Selected city\s*</.test(mapSrc), 'Legend: Selected, Worked locations, Other states, City (white), Selected city (yellow)');
 assert(!/texture|slab|SLAB/i.test(svgCode + mapCode), 'No texture lines or slab');
 

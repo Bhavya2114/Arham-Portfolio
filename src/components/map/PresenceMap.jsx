@@ -45,7 +45,18 @@ const OVERVIEW_CITY = { dotPx: 1.5, opacity: 0.9 };
 // Soft halo behind each zoomed city pin: white, ~2.2× the dot, no blur.
 const PIN_HALO = { scale: 2.2, opacity: 0.18 };
 // Plain navy radial background behind the map (CSS only, static).
-const MAP_BACKGROUND = 'radial-gradient(ellipse at 50% 45%, #0B1030 0%, #070A1F 100%)';
+// Page navy behind the whole /presence map section; the map's radial glow ends exactly in it at the
+// wrapper's sides, so there is no visible rectangle.
+export const PAGE_NAVY = '#070A1F';
+const MAP_BACKGROUND = `radial-gradient(ellipse farthest-side at 50% 50%, #0B1030 0%, ${PAGE_NAVY} 100%)`;
+// Soft edge fade over the map wrapper's clipped edges: page navy → transparent on all four sides,
+// sized by --map-fade (40 px phone, 80 px desktop). Plain linear gradients, no mask.
+const EDGE_FADE = [
+  `linear-gradient(to bottom, ${PAGE_NAVY}, transparent) top / 100% var(--map-fade) no-repeat`,
+  `linear-gradient(to top, ${PAGE_NAVY}, transparent) bottom / 100% var(--map-fade) no-repeat`,
+  `linear-gradient(to right, ${PAGE_NAVY}, transparent) left / var(--map-fade) 100% no-repeat`,
+  `linear-gradient(to left, ${PAGE_NAVY}, transparent) right / var(--map-fade) 100% no-repeat`,
+].join(', ');
 // District lines inside the selected state: dark olive, "engraved" into the fill, so the yellow
 // outer edge stays the only bright line.
 const DISTRICT_LINE = { color: '#1A2A06', opacity: 0.6, width: 0.7 };
@@ -557,8 +568,9 @@ export const PresenceMap = ({
     const card = overlayRef.current;
     const svg = wrapper?.querySelector('svg');
     if (!wrapper || !card || !svg || !m) return 0;
-    // Layout box (offset*), unaffected by the card's entrance transform.
-    const w = wrapper.getBoundingClientRect();
+    // Layout box (offset*), unaffected by the card's entrance transform; offsets are relative to the
+    // content frame the card is anchored in.
+    const w = (card.offsetParent || wrapper).getBoundingClientRect();
     const left = w.left + card.offsetLeft;
     const { shiftPx, shiftUnits } = markerClearanceShift({
       marker: m,
@@ -622,7 +634,7 @@ export const PresenceMap = ({
 
 
   return (
-    <div className="relative rounded-2xl border border-white/10 bg-brand-navy/60 p-3 sm:p-6 shadow-[0_0_60px_-20px_rgba(16,185,129,0.25)]">
+    <div className="relative mx-auto max-w-5xl [--map-fade:40px] md:[--map-fade:80px]">
       {/* Toolbar: selection status. Navigation is by map selection: covered state / city markers
           select; an uncovered state or the empty ocean returns to India. */}
       <div className="relative z-20 mb-2 flex flex-wrap items-center justify-between gap-2">
@@ -644,10 +656,18 @@ export const PresenceMap = ({
         )}
       </div>
 
+      {/* Map wrapper: no box. It extends --map-fade past the content area on every side (negative
+          margin + equal padding), so the map itself is never faded; when zoomed or dragged the map
+          spills into that band (svg overflow visible), where it is clipped and faded out. */}
       <div
         ref={wrapperRef}
-        className={`relative overflow-hidden rounded-xl ${isZoomed ? 'cursor-grab active:cursor-grabbing' : ''}`}
-        style={{ background: MAP_BACKGROUND, touchAction: isZoomed ? 'none' : 'pan-y pinch-zoom' }}
+        className={`relative overflow-hidden ${isZoomed ? 'cursor-grab active:cursor-grabbing' : ''}`}
+        style={{
+          background: MAP_BACKGROUND,
+          margin: 'calc(-1 * var(--map-fade))',
+          padding: 'var(--map-fade)',
+          touchAction: isZoomed ? 'none' : 'pan-y pinch-zoom',
+        }}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerEnd}
@@ -663,7 +683,7 @@ export const PresenceMap = ({
           onSelectState={onSelectState}
           onSelectInactiveState={onSelectInactiveState}
           ariaLabel="Map of India highlighting Arham's coverage states"
-          svgClassName="w-full h-auto max-h-[75vh] select-none"
+          svgClassName="w-full h-auto max-h-[75vh] select-none overflow-visible"
           pxUnit={unit}
           moving={moving}
         >
@@ -673,34 +693,39 @@ export const PresenceMap = ({
           {projectLayer}
         </IndiaMapSvg>
 
-        {scaleBar && !overlay && (
-          <div className="absolute bottom-2 left-2 z-10 rounded-md bg-brand-navy-dark/80 px-2 py-1 text-[10px] text-slate-300 pointer-events-none" aria-hidden="true">
-            <div className="h-1.5 border-x border-b border-slate-300" style={{ width: scaleBar.px }} />
-            <span>{scaleBar.km} km</span>
-          </div>
-        )}
+        <div className="absolute inset-0 z-10 pointer-events-none" style={{ background: EDGE_FADE }} aria-hidden="true" data-layer="edge-fade" />
 
-        {overlay && (
-          <div
-            ref={overlayRef}
-            className={`absolute z-20 ${overlayClass} ${
-              overlayShown
-                ? 'transition-[transform,opacity] duration-300 ease-out translate-y-0 opacity-100'
-                : 'transition-none translate-y-[calc(100%+1rem)] opacity-0 pointer-events-none'
-            }`}
-            data-map-overlay={overlaySide === 'full' ? 'bottom' : `bottom-${overlaySide}`}
-            data-overlay-shown={overlayShown ? 'true' : 'false'}
-            data-overlay-entries={overlayEntries.current}
-          >
-            {overlay}
-          </div>
-        )}
+        {/* Content frame (the map area without the fade band): the scale bar and the card anchor here. */}
+        <div className="absolute z-20 pointer-events-none" style={{ inset: 'var(--map-fade)' }} data-map-frame="">
+          {scaleBar && !overlay && (
+            <div className="absolute bottom-2 left-2 z-10 rounded-md bg-brand-navy-dark/80 px-2 py-1 text-[10px] text-slate-300 pointer-events-none" aria-hidden="true">
+              <div className="h-1.5 border-x border-b border-slate-300" style={{ width: scaleBar.px }} />
+              <span>{scaleBar.km} km</span>
+            </div>
+          )}
+
+          {overlay && (
+            <div
+              ref={overlayRef}
+              className={`absolute z-20 ${overlayClass} ${
+                overlayShown
+                  ? 'transition-[transform,opacity] duration-300 ease-out translate-y-0 opacity-100 pointer-events-auto'
+                  : 'transition-none translate-y-[calc(100%+1rem)] opacity-0 pointer-events-none'
+              }`}
+              data-map-overlay={overlaySide === 'full' ? 'bottom' : `bottom-${overlaySide}`}
+              data-overlay-shown={overlayShown ? 'true' : 'false'}
+              data-overlay-entries={overlayEntries.current}
+            >
+              {overlay}
+            </div>
+          )}
+        </div>
       </div>
 
-      {footer && <div className="mt-3">{footer}</div>}
+      {footer && <div className="relative z-20 mt-3">{footer}</div>}
 
-      {/* Legend & attribution */}
-      <div className="mt-3 space-y-1.5 text-center">
+      {/* Legend & attribution (float on the page background, above the map's fade band) */}
+      <div className="relative z-20 mt-3 space-y-1.5 text-center">
         <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-slate-400" aria-label="Map legend">
           <li className="inline-flex items-center gap-1.5">
             <span className="w-3 h-3 rounded-sm bg-[#5C7E1C] border-[1.5px] border-[#D9E35A]" aria-hidden="true" />
