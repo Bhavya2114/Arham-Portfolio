@@ -51,6 +51,10 @@ const sameAsMain = [
   "style={{ touchAction: 'pan-y' }}",
 ];
 assert(mainCard && sameAsMain.every((s) => mainCard.includes(s) && cardSrc.includes(s)), 'Same layout, sizes, colours, photo size, corners, swipe, slide and dots + "n / total" pager as main');
+const moveHandler = (cardSrc.match(/const handlePointerMove = \(e\) => \{[\s\S]*?\n  \};/) || [''])[0];
+assert(!/dragX|setDragX/.test(cardSrc) && /setDragOffset\(atEdge \? dx \/ 4 : dx\);/.test(moveHandler) && !/\bset(?!DragOffset\b|PointerCapture\b)[A-Z]\w*\(/.test(moveHandler)
+  && /el\.style\.transform = px \? `translateX\(\$\{px\}px\)` : '';/.test(cardSrc) && /ref=\{contentRef\}\s*className=\{slide \? `campus-slide \$\{incomingAnim\}` : 'transition-transform duration-200'\}/.test(cardSrc), 'Swipe follows the finger through a ref transform (no React state per move); eases back with main\'s 200 ms transition');
+assert(/backdrop-blur-md/.test(cardSrc), 'Glass blur kept for now (to be replaced by a solid ~92 % background if it lags on phones)');
 const mainCssBlock = (s) => (s.match(/\/\* Our Presence campus card:[\s\S]*?@keyframes campus-out-to-right[^\n]*/) || [''])[0];
 let mainCss = '';
 try { mainCss = execSync('git show main:src/styles/index.css', { cwd: repo, encoding: 'utf-8' }).replace(/\r\n/g, '\n'); } catch { /* no git */ }

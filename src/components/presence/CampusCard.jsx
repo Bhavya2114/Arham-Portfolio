@@ -12,7 +12,9 @@ import React, { useState, useRef, useEffect } from 'react';
  * - Controlled (`currentId` / `onChange`), so the map highlights the shown project's pin (or the city
  *   pin) and a tapped project pin switches the card.
  * - Swipe right→left for the next project, left→right for the previous one; ←/→ keys and the dots do
- *   the same. Pointer events are stopped here so a swipe never pans the map underneath.
+ *   the same. Pointer events are stopped here so a swipe never pans the map underneath. While dragging,
+ *   the content follows the finger through a ref-driven transform (no React state per move); the
+ *   project index changes only when the swipe settles.
  * - Changing project slides the card *content* horizontally (~320 ms ease-out) inside the stationary
  *   glass card: next = out to the left / in from the right, previous = the reverse. One transition at a
  *   time; under prefers-reduced-motion the content switches instantly.
@@ -52,7 +54,17 @@ export const CampusCard = ({ city, projects: locations = [], currentId = null, o
   // Controlled by the page (currentId / onChange) so the map can follow the shown project.
   const index = Math.max(0, locations.findIndex((p) => p.id === currentId));
   const setIndex = (i) => onChange?.(locations[i]?.id);
-  const [dragX, setDragX] = useState(0);
+  // Swipe offset goes straight to the content's transform through this ref (no React state per move);
+  // the index only changes when the swipe settles.
+  const contentRef = useRef(null);
+  const setDragOffset = (px) => {
+    const el = contentRef.current;
+    if (!el) return;
+    // While dragging: follow the finger with no transition. Released: clearing the inline styles lets
+    // the `transition-transform duration-200` class ease it back, exactly like the old state version.
+    el.style.transition = px ? 'none' : '';
+    el.style.transform = px ? `translateX(${px}px)` : '';
+  };
   // Active slide: { from: outgoing index, dir: 'next' | 'prev' } — null when idle.
   const [slide, setSlide] = useState(null);
   const sliding = useRef(false); // synchronous lock so rapid input cannot overlap transitions
@@ -103,7 +115,7 @@ export const CampusCard = ({ city, projects: locations = [], currentId = null, o
     if (d.horizontal) {
       // Resist dragging past the first / last project.
       const atEdge = (dx > 0 && current === 0) || (dx < 0 && current === count - 1);
-      setDragX(atEdge ? dx / 4 : dx);
+      setDragOffset(atEdge ? dx / 4 : dx);
     }
   };
 
@@ -112,13 +124,13 @@ export const CampusCard = ({ city, projects: locations = [], currentId = null, o
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
     const dx = e.clientX - d.x;
+    drag.current = null;
+    setDragOffset(0);
     if (d.horizontal) {
       swiped.current = true;
       if (dx <= -SWIPE_PX) go(current + 1);
       else if (dx >= SWIPE_PX) go(current - 1);
     }
-    drag.current = null;
-    setDragX(0);
   };
 
   const handleClickCapture = (e) => {
@@ -167,8 +179,8 @@ export const CampusCard = ({ city, projects: locations = [], currentId = null, o
           )}
           <div
             key={current}
-            className={slide ? `campus-slide ${incomingAnim}` : dragX ? '' : 'transition-transform duration-200'}
-            style={dragX ? { transform: `translateX(${dragX}px)` } : undefined}
+            ref={contentRef}
+            className={slide ? `campus-slide ${incomingAnim}` : 'transition-transform duration-200'}
             data-campus-slide={slide ? 'in' : 'idle'}
           >
             <CampusSlide loc={loc} />
