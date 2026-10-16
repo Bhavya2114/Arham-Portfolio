@@ -34,6 +34,22 @@ import { MapPin, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, X } from 'luc
  * - Project pins use each published project's own verified `coordinates`; city coordinates are never
  *   substituted. With no published projects a city shows the honest empty state.
  */
+// Desktop (lg and up): the project card is a side panel next to the map instead of over it.
+const DESKTOP_QUERY = '(min-width: 1024px)';
+const PANEL_PX = 380;
+const useIsDesktop = () => {
+  const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && !!window.matchMedia?.(DESKTOP_QUERY).matches);
+  useEffect(() => {
+    const mq = window.matchMedia?.(DESKTOP_QUERY);
+    if (!mq) return undefined;
+    const onChange = () => setIsDesktop(mq.matches);
+    onChange();
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  return isDesktop;
+};
+
 export const Presence = () => {
   usePageMetadata(
     'Our Presence — ARHAM Electrical & Lighting Installations',
@@ -41,6 +57,7 @@ export const Presence = () => {
   );
 
   const [nav, dispatch] = useReducer(presenceNavReducer, INITIAL_PRESENCE_NAV);
+  const isDesktop = useIsDesktop();
 
   const coverageStateCodes = useMemo(() => getPresenceStateCodes(), []);
   const publishedCount = useMemo(() => getPublishedProjects().length, []);
@@ -126,6 +143,19 @@ export const Presence = () => {
   const projectCardOnly = Boolean(selectedCity && !selectedProject && clusterProjects.length === 0 && cityProjects.length === 0);
   // The panel opens for a selected city (project list / empty state), a project, or a same-site cluster.
   const detailsOpen = Boolean((selectedCity && !projectCardOnly) || selectedProject || clusterProjects.length > 0);
+
+  // Phone / tablet: the card sits over the bottom of the map. Desktop: a side panel next to it.
+  const cardPanel = isDesktop && projectCardOnly && Boolean(cardProject);
+  const projectCard = projectCardOnly && cardProject ? (
+    <CityProjectCard
+      key={`${nav.stateCode}|${selectedCity}`}
+      city={selectedCity}
+      projects={cityShowcase}
+      currentId={cardProject.id}
+      onChange={setCardProjectId}
+      variant={isDesktop ? 'panel' : 'overlay'}
+    />
+  ) : null;
 
   // Card <-> map: the card's project is highlighted on the map: its own pin when it has lat / lng,
   // otherwise its city pin. A tapped showcase pin switches the card to that project (and its city).
@@ -258,7 +288,7 @@ export const Presence = () => {
 
           <div className="sr-only" aria-live="polite" aria-atomic="true">{announcement}</div>
 
-          <div className="flex flex-col lg:flex-row gap-6 items-start">
+          <div className={`flex flex-col lg:flex-row items-start ${cardPanel ? 'gap-6 lg:gap-0' : 'gap-6'}`}>
             {/* Map — the primary interface */}
             <div className="w-full min-w-0 flex-1">
               <PresenceMap
@@ -284,20 +314,24 @@ export const Presence = () => {
                   if (showcaseId) showShowcaseProject(showcaseId);
                   else dispatch({ type: 'showCluster', projectIds });
                 }}
-                footer={selectedState ? <StateStatus stateName={selectedState.name} cityCount={selectedState.cities.length} /> : null}
-                overlay={
-                  projectCardOnly ? (
-                    <CityProjectCard
-                      key={`${nav.stateCode}|${selectedCity}`}
-                      city={selectedCity}
-                      projects={cityShowcase}
-                      currentId={cardProject?.id || null}
-                      onChange={setCardProjectId}
-                    />
-                  ) : null
-                }
+                footer={selectedState && !selectedCity ? <StateStatus stateName={selectedState.name} cityCount={selectedState.cities.length} /> : null}
+                overlay={isDesktop ? null : projectCard}
+                sidePanelPx={cardPanel ? PANEL_PX : 0}
               />
             </div>
+
+            {/* Desktop project panel: next to the map (never over it), vertically centred, slides in
+                from the right. The map's spill / fade band runs underneath it (sidePanelPx). */}
+            {cardPanel && (
+              <aside
+                className="presence-panel-in relative z-30 shrink-0 self-center"
+                style={{ width: PANEL_PX }}
+                aria-label={`Arham projects in ${selectedCity}`}
+                data-project-panel=""
+              >
+                {projectCard}
+              </aside>
+            )}
 
             {/* Desktop panel — rendered only while a city, project or cluster is selected */}
             {detailsOpen && (

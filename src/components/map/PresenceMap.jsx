@@ -36,6 +36,9 @@ const PRESENCE_MAP_VIEWBOX = `${BASE.x} ${BASE.y} ${BASE.w} ${BASE.h}`;
 const HOME_VIEW = { cx: BASE.x + BASE.w / 2, cy: BASE.y + BASE.h / 2, k: 1 };
 const MAX_ZOOM = 320; // lets project sites roughly 1 km+ apart separate on screen
 const STATE_FIT_MAX_ZOOM = 8;
+// Phone / tablet card over the map: at most this share of the map height. While it is open the
+// selected state is fitted into the part of the map above it.
+const OVERLAY_MAX_FRACTION = 0.55;
 const PROJECT_PIN_PX = 9;
 const CLUSTER_RADIUS_PX = 36;
 const DRAG_THRESHOLD_PX = 6;
@@ -112,6 +115,7 @@ export const PresenceMap = ({
   onSelectProject,
   onSelectCluster,
   footer = null,
+  sidePanelPx = 0, // desktop side panel width: the map's spill / fade band extends under it
   overlay = null,
 }) => {
   const wrapperRef = useRef(null);
@@ -188,17 +192,26 @@ export const PresenceMap = ({
     return () => observer.disconnect();
   }, []);
 
-  const getStateFitView = useCallback((code) => {
+  // Fit the state; `reserveBottom` (0..1) keeps that share of the map height free at the bottom
+  // (for the card), fitting the state into the part above it.
+  const getStateFitView = useCallback((code, reserveBottom = 0) => {
     const path = code ? wrapperRef.current?.querySelector(`path[id="${code}"]`) : null;
     if (!path) return HOME_VIEW;
     const box = path.getBBox();
-    const k = Math.min(BASE.w / (box.width * 1.3), BASE.h / (box.height * 1.3), STATE_FIT_MAX_ZOOM);
-    return clampView({ cx: box.x + box.width / 2, cy: box.y + box.height / 2, k });
+    const free = 1 - reserveBottom;
+    const k = Math.min(BASE.w / (box.width * 1.3), (BASE.h * free) / (box.height * 1.3), STATE_FIT_MAX_ZOOM);
+    const visibleH = BASE.h / Math.max(1, k);
+    return clampView({ cx: box.x + box.width / 2, cy: box.y + box.height / 2 + (reserveBottom * visibleH) / 2, k });
   }, []);
 
   const selectedCode = selectedState?.code || null;
-  // The view depends only on the selected state; selecting a city never re-fits or zooms the map.
-  const getTargetView = useCallback(() => getStateFitView(selectedCode), [selectedCode, getStateFitView]);
+  const hasOverlay = Boolean(overlay);
+  // The view depends on the selected state, and on whether the card covers the bottom of the map
+  // (phone / tablet): then the state is fitted above the card so it stays visible.
+  const getTargetView = useCallback(
+    () => getStateFitView(selectedCode, hasOverlay ? OVERLAY_MAX_FRACTION : 0),
+    [selectedCode, hasOverlay, getStateFitView]
+  );
 
   // India → state fit, driven by the state selection.
   useEffect(() => {
@@ -596,7 +609,6 @@ export const PresenceMap = ({
   // ---- Bottom-anchored overlay (campus card) ----
   // Always at the bottom of the map container. On wide maps it takes the bottom corner away from the
   // selected city; decided once per city selection so the card does not jump while panning.
-  const hasOverlay = Boolean(overlay);
   const overlayKey = hasOverlay ? selectedCity : null;
   const overlayRef = useRef(null);
   // 'reset' = hidden below the map edge, no transition; 'enter' = sliding up / in place.
@@ -718,6 +730,7 @@ export const PresenceMap = ({
           background: MAP_BACKGROUND,
           margin: 'calc(-1 * var(--map-fade))',
           padding: 'var(--map-fade)',
+          ...(sidePanelPx ? { marginRight: `calc(-1 * var(--map-fade) - ${sidePanelPx}px)`, paddingRight: `calc(var(--map-fade) + ${sidePanelPx}px)` } : {}),
           touchAction: isZoomed ? 'none' : 'pan-y pinch-zoom',
         }}
         onPointerDown={handlePointerDown}
@@ -760,7 +773,7 @@ export const PresenceMap = ({
           {overlay && (
             <div
               ref={overlayRef}
-              className={`absolute z-20 ${overlayClass} ${
+              className={`absolute z-20 flex max-h-[55%] flex-col ${overlayClass} ${
                 overlayShown
                   ? 'transition-[transform,opacity] duration-300 ease-out translate-y-0 opacity-100 pointer-events-auto'
                   : 'transition-none translate-y-[calc(100%+1rem)] opacity-0 pointer-events-none'

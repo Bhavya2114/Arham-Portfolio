@@ -110,7 +110,7 @@ const publicFiles = ['../src/components/map/PresenceMap.jsx', '../src/sections/P
 assert(publicFiles.every((f) => !/cand-|candidate/i.test(read(f))), 'Map, homepage, gallery, routes, selectors and projects.js contain no candidate references');
 if (process.env.BUILD_DIR) {
   const assets = path.resolve(process.env.BUILD_DIR, 'assets');
-  const carriers = fs.readdirSync(assets).filter((f) => /\.js$/.test(f) && /cand-kota|cand-jaipur|Indra Vihar|Samachar Jagat/.test(fs.readFileSync(path.join(assets, f), 'utf-8')));
+  const carriers = fs.readdirSync(assets).filter((f) => /\.js$/.test(f) && /cand-kota|cand-jaipur|CP-6, Indra Vihar|Samachar Jagat|324005/.test(fs.readFileSync(path.join(assets, f), 'utf-8')));
   assert(carriers.length === 0, `Candidate records (ids, supplied addresses) are not shipped in any bundle (${carriers.join(', ') || 'none'}); only the placeholder campus names are`);
 }
 
@@ -134,7 +134,7 @@ console.log('\n4c. Floating Card (now the project card, see test_presence_projec
 const mapSrcC = read('../src/components/map/PresenceMap.jsx');
 assert(/<CityProjectCard\s*key=\{`\$\{nav\.stateCode\}\|\$\{selectedCity\}`\}/.test(pageSrcC) && /projects=\{cityShowcase\}/.test(pageSrcC), 'The floating card shows the selected city\'s own showcase projects, keyed per city');
 assert(mapSrcC.includes('overlay = null,') && mapSrcC.includes('data-map-overlay=') && !mapSrcC.includes('controlsAtTop'), 'Map hosts the card as an overlay (no zoom controls to move out of its way)');
-assert(mapSrcC.includes('const getTargetView = useCallback(() => getStateFitView(selectedCode), [selectedCode, getStateFitView]);'), 'Showing the card never changes the map zoom (fit depends only on the state)');
+assert(mapSrcC.includes('() => getStateFitView(selectedCode, hasOverlay ? OVERLAY_MAX_FRACTION : 0),') && /\[selectedCode, hasOverlay, getStateFitView\]/.test(mapSrcC), 'The fit depends only on the state, plus (phone / tablet) keeping it above the card');
 if (process.env.BUILD_DIR) {
   assert(fs.readdirSync(path.resolve(process.env.BUILD_DIR, 'assets')).filter((f) => /^allen image-.+\.png$/.test(f)).length === 1, 'The ALLEN campus photo is bundled once, as the placeholder project photo');
 }
@@ -142,7 +142,7 @@ if (process.env.BUILD_DIR) {
 console.log('\n4e. Bottom-Anchored Card & Minimal Map Shift:');
 const overlayClassSrc = (mapSrcC.match(/const overlayClass = [\s\S]*?;\r?\n/) || [''])[0];
 assert(overlayClassSrc.includes("'inset-x-2 bottom-2'") && overlayClassSrc.includes('bottom-3') && !/top-\d/.test(overlayClassSrc), 'Card is always anchored to the bottom of the map container (never the top)');
-assert(mapSrcC.includes('className={`absolute z-20 ${overlayClass}') && !/fixed/.test(overlayClassSrc), 'Anchored inside the map container (absolute), not the page / viewport');
+assert(mapSrcC.includes('className={`absolute z-20 flex max-h-[55%] flex-col ${overlayClass}') && !/fixed/.test(overlayClassSrc), 'Anchored inside the map container (absolute), not the page / viewport');
 assert(mapSrcC.includes('card: { top: w.top + card.offsetTop, left, right: left + card.offsetWidth },'), "Uses the card's actual rendered size and position (layout box)");
 assert(read('../src/lib/markerClearance.js').includes('const shiftPx = overlapsX && my > card.top - clearancePx ? my - (card.top - clearancePx) : 0;') && mapSrcC.includes('clearancePx: MARKER_CLEARANCE_PX,'), 'Map shifts only when the selected marker would be under / too close to the card, by just that amount');
 assert(mapSrcC.includes('animateTo({ ...v, cy: v.cy + shiftUnits }, {') && mapSrcC.includes('return shiftPx > MIN_SHIFT_PX ? shiftUnits : 0;'), 'Shift is a vertical pan only (zoom unchanged), ignoring sub-pixel amounts');

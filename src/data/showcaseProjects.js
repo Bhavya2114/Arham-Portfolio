@@ -1,24 +1,27 @@
 /**
- * Arham project showcase — the projects shown on the /presence map card and as project pins.
+ * Arham project showcase — the projects shown in the /presence project card (the only place project
+ * info is shown) and as project pins on the map.
  *
  * One record per project:
- *   id         stable, URL-safe id (used by /projects/:id)
+ *   id         stable unique id
  *   name       project name
  *   city       city exactly as listed in presenceCoverage.js (the card only shows a city's own projects)
  *   stateCode  state code, e.g. 'IN-RJ'
+ *   location   short location: area + city only, e.g. 'Indra Vihar, Kota' (no full address / pincode)
  *   type       short type shown as the card chip, e.g. 'Coaching centre'
  *   scope      one line on what Arham did, e.g. 'Complete wiring of the whole building'
  *   year       completion year (number)
- *   stats      up to 3 tiles: [{ label: 'Area', value: '10,000 sq ft' }]
- *   photo      main photo (import the image file and use it here), or null
+ *   photos     1–4 photos (import the image files, or new URL(..., import.meta.url).href)
  *   beforePhoto, afterPhoto  optional; when both exist the card shows the before / after slider
  *   lat, lng   optional site coordinates; with them the project gets its own pin on the map,
- *              otherwise its city pin is highlighted instead
+ *              otherwise the selected city's pin is highlighted instead
  *
  * Records without a city are never shown (nothing is guessed). Separate from data/projects.js, which
  * is the publication-gated source for the /projects gallery. While USE_PLACEHOLDER_PROJECTS is on,
  * cities without their own records show PLACEHOLDER_PROJECTS (see below).
  */
+
+export const MAX_PHOTOS = 4;
 
 /** @type {Array<object>} */
 export const SHOWCASE_PROJECTS = Object.freeze([
@@ -27,11 +30,11 @@ export const SHOWCASE_PROJECTS = Object.freeze([
     name: 'TODO: project name', // TODO: confirm the project name
     city: null, // TODO: confirm the city (must match presenceCoverage.js); hidden until set
     stateCode: null, // TODO: confirm the state code, e.g. 'IN-RJ'
+    location: null, // TODO: area + city, e.g. 'Indra Vihar, Kota'
     type: 'Coaching centre',
     scope: 'Complete wiring of the whole building',
     year: 2022,
-    stats: [{ label: 'Area', value: '10,000 sq ft' }], // TODO: confirm
-    photo: null, // TODO: add the project photo
+    photos: [], // TODO: add 1–4 project photos
     beforePhoto: null,
     afterPhoto: null,
     lat: null,
@@ -52,28 +55,29 @@ export const USE_PLACEHOLDER_PROJECTS = true;
 // The photo the old campus card used for every campus (Images/allen image.png).
 const ALLEN_PHOTO = new URL('../../Images/allen image.png', import.meta.url).href;
 
-const PLACEHOLDER_NAMES = [
-  'ALLEN Sankalp (Head Office)',
-  'ALLEN Supath Campus',
-  'ALLEN Saakar Campus',
-  'ALLEN Sangyan Campus',
-  'ALLEN Satyarth Campus',
-  'ALLEN Sammunnat Campus',
-  'ALLEN Samyak Campus',
-  'ALLEN Samarth Campus',
+// Name + short area / city, from the old campus records' supplied addresses (no full address).
+const PLACEHOLDER_CAMPUSES = [
+  ['ALLEN Sankalp (Head Office)', 'Indra Vihar, Kota'],
+  ['ALLEN Supath Campus', 'Naya Nohra, Kota'],
+  ['ALLEN Saakar Campus', 'Rajeev Gandhi Nagar, Kota'],
+  ['ALLEN Sangyan Campus', 'Kunhari, Kota'],
+  ['ALLEN Satyarth Campus', 'New Jawahar Nagar, Kota'],
+  ['ALLEN Sammunnat Campus', 'New Jawahar Nagar, Kota'],
+  ['ALLEN Samyak Campus', 'Landmark City, Kota'],
+  ['ALLEN Samarth Campus', 'Landmark City, Kota'],
 ];
 
 export const PLACEHOLDER_PROJECTS = Object.freeze(
-  PLACEHOLDER_NAMES.map((name) => ({
+  PLACEHOLDER_CAMPUSES.map(([name, location]) => ({
     id: `placeholder-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`,
     name,
     city: null, // shown for every city
     stateCode: null,
+    location,
     type: 'Coaching centre',
     scope: 'Complete wiring of the whole building',
     year: 2022,
-    stats: [{ label: 'Area', value: '10,000 sq ft' }],
-    photo: ALLEN_PHOTO,
+    photos: [ALLEN_PHOTO],
     beforePhoto: null,
     afterPhoto: null,
     lat: null,
@@ -96,8 +100,8 @@ export const getShowcaseProjectsForCity = (stateCode, city) => {
 export const getShowcaseProjectsForState = (stateCode) =>
   !stateCode ? [] : SHOWCASE_PROJECTS.filter((p) => p.city && p.stateCode === stateCode);
 
-export const getShowcaseProject = (id) =>
-  SHOWCASE_PROJECTS.find((p) => p.id === id) || (USE_PLACEHOLDER_PROJECTS && PLACEHOLDER_PROJECTS.find((p) => p.id === id)) || null;
+/** A project's photos (at most MAX_PHOTOS). */
+export const projectPhotos = (p) => (Array.isArray(p?.photos) ? p.photos.filter(Boolean).slice(0, MAX_PHOTOS) : []);
 
 export const hasSiteCoordinates = (p) => Number.isFinite(p?.lat) && Number.isFinite(p?.lng);
 

@@ -1,12 +1,12 @@
 /**
- * /presence project card (presence-projects).
+ * /presence project card (presence-projects) — the only place project info is shown.
  *
- * Verifies the showcase data (one record shape, city-exact matching — no other city's card), the
- * project card (type chip, "scope · year", up to 3 stats, "View project", no address / Directions,
- * pager + swipe, "Projects coming soon"), the "lights on" before / after slider (clip-path + transform
- * through refs, mouse + touch, one-time 0 → 50 % hint, reduced motion), the card <-> map link (beacon
- * on the project pin or its city pin, pin tap switches the card, swipes never move the map), the
- * layout and the motion / blur rules.
+ * Verifies the showcase data (record shape with photos[] + short location, no stats; city-exact
+ * matching; the ALLEN placeholder set), the card content (context line, photo area, chip, name,
+ * location, "scope · year", "‹ n / total ›"; no stats, no "View project", no project page), project
+ * switching by buttons / keys only, the photo area (1–4 photos, swipe, ‹ › on hover devices, counter,
+ * edge gradient, lightbox with focus trap + scroll lock), the before / after slider kept, the phone
+ * overlay vs desktop side panel layout, the card <-> map link, the plain hint and the motion rules.
  */
 
 import fs from 'fs';
@@ -25,7 +25,10 @@ const code = (src) => src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/
 
 const dataSrc = read('../src/data/showcaseProjects.js');
 const cardSrc = read('../src/components/presence/CityProjectCard.jsx');
+const photosSrc = read('../src/components/presence/ProjectPhotos.jsx');
+const lightboxSrc = read('../src/components/presence/PhotoLightbox.jsx');
 const sliderSrc = read('../src/components/presence/BeforeAfterSlider.jsx');
+const statusSrc = read('../src/components/presence/CityStatus.jsx');
 const pageSrc = read('../src/pages/Presence.jsx');
 const mapSrc = read('../src/components/map/PresenceMap.jsx');
 const detailSrc = read('../src/pages/ProjectDetail.jsx');
@@ -34,71 +37,62 @@ const data = await load('../src/data/showcaseProjects.js');
 const { getPresenceStateCodes, getPresenceState } = await load('../src/data/presenceCoverage.js');
 
 console.log('\n1. Project data');
+const keys = ['id', 'name', 'city', 'stateCode', 'location', 'type', 'scope', 'year', 'photos', 'beforePhoto', 'afterPhoto', 'lat', 'lng'];
+const all = [...data.SHOWCASE_PROJECTS, ...data.PLACEHOLDER_PROJECTS];
+assert(all.every((p) => keys.every((k) => k in p) && Array.isArray(p.photos) && p.photos.length <= data.MAX_PHOTOS) && data.MAX_PHOTOS === 4, 'Every record: id, name, city, stateCode, location, type, scope, year, photos[] (≤ 4), before / after, lat / lng');
+assert(all.every((p) => !('stats' in p)) && !/\bstats\b/.test(code(cardSrc)), 'No stats field and no stat tiles');
 const [example] = data.SHOWCASE_PROJECTS;
-const keys = ['id', 'name', 'city', 'stateCode', 'type', 'scope', 'year', 'stats', 'photo', 'beforePhoto', 'afterPhoto', 'lat', 'lng'];
-assert(data.SHOWCASE_PROJECTS.every((p) => keys.every((k) => k in p)), 'Every record has the agreed shape (id, name, city, stateCode, type, scope, year, stats, photos, lat / lng)');
-assert(example.type === 'Coaching centre' && example.scope === 'Complete wiring of the whole building' && example.year === 2022
-  && example.stats.length === 1 && example.stats[0].label === 'Area' && example.stats[0].value === '10,000 sq ft', 'First real example: coaching centre, complete wiring, 2022, 10,000 sq ft');
-assert(example.city === null && example.stateCode === null && /TODO: confirm the city/.test(dataSrc) && /TODO: confirm the project name/.test(dataSrc) && /TODO: confirm\n?/.test(dataSrc), 'City / name / area marked TODO until confirmed (record hidden meanwhile)');
-assert(data.SHOWCASE_PROJECTS.every((p) => p.stats.length <= 3), 'At most 3 stats per project');
-// Every coverage city: the card gets only that city's records, never another city's.
+assert(example.city === null && /TODO: confirm the city/.test(dataSrc) && example.type === 'Coaching centre' && example.year === 2022, 'The coaching-centre example stays hidden until its city / name are confirmed (TODO)');
 const cities = getPresenceStateCodes().flatMap((s) => getPresenceState(s).cities.map((c) => [s, c]));
-assert(cities.every(([s, c]) => data.getShowcaseProjectsForCity(s, c).every((p) => (p.city === c && p.stateCode === s) || p.placeholder)), 'Each city shows only its own projects (exact city + state match), or the placeholders');
-const { SHOWCASE_PROJECTS: realOnly } = data;
-assert(cities.every(([s, c]) => realOnly.filter((p) => p.city).every((p) => p.city === c || !data.getShowcaseProjectsForCity(s, c).includes(p))), 'A real project never appears under another city');
-assert(data.getShowcaseProjectsForCity('IN-RJ', 'Bikaner').every((p) => p.placeholder && !p.city && !('suppliedAddress' in p)), 'Bikaner shows placeholders only (no Kota record with its Kota address)');
+assert(cities.every(([s, c]) => data.getShowcaseProjectsForCity(s, c).every((p) => (p.city === c && p.stateCode === s) || p.placeholder)), 'Each city shows only its own projects (exact city + state), or the placeholders');
 
-console.log('\n1b. Placeholder projects (ALLEN photos, until real projects are added)');
+console.log('\n1b. Placeholder projects');
 const P = data.PLACEHOLDER_PROJECTS;
-assert(data.USE_PLACEHOLDER_PROJECTS === true && P.length === 8 && P[0].name === 'ALLEN Sankalp (Head Office)' && P.every((p) => /^ALLEN /.test(p.name)), 'One clearly named PLACEHOLDER_PROJECTS set: the 8 ALLEN campuses, as before');
-assert(P.every((p) => p.type === 'Coaching centre' && p.scope === 'Complete wiring of the whole building' && p.year === 2022 && p.stats.length === 1 && p.stats[0].label === 'Area' && p.stats[0].value === '10,000 sq ft'), 'Each: "Coaching centre", "Complete wiring of the whole building · 2022", Area 10,000 sq ft');
-assert(P.every((p) => /Images\/allen%20image\.png$|Images\/allen image\.png$/.test(decodeURIComponent(p.photo)) || /allen%20image\.png$/.test(p.photo)) && /new URL\('\.\.\/\.\.\/Images\/allen image\.png', import\.meta\.url\)\.href/.test(dataSrc), 'Photo: the ALLEN photo the old campus card used (Images/allen image.png)');
-assert(P.every((p) => !data.hasBeforeAfter(p) && !data.hasSiteCoordinates(p)), 'No before / after photos (single photo, slider kept for later) and no coordinates (city pin highlighted)');
-assert(cities.every(([s, c]) => data.getShowcaseProjectsForCity(s, c).length === 8), 'Every coverage city shows the same 8 placeholders (no "Projects coming soon" while they are on)');
-assert(P.every((p) => data.getShowcaseProject(p.id) === p) && new Set(P.map((p) => p.id)).size === 8, 'Placeholders have unique ids for "View project"');
-assert(data.getShowcaseProjectsForCity(null, null).length === 0 && data.getShowcaseProjectsForState('IN-RJ').every((p) => p.city), 'Records without a city are never shown');
-assert(data.hasSiteCoordinates({ lat: 26.9, lng: 75.8 }) && !data.hasSiteCoordinates(example) && data.hasBeforeAfter({ beforePhoto: 'a', afterPhoto: 'b' }) && !data.hasBeforeAfter({ beforePhoto: 'a' }), 'Helpers: site coordinates, before / after only with both photos');
-assert(!fs.existsSync(path.resolve(here, '../src/data/demoCampusCards.js')) && !fs.existsSync(path.resolve(here, '../src/components/presence/CampusCard.jsx')) && !/CampusCard|getCampusCardsForCity|campusLocations/.test(pageSrc), 'Demo campus cards removed (adapter, card and page use)');
+assert(/export const PLACEHOLDER_PROJECTS = /.test(dataSrc) && data.USE_PLACEHOLDER_PROJECTS === true && P.length === 8 && P[0].name === 'ALLEN Sankalp (Head Office)', 'One clearly named PLACEHOLDER_PROJECTS set: the 8 ALLEN campuses');
+assert(P.every((p) => p.photos.length === 1 && /allen(%20| )image\.png$/.test(p.photos[0]) && p.type === 'Coaching centre' && p.scope === 'Complete wiring of the whole building' && p.year === 2022), 'Each: its ALLEN photo in photos: [photo], "Coaching centre", "Complete wiring of the whole building", 2022');
+assert(P[0].location === 'Indra Vihar, Kota' && P.every((p) => /^[A-Za-z ]+, Kota$/.test(p.location)), 'Short location: area + city only (e.g. "Indra Vihar, Kota"), no full address / pincode');
+assert(cities.every(([s, c]) => data.getShowcaseProjectsForCity(s, c).length === 8) && P.every((p) => !data.hasSiteCoordinates(p) && !data.hasBeforeAfter(p)), 'Same 8 for every city; no coordinates (city pin highlighted), no before / after');
 
 console.log('\n2. Card content');
-assert(/data-project-type=""/.test(cardSrc) && /\{project\.type\}/.test(cardSrc) && !/Campus location/.test(cardSrc), 'Type chip instead of "Campus location"');
-assert(/\[project\.scope, project\.year\]\.filter\(Boolean\)\.join\(' · '\)/.test(cardSrc), 'Name, then "scope · year"');
-assert(/project\.stats\.slice\(0, 3\)/.test(cardSrc) && /text-sm font-bold[^"]*">\{s\.value\}<\/p>\s*<p className="text-\[10px\][^"]*">\{s\.label\}<\/p>/.test(cardSrc), 'Up to 3 stat tiles: value big, label small');
-assert(!/suppliedAddress|Directions|google\.com\/maps|Navigation/.test(cardSrc), 'No address line and no Directions button');
-assert(/to=\{`\/projects\/\$\{project\.id\}`\}/.test(cardSrc) && /View project\s*<ArrowRight/.test(cardSrc), '"View project →" links to /projects/:id');
-assert(/\{index \+ 1\} \/ \{count\}/.test(cardSrc) && /aria-label=\{`Show project \$\{i \+ 1\} of \$\{count\}: \$\{p\.name\}`\}/.test(cardSrc), 'Pager: dots + "n / total"');
-assert(/if \(dx <= -SWIPE_PX\) go\(index \+ 1\);\s*else if \(dx >= SWIPE_PX\) go\(index - 1\);/.test(cardSrc) && /e\.key === 'ArrowRight'/.test(cardSrc), 'Swipe (and ←/→) between the city\'s projects');
-assert(/const ComingSoonCard = /.test(cardSrc) && /Projects coming soon/.test(cardSrc) && /if \(count === 0\) return <ComingSoonCard city=\{city\} \/>;/.test(cardSrc), 'A city without projects gets a small "Projects coming soon" card');
-assert(/Photo coming soon/.test(cardSrc), 'Missing photo: quiet placeholder, no stock image');
+assert(/data-card-context=""/.test(cardSrc) && /\{city\}<\/span> · \{count\} \{count === 1 \? 'project' : 'projects'\}/.test(cardSrc), 'Context line at the top: "<City> · <n> projects"');
+assert(/data-project-type=""/.test(cardSrc) && /<h3[^>]*>\{project\.name\}<\/h3>/.test(cardSrc) && /data-project-location=""/.test(cardSrc) && /\[project\.scope, project\.year\]\.filter\(Boolean\)\.join\(' · '\)/.test(cardSrc), 'Type chip, name, short location, "scope · year"');
+assert(!/View project|to=\{`\/projects|Link|suppliedAddress|Directions/.test(code(cardSrc)), 'No "View project" button, no link, no address or Directions');
+assert(/aria-label="Previous project"/.test(cardSrc) && /aria-label="Next project"/.test(cardSrc) && /\{index \+ 1\} \/ \{count\}/.test(cardSrc), 'Bottom row: "‹ n / total ›"');
+assert(!/onPointerMove|SWIPE_PX|setPointerCapture/.test(cardSrc) && /e\.key === 'ArrowRight'\) \{ e\.preventDefault\(\); go\(index \+ 1\);/.test(cardSrc) && /if \(e\.target !== e\.currentTarget\) return;/.test(cardSrc), 'Projects change only via ‹ › and ←/→ on the focused card — never by swiping the card');
 
-console.log('\n3. "Lights on" before / after slider');
-assert(/if \(hasBeforeAfter\(project\)\) \{\s*return <BeforeAfterSlider/.test(cardSrc) && /if \(project\.photo\) \{\s*return <img/.test(cardSrc), 'Slider only with both photos; a single photo is shown normally');
-assert(/afterRef\.current\.style\.clipPath = `inset\(0 0 0 \$\{pct\.current\}%\)`/.test(sliderSrc) && /dividerRef\.current\.style\.transform = `translateX\(\$\{pct\.current\}%\)`/.test(sliderSrc), 'After image clipped by clip-path: inset(); divider moved by a transform, both through refs');
-assert(!/useState/.test(sliderSrc), 'No React state per move (no useState in the slider)');
-assert(/onPointerDown=\{handlePointerDown\}/.test(sliderSrc) && /e\.stopPropagation\(\);/.test(sliderSrc) && /style=\{\{ touchAction: 'none' \}\}/.test(sliderSrc) && /style=\{\{ touchAction: 'pan-y' \}\}/.test(sliderSrc), 'Mouse + touch; slider drags never swipe the cards or pan the map; handle is touch-action none');
-assert(/>Before<\/span>/.test(sliderSrc) && />After<\/span>/.test(sliderSrc) && /<Lightbulb/.test(sliderSrc) && /rounded-full[^"]*bg-\[#D9E35A\]/.test(sliderSrc), '"Before" / "After" labels and a round EDGE_YELLOW handle with a lightbulb');
-assert(/export const SLIDER_START = 50;/.test(sliderSrc) && /const HINT_MS = 600;/.test(sliderSrc) && /apply\(SLIDER_START \* \(1 - \(1 - t\) \*\* 3\)\)/.test(sliderSrc) && /const hinted = new Set\(\);/.test(sliderSrc), 'Starts at 50 %; one-time 0 → 50 % hint (~600 ms) on first view');
-assert(/const willHint = !prefersReducedMotion\(\) && !hinted\.has\(id\)/.test(sliderSrc), 'Hint skipped under prefers-reduced-motion');
-assert(/role="slider"/.test(sliderSrc) && /aria-valuenow/.test(sliderSrc) && /ArrowLeft: -5, ArrowRight: 5/.test(sliderSrc), 'Keyboard-accessible slider handle');
-assert(/aspect-\[2\/1\] sm:aspect-auto sm:h-full sm:min-h-\[13rem\]/.test(cardSrc) && /sm:w-\[52%\]/.test(cardSrc), 'Photo is the main part of the card');
+console.log('\n3. Photo area and lightbox');
+assert(/\{photos\.map\(\(src, i\) =>/.test(photosSrc) && /\{index \+ 1\}\/\{count\}/.test(photosSrc) && /\{count > 1 && \(/.test(photosSrc), '1–4 photos; "n/total" counter and ‹ › only with more than one photo');
+assert(/el\.style\.transform = `translateX\(calc\(\$\{-i \* 100\}% \+ \$\{dx\}px\)\)`/.test(photosSrc) && /style=\{\{ touchAction: 'pan-y' \}\}/.test(photosSrc) && /e\.stopPropagation\(\);/.test(photosSrc), 'Swipe between photos (ref transform, pan-y; stops at the photo area)');
+assert(/hidden \[@media\(hover:hover\)\]:inline-flex h-11 w-11/.test(photosSrc), 'Small ‹ › on desktop (hover devices), 44 px tap targets');
+assert(/linear-gradient\(to top, \$\{fadeTo\}cc, transparent\)/.test(photosSrc), 'Subtle dark gradient on the photo edge next to the text');
+assert(/<img src=\{src\} alt=\{alt\}/.test(photosSrc) && /alt=\{project\.name\}/.test(cardSrc), 'Photo alt text = project name');
+assert(/setTimeout\(\(\) => \{ swiped\.current = false; \}, 50\);/.test(photosSrc), 'A swipe never opens the lightbox, and never swallows a later tap');
+assert(/createPortal\(/.test(lightboxSrc) && /role="dialog"\s*aria-modal="true"/.test(lightboxSrc) && /object-contain/.test(lightboxSrc) && /bg-black\/90/.test(lightboxSrc), 'Lightbox: modal dialog, dark overlay, photo fitted to the screen');
+assert(/body\.style\.overflow = 'hidden';/.test(lightboxSrc) && /body\.style\.overflow = previous;/.test(lightboxSrc), 'Page scroll locked while open');
+assert(/closeRef\.current\?\.focus/.test(lightboxSrc) && /e\.key === 'Tab'/.test(lightboxSrc) && /opener\?\.focus\?\.\(/.test(lightboxSrc), 'Focus moves in, is trapped, and returns to the photo on close');
+assert(/window\.addEventListener\('keydown', onKey, true\);/.test(lightboxSrc) && /e\.key === 'Escape'\) \{ e\.preventDefault\(\); e\.stopPropagation\(\);/.test(lightboxSrc), 'Escape / ←/→ handled in a capture listener and stopped (Escape never steps the page back)');
+assert(/aria-label="Close photo"/.test(lightboxSrc) && /e\.target === e\.currentTarget \|\| e\.target\.dataset\?\.backdrop === ''/.test(lightboxSrc) && /aria-label="Previous photo"/.test(lightboxSrc), 'Close with ✕, Escape or a tap on the backdrop; ‹ › / swipe between photos');
+assert(/hasBeforeAfter\(project\) \? \(\s*<BeforeAfterSlider/.test(cardSrc) && /clip-path|clipPath/.test(sliderSrc), 'Before / after slider kept for projects with both photos');
 
-console.log('\n4. Card <-> map');
-assert(/const highlightedProjectId = nav\.projectId \|\| \(projectCardOnly && cardProject && hasSiteCoordinates\(cardProject\) \? cardProject\.id : null\);/.test(pageSrc) && /selectedProjectId=\{highlightedProjectId\}/.test(pageSrc) && /cityBeacon=\{!highlightedProjectId\}/.test(pageSrc), 'Card project highlighted: its own pin with lat / lng, otherwise its city pin');
-assert(/data-project-beacon=""/.test(mapSrc) && /fill=\{isSelected \? MAP_COLORS\.edge : '#FFFFFF'\}\s*stroke=\{MAP_COLORS\.land\}\s*strokeWidth=\{1\.5\}/.test(mapSrc), 'Project pin highlight reuses the yellow beacon style');
-assert(/\.\.\.stateShowcase\.filter\(hasSiteCoordinates\)\.map\(\(p\) => \(\{ id: p\.id, name: p\.name, city: p\.city, \.\.\.projectLatLon\(p\.lat, p\.lng\) \}\)\)/.test(pageSrc), 'Showcase projects with lat / lng get project pins');
-assert(/const openProject = \(projectId\) => \{\s*if \(showShowcaseProject\(projectId\)\) return;/.test(pageSrc) && /setCardProjectId\(project\.id\);/.test(pageSrc), 'Tapping a project pin switches the card to that project');
-assert(/const overlayKey = hasOverlay \? selectedCity : null;/.test(mapSrc) && /onChange=\{setCardProjectId\}/.test(pageSrc), 'Swiping only changes the highlighted pin: the map shift is keyed per city, not per project (no move / zoom)');
+console.log('\n4. Layout');
+assert(/const OVERLAY_MAX_FRACTION = 0\.55;/.test(mapSrc) && /absolute z-20 flex max-h-\[55%\] flex-col/.test(mapSrc) && /min-h-\[5rem\] basis-\[11rem\] shrink/.test(cardSrc), 'Phone / tablet: bottom-anchored card, at most ~55 % of the map height, photo on top');
+assert(/\(BASE\.h \* free\) \/ \(box\.height \* 1\.3\)/.test(mapSrc) && /getStateFitView\(selectedCode, hasOverlay \? OVERLAY_MAX_FRACTION : 0\)/.test(mapSrc), 'The selected state is fitted above the card, so it stays visible');
+assert(/const DESKTOP_QUERY = '\(min-width: 1024px\)';/.test(pageSrc) && /const PANEL_PX = 380;/.test(pageSrc) && /overlay=\{isDesktop \? null : projectCard\}/.test(pageSrc), 'Desktop (lg+): side panel (380 px) next to the map instead of over it');
+assert(/className="presence-panel-in relative z-30 shrink-0 self-center"/.test(pageSrc) && /@keyframes presence-panel-in \{\s*from \{ transform: translateX\(32px\); opacity: 0; \}/.test(css) && /\.presence-panel-in \{ animation: presence-panel-in 300ms/.test(css), 'Panel vertically centred, slides in from the right (~300 ms, transform / opacity)');
+assert(/w-full aspect-\[16\/10\] shrink-0/.test(cardSrc), 'Desktop panel: 16:10 photo on top, text below');
+assert(/sidePanelPx=\{cardPanel \? PANEL_PX : 0\}/.test(pageSrc) && /marginRight: `calc\(-1 \* var\(--map-fade\) - \$\{sidePanelPx\}px\)`/.test(mapSrc), 'Map + panel use the page width: the map\'s fade band runs under the panel (none in the middle)');
 
-console.log('\n5. Layout and style');
-assert(/bottom-3 w-\[min\(28rem,calc\(100%-1\.5rem\)\)\]/.test(mapSrc) && /'inset-x-2 bottom-2'/.test(mapSrc), 'Anchored at the bottom of the map area: full width on phones, max ~28rem on desktop');
-assert(/flex flex-col sm:flex-row/.test(cardSrc), 'Phone: photo on top, text below; desktop: photo left, text right');
-assert(!/backdrop-blur|blur\(/.test(code(cardSrc) + code(sliderSrc)), 'No blur on the card or slider');
-assert(/@keyframes project-card-in-from-right \{ from \{ transform: translateX\(40%\); opacity: 0; \} to \{ transform: translateX\(0\); opacity: 1; \} \}/.test(css) && !/@keyframes campus-/.test(css), 'Card slide: transform + opacity only (old campus keyframes removed)');
-assert(/el\.style\.transform = px \? `translateX\(\$\{px\}px\)` : '';/.test(cardSrc) && !/useState/.test(cardSrc), 'Swipe follows the finger through a ref transform (no React state per move)');
-assert(/slide\.current\.id === project\.id && !prefersReducedMotion\(\)/.test(cardSrc), 'Reduced motion: no slide animation');
+console.log('\n5. Card <-> map, hint, project page');
+assert(/const highlightedProjectId = nav\.projectId \|\| \(projectCardOnly && cardProject && hasSiteCoordinates\(cardProject\) \? cardProject\.id : null\);/.test(pageSrc) && /cityBeacon=\{!highlightedProjectId\}/.test(pageSrc) && /if \(showShowcaseProject\(projectId\)\) return;/.test(pageSrc), 'Shown project highlights its pin (or the city pin); a project pin tap switches to it');
+assert(/footer=\{selectedState && !selectedCity \? <StateStatus/.test(pageSrc) && /className="text-xs text-slate-500 leading-relaxed text-center" data-state-hint=""/.test(statusSrc) && !/rounded-xl border/.test(statusSrc), 'Hint: plain small grey text, only with a state selected and no city');
+assert(!/getShowcaseProject|showcase/.test(detailSrc), '/projects/:id is as on main (no showcase placeholder page)');
 
-console.log('\n6. /projects/:id');
-assert(/const p = project \? null : getShowcaseProject\(id\);\s*return p && \(p\.city \|\| p\.placeholder\) \? p : null;/.test(detailSrc) && /The full project page with photos is coming soon\./.test(detailSrc), 'Showcase projects get a simple placeholder page (only records shown on the map)');
+console.log('\n6. Rules');
+assert(!/backdrop-blur|blur\(/.test(code(cardSrc) + code(photosSrc) + code(lightboxSrc)), 'No blur');
+const moveHandlers = [photosSrc, lightboxSrc, sliderSrc].map((s) => (s.match(/const handlePointerMove = \(e\) => \{[\s\S]*?\n  \};/) || [''])[0]);
+assert(moveHandlers.every((h) => h && !/\bset(?!Offset\b|PointerCapture\b)[A-Z]\w*\(/.test(h)) && !/useState/.test(sliderSrc), 'No React state per move: pointer-move handlers only touch refs (state changes when a swipe settles)');
+assert(/@media \(prefers-reduced-motion: reduce\) \{\s*\.presence-panel-in, \.presence-lightbox \{ animation: none; \}/.test(css) && /slide\.current\.id === project\.id && !prefersReducedMotion\(\)/.test(cardSrc), 'Reduced motion: no panel slide, lightbox fade or project slide');
+assert(/stepBtn = 'inline-flex h-11 w-11/.test(cardSrc) && /h-12 w-12/.test(lightboxSrc) && /focus-visible:ring-2/.test(cardSrc + photosSrc + lightboxSrc), 'Buttons ≥ 44 px with visible focus rings');
 
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);

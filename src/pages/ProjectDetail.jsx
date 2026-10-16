@@ -6,7 +6,6 @@ import Button from '../components/ui/Button';
 import Card from '../components/ui/Card';
 import { CATEGORY_META } from '../components/map/ProjectCard';
 import { getPublishedProjectById, getStateDetails } from '../data/projectSelectors';
-import { getShowcaseProject } from '../data/showcaseProjects.js';
 import { 
   MapPin, 
   Calendar, 
@@ -42,69 +41,16 @@ export const ProjectDetail = () => {
   const project = useMemo(() => {
     return getPublishedProjectById(id);
   }, [id]);
-  // Showcase project from the /presence map card (only records shown there: with a city, or a placeholder).
-  const showcase = useMemo(() => {
-    const p = project ? null : getShowcaseProject(id);
-    return p && (p.city || p.placeholder) ? p : null;
-  }, [project, id]);
 
   // Dynamic document title, meta description & scroll reset
   const pageTitle = project
     ? `${project.name} | Project Profile | Arham`
-    : showcase
-      ? `${showcase.name} | Arham`
-      : 'Project Record Not Found | Arham';
+    : 'Project Record Not Found | Arham';
   const pageDescription = project
     ? `${project.name}: ${project.summary || 'Verified electrical engineering and lighting installation profile.'}`
-    : showcase
-      ? `${showcase.name}: ${[showcase.scope, showcase.city].filter(Boolean).join(', ')}.`
-      : 'The requested project profile could not be found or has not been verified for publication.';
+    : 'The requested project profile could not be found or has not been verified for publication.';
 
   usePageMetadata(pageTitle, pageDescription);
-
-  // Placeholder page for a showcase project until its full write-up exists.
-  if (!project && showcase) {
-    return (
-      <div className="w-full bg-brand-bg min-h-[70vh] py-16 flex items-center" data-showcase-project={showcase.id}>
-        <Container size="default">
-          <Card variant="default" padding="lg" className="max-w-2xl mx-auto bg-white border border-brand-border py-10 px-6 sm:px-10 space-y-5 shadow-subtle">
-            <Badge variant="neutral" size="sm">{showcase.type}</Badge>
-            <div className="space-y-2">
-              <h1 className="text-2xl sm:text-3xl font-bold font-heading text-brand-navy">{showcase.name}</h1>
-              <p className="text-sm text-brand-slate">
-                {[showcase.scope, showcase.year].filter(Boolean).join(' · ')}
-              </p>
-              {showcase.city && (
-                <p className="inline-flex items-center gap-1.5 text-sm text-brand-slate">
-                  <MapPin className="w-4 h-4" aria-hidden="true" />
-                  {showcase.city}
-                </p>
-              )}
-            </div>
-            {showcase.stats?.length > 0 && (
-              <ul className="grid grid-cols-3 gap-3">
-                {showcase.stats.slice(0, 3).map((s) => (
-                  <li key={s.label} className="rounded-xl border border-brand-border bg-slate-50 px-3 py-2">
-                    <p className="text-base font-bold text-brand-navy">{s.value}</p>
-                    <p className="text-xs text-brand-slate">{s.label}</p>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <p className="text-sm text-brand-slate">The full project page with photos is coming soon.</p>
-            <div className="flex flex-wrap gap-3 pt-2">
-              <Button variant="primary" size="md" as={Link} to="/presence" icon={ArrowLeft}>
-                Back to the map
-              </Button>
-              <Button variant="outline" size="md" as={Link} to="/contact" icon={ArrowRight} iconPosition="right">
-                Discuss a project
-              </Button>
-            </div>
-          </Card>
-        </Container>
-      </div>
-    );
-  }
 
   // Handle Project Not Found or Unpublished ID
   if (!project) {
