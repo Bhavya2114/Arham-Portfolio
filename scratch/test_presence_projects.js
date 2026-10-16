@@ -43,8 +43,19 @@ assert(example.city === null && example.stateCode === null && /TODO: confirm the
 assert(data.SHOWCASE_PROJECTS.every((p) => p.stats.length <= 3), 'At most 3 stats per project');
 // Every coverage city: the card gets only that city's records, never another city's.
 const cities = getPresenceStateCodes().flatMap((s) => getPresenceState(s).cities.map((c) => [s, c]));
-assert(cities.every(([s, c]) => data.getShowcaseProjectsForCity(s, c).every((p) => p.city === c && p.stateCode === s)), 'Each city shows only its own projects (exact city + state match)');
-assert(data.getShowcaseProjectsForCity('IN-RJ', 'Bikaner').length === 0 && data.getShowcaseProjectsForCity('IN-RJ', 'Bikaner').every((p) => !/Kota|ALLEN/.test(p.name)), 'Bikaner gets no Kota / ALLEN card (the wrong-city bug)');
+assert(cities.every(([s, c]) => data.getShowcaseProjectsForCity(s, c).every((p) => (p.city === c && p.stateCode === s) || p.placeholder)), 'Each city shows only its own projects (exact city + state match), or the placeholders');
+const { SHOWCASE_PROJECTS: realOnly } = data;
+assert(cities.every(([s, c]) => realOnly.filter((p) => p.city).every((p) => p.city === c || !data.getShowcaseProjectsForCity(s, c).includes(p))), 'A real project never appears under another city');
+assert(data.getShowcaseProjectsForCity('IN-RJ', 'Bikaner').every((p) => p.placeholder && !p.city && !('suppliedAddress' in p)), 'Bikaner shows placeholders only (no Kota record with its Kota address)');
+
+console.log('\n1b. Placeholder projects (ALLEN photos, until real projects are added)');
+const P = data.PLACEHOLDER_PROJECTS;
+assert(data.USE_PLACEHOLDER_PROJECTS === true && P.length === 8 && P[0].name === 'ALLEN Sankalp (Head Office)' && P.every((p) => /^ALLEN /.test(p.name)), 'One clearly named PLACEHOLDER_PROJECTS set: the 8 ALLEN campuses, as before');
+assert(P.every((p) => p.type === 'Coaching centre' && p.scope === 'Complete wiring of the whole building' && p.year === 2022 && p.stats.length === 1 && p.stats[0].label === 'Area' && p.stats[0].value === '10,000 sq ft'), 'Each: "Coaching centre", "Complete wiring of the whole building · 2022", Area 10,000 sq ft');
+assert(P.every((p) => /Images\/allen%20image\.png$|Images\/allen image\.png$/.test(decodeURIComponent(p.photo)) || /allen%20image\.png$/.test(p.photo)) && /new URL\('\.\.\/\.\.\/Images\/allen image\.png', import\.meta\.url\)\.href/.test(dataSrc), 'Photo: the ALLEN photo the old campus card used (Images/allen image.png)');
+assert(P.every((p) => !data.hasBeforeAfter(p) && !data.hasSiteCoordinates(p)), 'No before / after photos (single photo, slider kept for later) and no coordinates (city pin highlighted)');
+assert(cities.every(([s, c]) => data.getShowcaseProjectsForCity(s, c).length === 8), 'Every coverage city shows the same 8 placeholders (no "Projects coming soon" while they are on)');
+assert(P.every((p) => data.getShowcaseProject(p.id) === p) && new Set(P.map((p) => p.id)).size === 8, 'Placeholders have unique ids for "View project"');
 assert(data.getShowcaseProjectsForCity(null, null).length === 0 && data.getShowcaseProjectsForState('IN-RJ').every((p) => p.city), 'Records without a city are never shown');
 assert(data.hasSiteCoordinates({ lat: 26.9, lng: 75.8 }) && !data.hasSiteCoordinates(example) && data.hasBeforeAfter({ beforePhoto: 'a', afterPhoto: 'b' }) && !data.hasBeforeAfter({ beforePhoto: 'a' }), 'Helpers: site coordinates, before / after only with both photos');
 assert(!fs.existsSync(path.resolve(here, '../src/data/demoCampusCards.js')) && !fs.existsSync(path.resolve(here, '../src/components/presence/CampusCard.jsx')) && !/CampusCard|getCampusCardsForCity|campusLocations/.test(pageSrc), 'Demo campus cards removed (adapter, card and page use)');
@@ -87,7 +98,7 @@ assert(/el\.style\.transform = px \? `translateX\(\$\{px\}px\)` : '';/.test(card
 assert(/slide\.current\.id === project\.id && !prefersReducedMotion\(\)/.test(cardSrc), 'Reduced motion: no slide animation');
 
 console.log('\n6. /projects/:id');
-assert(/const p = project \? null : getShowcaseProject\(id\);\s*return p && p\.city \? p : null;/.test(detailSrc) && /The full project page with photos is coming soon\./.test(detailSrc), 'Showcase projects get a simple placeholder page (only records shown on the map)');
+assert(/const p = project \? null : getShowcaseProject\(id\);\s*return p && \(p\.city \|\| p\.placeholder\) \? p : null;/.test(detailSrc) && /The full project page with photos is coming soon\./.test(detailSrc), 'Showcase projects get a simple placeholder page (only records shown on the map)');
 
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);

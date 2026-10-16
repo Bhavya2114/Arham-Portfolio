@@ -42,10 +42,10 @@ export const ProjectDetail = () => {
   const project = useMemo(() => {
     return getPublishedProjectById(id);
   }, [id]);
-  // Showcase project from the /presence map card (only records shown there, i.e. with a city).
+  // Showcase project from the /presence map card (only records shown there: with a city, or a placeholder).
   const showcase = useMemo(() => {
     const p = project ? null : getShowcaseProject(id);
-    return p && p.city ? p : null;
+    return p && (p.city || p.placeholder) ? p : null;
   }, [project, id]);
 
   // Dynamic document title, meta description & scroll reset
@@ -57,7 +57,7 @@ export const ProjectDetail = () => {
   const pageDescription = project
     ? `${project.name}: ${project.summary || 'Verified electrical engineering and lighting installation profile.'}`
     : showcase
-      ? `${showcase.name}: ${showcase.scope}, ${showcase.city}.`
+      ? `${showcase.name}: ${[showcase.scope, showcase.city].filter(Boolean).join(', ')}.`
       : 'The requested project profile could not be found or has not been verified for publication.';
 
   usePageMetadata(pageTitle, pageDescription);
@@ -74,10 +74,12 @@ export const ProjectDetail = () => {
               <p className="text-sm text-brand-slate">
                 {[showcase.scope, showcase.year].filter(Boolean).join(' · ')}
               </p>
-              <p className="inline-flex items-center gap-1.5 text-sm text-brand-slate">
-                <MapPin className="w-4 h-4" aria-hidden="true" />
-                {showcase.city}
-              </p>
+              {showcase.city && (
+                <p className="inline-flex items-center gap-1.5 text-sm text-brand-slate">
+                  <MapPin className="w-4 h-4" aria-hidden="true" />
+                  {showcase.city}
+                </p>
+              )}
             </div>
             {showcase.stats?.length > 0 && (
               <ul className="grid grid-cols-3 gap-3">

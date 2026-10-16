@@ -16,7 +16,8 @@
  *              otherwise its city pin is highlighted instead
  *
  * Records without a city are never shown (nothing is guessed). Separate from data/projects.js, which
- * is the publication-gated source for the /projects gallery.
+ * is the publication-gated source for the /projects gallery. While USE_PLACEHOLDER_PROJECTS is on,
+ * cities without their own records show PLACEHOLDER_PROJECTS (see below).
  */
 
 /** @type {Array<object>} */
@@ -38,15 +39,65 @@ export const SHOWCASE_PROJECTS = Object.freeze([
   },
 ]);
 
-/** A city's projects, in data order. Only exact city + state matches; never another city's records. */
-export const getShowcaseProjectsForCity = (stateCode, city) =>
-  !stateCode || !city ? [] : SHOWCASE_PROJECTS.filter((p) => p.city === city && p.stateCode === stateCode);
+/**
+ * PLACEHOLDER content — the ALLEN campus photos, shown for EVERY selected city until real projects
+ * are added. Same set for each city; no coordinates, so the selected city's pin is highlighted.
+ *
+ * To swap in real projects: add them to SHOWCASE_PROJECTS above (with their city), then set
+ * USE_PLACEHOLDER_PROJECTS to false (or delete this block). A city with its own projects in
+ * SHOWCASE_PROJECTS always shows those instead of the placeholders.
+ */
+export const USE_PLACEHOLDER_PROJECTS = true;
+
+// The photo the old campus card used for every campus (Images/allen image.png).
+const ALLEN_PHOTO = new URL('../../Images/allen image.png', import.meta.url).href;
+
+const PLACEHOLDER_NAMES = [
+  'ALLEN Sankalp (Head Office)',
+  'ALLEN Supath Campus',
+  'ALLEN Saakar Campus',
+  'ALLEN Sangyan Campus',
+  'ALLEN Satyarth Campus',
+  'ALLEN Sammunnat Campus',
+  'ALLEN Samyak Campus',
+  'ALLEN Samarth Campus',
+];
+
+export const PLACEHOLDER_PROJECTS = Object.freeze(
+  PLACEHOLDER_NAMES.map((name) => ({
+    id: `placeholder-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`,
+    name,
+    city: null, // shown for every city
+    stateCode: null,
+    type: 'Coaching centre',
+    scope: 'Complete wiring of the whole building',
+    year: 2022,
+    stats: [{ label: 'Area', value: '10,000 sq ft' }],
+    photo: ALLEN_PHOTO,
+    beforePhoto: null,
+    afterPhoto: null,
+    lat: null,
+    lng: null,
+    placeholder: true,
+  }))
+);
+
+/**
+ * A city's projects, in data order: only that city's own records (exact city + state match, never
+ * another city's). A city without its own records gets the placeholders while they are on.
+ */
+export const getShowcaseProjectsForCity = (stateCode, city) => {
+  if (!stateCode || !city) return [];
+  const own = SHOWCASE_PROJECTS.filter((p) => p.city === city && p.stateCode === stateCode);
+  return own.length > 0 || !USE_PLACEHOLDER_PROJECTS ? own : PLACEHOLDER_PROJECTS;
+};
 
 /** All shown projects in a state (records with a city only). */
 export const getShowcaseProjectsForState = (stateCode) =>
   !stateCode ? [] : SHOWCASE_PROJECTS.filter((p) => p.city && p.stateCode === stateCode);
 
-export const getShowcaseProject = (id) => SHOWCASE_PROJECTS.find((p) => p.id === id) || null;
+export const getShowcaseProject = (id) =>
+  SHOWCASE_PROJECTS.find((p) => p.id === id) || (USE_PLACEHOLDER_PROJECTS && PLACEHOLDER_PROJECTS.find((p) => p.id === id)) || null;
 
 export const hasSiteCoordinates = (p) => Number.isFinite(p?.lat) && Number.isFinite(p?.lng);
 

@@ -110,8 +110,8 @@ const publicFiles = ['../src/components/map/PresenceMap.jsx', '../src/sections/P
 assert(publicFiles.every((f) => !/cand-|candidate/i.test(read(f))), 'Map, homepage, gallery, routes, selectors and projects.js contain no candidate references');
 if (process.env.BUILD_DIR) {
   const assets = path.resolve(process.env.BUILD_DIR, 'assets');
-  const carriers = fs.readdirSync(assets).filter((f) => /\.js$/.test(f) && /cand-kota|cand-jaipur|ALLEN Sankalp|Samachar Jagat/.test(fs.readFileSync(path.join(assets, f), 'utf-8')));
-  assert(carriers.length === 0, `Candidate data is not shipped in any bundle (${carriers.join(', ') || 'none'})`);
+  const carriers = fs.readdirSync(assets).filter((f) => /\.js$/.test(f) && /cand-kota|cand-jaipur|Indra Vihar|Samachar Jagat/.test(fs.readFileSync(path.join(assets, f), 'utf-8')));
+  assert(carriers.length === 0, `Candidate records (ids, supplied addresses) are not shipped in any bundle (${carriers.join(', ') || 'none'}); only the placeholder campus names are`);
 }
 
 console.log('\n4a. Kota / Jaipur Campus Records (internal data, no longer shown on /presence):');
@@ -136,7 +136,7 @@ assert(/<CityProjectCard\s*key=\{`\$\{nav\.stateCode\}\|\$\{selectedCity\}`\}/.t
 assert(mapSrcC.includes('overlay = null,') && mapSrcC.includes('data-map-overlay=') && !mapSrcC.includes('controlsAtTop'), 'Map hosts the card as an overlay (no zoom controls to move out of its way)');
 assert(mapSrcC.includes('const getTargetView = useCallback(() => getStateFitView(selectedCode), [selectedCode, getStateFitView]);'), 'Showing the card never changes the map zoom (fit depends only on the state)');
 if (process.env.BUILD_DIR) {
-  assert(!fs.readdirSync(path.resolve(process.env.BUILD_DIR, 'assets')).some((f) => /^allen image-.+\.png$/.test(f)), 'The ALLEN campus image is no longer bundled');
+  assert(fs.readdirSync(path.resolve(process.env.BUILD_DIR, 'assets')).filter((f) => /^allen image-.+\.png$/.test(f)).length === 1, 'The ALLEN campus photo is bundled once, as the placeholder project photo');
 }
 
 console.log('\n4e. Bottom-Anchored Card & Minimal Map Shift:');
