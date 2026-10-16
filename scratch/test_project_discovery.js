@@ -133,7 +133,7 @@ assert(read('../src/App.jsx').includes("lazy(() => import('./pages/Presence'))")
 
 console.log('\n6. City Selection Without Zoom (restored behaviour):');
 // The map's target view depends only on the selected state, so a city click cannot change the zoom.
-assert(mapSrc.includes('() => getStateFitView(selectedCode, hasOverlay ? OVERLAY_MAX_FRACTION : 0),') && /\[selectedCode, hasOverlay, getStateFitView\]/.test(mapSrc), 'Map target view depends only on the selected state (and, on phone / tablet, keeping it above the card)');
+assert(mapSrc.includes('const getTargetView = useCallback(() => getStateFitView(selectedCode), [selectedCode, getStateFitView]);'), 'Map target view depends only on the selected state (city click cannot change zoom)');
 assert(!mapSrc.includes('data-city-area') && !pageSrc.includes('focusPoint'), 'No city boundary or city-level map view');
 assert(pageSrc.includes('const detailsOpen = Boolean((selectedCity && !projectCardOnly) ||'), 'Selecting a city opens the project panel / sheet (cities without published gallery projects use the floating project card instead)');
 assert(pageSrc.includes('<CityProjectList city={selectedCity} projects={cityProjects}'), "City panel lists that city's verified projects");

@@ -91,17 +91,21 @@ p {
     linear-gradient(to bottom, rgba(16, 29, 44, 0.035) 1px, transparent 1px);
 }
 
-/* Our Presence project card: the next / previous project slides in (320 ms ease-out, slight fade).
-   Transform + opacity only. Reduced motion: the global rule above, and CityProjectCard skips it. */
-.project-card-slide {
+/* Our Presence campus card: horizontal content slide (320 ms ease-out, subtle fade).
+   Reduced motion is handled by the global rule above and by CampusCard skipping the slide. */
+.campus-slide {
   animation-duration: 320ms;
   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
   animation-fill-mode: both;
 }
-.project-card-in-from-right { animation-name: project-card-in-from-right; }
-.project-card-in-from-left { animation-name: project-card-in-from-left; }
-@keyframes project-card-in-from-right { from { transform: translateX(40%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-@keyframes project-card-in-from-left { from { transform: translateX(-40%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.campus-in-from-right { animation-name: campus-in-from-right; }
+.campus-in-from-left { animation-name: campus-in-from-left; }
+.campus-out-to-left { animation-name: campus-out-to-left; }
+.campus-out-to-right { animation-name: campus-out-to-right; }
+@keyframes campus-in-from-right { from { transform: translateX(100%); opacity: 0.85; } to { transform: translateX(0); opacity: 1; } }
+@keyframes campus-in-from-left { from { transform: translateX(-100%); opacity: 0.85; } to { transform: translateX(0); opacity: 1; } }
+@keyframes campus-out-to-left { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0.85; } }
+@keyframes campus-out-to-right { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0.85; } }
 
 /* Our Presence map: one gentle pulse ring on the selected city pin ("beacon"). Animates only transform
    (scale) and opacity on a small wrapper; hidden at rest and under reduced motion. */
@@ -162,16 +166,4 @@ p {
     opacity: 1;
   }
   .presence-highlight { transition: none; }
-}
-
-/* Our Presence desktop project panel: slides in from the right once when it opens (300 ms,
-   transform + opacity only). Off under reduced motion. */
-@keyframes presence-panel-in {
-  from { transform: translateX(32px); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-.presence-panel-in { animation: presence-panel-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both; }
-.presence-lightbox { animation: presence-enter 200ms ease-out both; }
-@media (prefers-reduced-motion: reduce) {
-  .presence-panel-in, .presence-lightbox { animation: none; }
 }
