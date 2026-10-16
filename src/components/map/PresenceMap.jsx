@@ -350,12 +350,14 @@ export const PresenceMap = ({
               strokeWidth={2}
               vectorEffect="non-scaling-stroke"
             />
-            {isSelected && (
-              <circle r={r + 3.5 * unit} fill="none" stroke={MAP_COLORS.edge} strokeWidth={2} vectorEffect="non-scaling-stroke" />
+            {isSelected && !moving && (
+              <g className="presence-beacon motion-reduce:hidden" aria-hidden="true">
+                <circle r={r} fill="none" stroke={MAP_COLORS.edge} strokeWidth={2} vectorEffect="non-scaling-stroke" />
+              </g>
             )}
             <circle
               r={r}
-              fill="#FFFFFF"
+              fill={isSelected ? MAP_COLORS.edge : '#FFFFFF'}
               stroke={MAP_COLORS.land}
               strokeWidth={1.25}
               vectorEffect="non-scaling-stroke"
@@ -744,6 +746,12 @@ export const PresenceMap = ({
             <li className="inline-flex items-center gap-1.5">
               <span className="w-2.5 h-2.5 rounded-full bg-white border border-[#070A1F]" aria-hidden="true" />
               City
+            </li>
+          )}
+          {markers.length > 0 && (
+            <li className="inline-flex items-center gap-1.5">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#D9E35A] border border-[#070A1F]" aria-hidden="true" />
+              Selected city
             </li>
           )}
           {projectMarkers.length > 0 && (
