@@ -3,7 +3,7 @@
  * 
  * Verifies:
  * 1. Route-level lazy loading and code splitting in App.jsx.
- * 2. Complete route coverage (Home, About, Services, Projects, ProjectDetail, Contact, NotFound).
+ * 2. Route coverage: Home, Our Work, Services, Contact, NotFound, and the redirects of the old routes.
  * 3. Design token consistency and CSS variables.
  * 4. Accessibility, touch targets, and reduced-motion rules.
  * 5. Button and link semantic hierarchy in NotFound and shared components.
@@ -42,10 +42,11 @@ assert(appCode.includes('PageFallback'), 'App.jsx defines accessible PageFallbac
 // 2. Complete Route Coverage
 console.log('\n2. Route Registry Coverage:');
 assert(appCode.includes('path="/"'), 'Route "/" registered');
-assert(appCode.includes('path="/about"'), 'Route "/about" registered');
+assert(appCode.includes('<Route path="/our-work" element={<Presence />} />'), 'Route "/our-work" registered (map + project cards)');
 assert(appCode.includes('path="/services"'), 'Route "/services" registered');
-assert(appCode.includes('path="/projects"'), 'Route "/projects" registered');
-assert(appCode.includes('path="/projects/:id"'), 'Route "/projects/:id" registered');
+assert(appCode.includes('<Route path="/presence" element={<Navigate to="/our-work" replace />} />') && appCode.includes('<Route path="/projects" element={<Navigate to="/our-work" replace />} />') && appCode.includes('<Route path="/projects/:id" element={<Navigate to="/our-work" replace />} />'), '/presence, /projects and /projects/:id redirect to /our-work');
+assert(appCode.includes('<Route path="/about" element={<Navigate to="/#about" replace />} />'), '/about redirects to /#about');
+assert(!/import\('\.\/pages\/(About|ProjectsGallery|ProjectDetail)'\)/.test(appCode), 'Removed pages are no longer loaded');
 assert(appCode.includes('path="/contact"'), 'Route "/contact" registered');
 assert(appCode.includes('path="*"'), 'Wildcard 404 Route "*" registered');
 
@@ -70,7 +71,7 @@ console.log('\n5. Component Semantic Integrity:');
 const notFoundCode = fs.readFileSync(path.resolve(__dirname, '../src/pages/NotFound.jsx'), 'utf-8');
 assert(!notFoundCode.includes('<Link to="/"><Button'), 'NotFound.jsx does not nest <Button> inside <Link>');
 assert(notFoundCode.includes('as={Link}'), 'NotFound.jsx uses button delegation with as={Link}');
-assert(notFoundCode.includes('document.title ='), 'NotFound.jsx updates document title');
+assert(notFoundCode.includes("usePageMetadata(pageTitle('Page not found')"), 'NotFound.jsx sets its document title (usePageMetadata)');
 
 console.log('\n============================================================');
 console.log(`PHASE 8 RESULTS: ${passed} passed, ${failed} failed.`);

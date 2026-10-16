@@ -33,7 +33,7 @@ const dataSrc = read('../src/data/showcaseProjects.js');
 const pageSrc = read('../src/pages/Presence.jsx');
 const mapSrc = read('../src/components/map/PresenceMap.jsx');
 const statusSrc = read('../src/components/presence/CityStatus.jsx');
-const detailSrc = read('../src/pages/ProjectDetail.jsx');
+const appSrc = read('../src/App.jsx');
 const css = read('../src/styles/index.css');
 const data = await load('../src/data/showcaseProjects.js');
 const { getPresenceStateCodes, getPresenceState } = await load('../src/data/presenceCoverage.js');
@@ -74,7 +74,7 @@ assert(!exists('../src/components/presence/CityProjectCard.jsx') && !exists('../
 assert(!/isDesktop|PANEL_PX|data-project-panel|presence-panel-in|sidePanelPx/.test(pageSrc + mapSrc + css), 'No desktop side panel (floating card over the map again)');
 assert(!/OVERLAY_MAX_FRACTION|max-h-\[55%\]|reserveBottom/.test(mapSrc) && /const getTargetView = useCallback\(\(\) => getStateFitView\(selectedCode\), \[selectedCode, getStateFitView\]\);/.test(mapSrc), 'No 55 % height cap and no state refit above the card');
 assert(!/data-card-context|Previous project|Next project/.test(cardSrc) && !/data-card-context/.test(pageSrc), 'No context line and no ‹ › project buttons (swipe + dots, as on main)');
-assert(!/getShowcaseProject|showcase/.test(detailSrc), '/projects/:id as on main');
+assert(!exists('../src/pages/ProjectDetail.jsx') && appSrc.includes('<Route path="/projects/:id" element={<Navigate to="/our-work" replace />} />'), 'Old /projects/:id pages redirect to /our-work (project info lives on the map card and the cards under it)');
 
 console.log('\n4. Kept: data, card <-> map link, hint');
 const P = data.PLACEHOLDER_PROJECTS;

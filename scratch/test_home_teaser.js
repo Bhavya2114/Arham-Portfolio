@@ -1,10 +1,10 @@
 /**
- * Homepage "Our work across India" teaser (theme-light-in-dark).
+ * Homepage "Our work across India" teaser, and the homepage order (site-restructure).
  *
- * The interactive map lives only on /presence: the homepage shows a static image of its overview
+ * The interactive map lives only on /our-work: the homepage shows a static image of its overview
  * (WebP + PNG fallback, lazy, fixed width / height), the stats from one constant, and links to
- * /presence. Also checks that no map code is on the homepage and that the homepage sections
- * alternate between the two navy shades (tonal dark; no light sections).
+ * /our-work. Also checks that no map code is on the homepage, and the homepage order: hero → map
+ * teaser (right after the hero) → what we do → about → enquiry, alternating the two Graphite shades.
  */
 
 import fs from 'fs';
@@ -36,8 +36,8 @@ console.log('\n1. Content');
 assert(/>\s*Our work across India\s*</.test(teaser) && /Electrical wiring and lighting projects in cities across the country\./.test(teaser), 'Heading and the short line under it');
 assert(PRESENCE_TEASER_STATS.length === 2 && PRESENCE_TEASER_STATS[0].value === '27+' && PRESENCE_TEASER_STATS[0].label === 'Cities' && PRESENCE_TEASER_STATS[1].value === '10' && PRESENCE_TEASER_STATS[1].label === 'States', 'Stats "27+ Cities" and "10 States" from one constant');
 assert(/PRESENCE_TEASER_STATS\.map/.test(teaser) && /font-heading text-4xl sm:text-5xl font-bold/.test(teaser) && /<dt className="text-sm text-muted-dark">/.test(teaser), 'Numbers in Sora (font-heading), muted labels');
-assert(/<Button as=\{Link\} to="\/presence" variant="primary"[\s\S]*?>\s*Explore our work\s*<\/Button>/.test(teaser) && /icon=\{ArrowRight\} iconPosition="right"/.test(teaser), 'Primary yellow "Explore our work →" button to /presence');
-assert(/<Link\s+to="\/presence"[\s\S]*?<picture>/.test(teaser), 'The image links to /presence too');
+assert(/<Button as=\{Link\} to="\/our-work" variant="primary"[\s\S]*?>\s*Explore our work\s*<\/Button>/.test(teaser) && /icon=\{ArrowRight\} iconPosition="right"/.test(teaser), 'Primary yellow "Explore our work →" button to /our-work');
+assert(/<Link\s+to="\/our-work"[\s\S]*?<picture>/.test(teaser) && !/\/presence"/.test(teaser), 'The image links to /our-work too');
 
 console.log('\n2. Static image');
 assert(/<source srcSet=\{PRESENCE_OVERVIEW_IMAGE\.webp\} type="image\/webp" \/>/.test(teaser) && /src=\{PRESENCE_OVERVIEW_IMAGE\.png\}/.test(teaser), 'WebP with a PNG fallback (<picture>)');
@@ -60,23 +60,23 @@ if (process.env.BUILD_DIR) {
   assert(homeChunk && !/india-states-layer|INDIA_MAP_STATES|regionEdges|india-map-worked-fill/.test(code), `Home chunk (${homeChunk}) carries no map code`);
 }
 
-console.log('\n4. Graphite rhythm (bg / bg2 = navy-950 / navy-800 tokens, no light sections)');
-const sections = [...home.matchAll(/<(Hero|CompanyIntroduction|ServicesOverview|ProjectPreview|PresenceTeaser)\b|<section[\s\S]*?className="([^"]+)"/g)].map((m) => m[1] || 'EnquirySection');
+console.log('\n4. Homepage order and Graphite rhythm (bg / bg2 = navy-950 / navy-800, no light sections)');
+const SECTION_FILES = { Hero: 'Hero', PresenceTeaser: 'PresenceTeaser', ServicesList: 'ServicesList', AboutArham: 'AboutArham' };
+const sections = [...home.matchAll(/<(Hero|PresenceTeaser|ServicesList|AboutArham)\b[^>]*\/>|<section[\s\S]*?className="([^"]+)"/g)].map((m) => m[1] || 'EnquirySection');
 const sectionClass = (src) => (src.match(/<section[\s\S]*?className="([^"]+)"/) || ['', ''])[1];
 const shadeOf = (cls) => (/\bbg-navy-950\b/.test(cls) ? '950' : /\bbg-navy-800\b/.test(cls) ? '800' : /\bbg-footer\b/.test(cls) ? 'footer' : `other(${cls.match(/\bbg-[\w-]+/)?.[0] || 'none'})`);
+const sectionSrc = Object.fromEntries(Object.entries(SECTION_FILES).map(([k, f]) => [k, read(`../src/sections/${f}.jsx`)]));
 const shades = {
-  Hero: shadeOf(sectionClass(read('../src/sections/Hero.jsx'))),
-  CompanyIntroduction: shadeOf(sectionClass(read('../src/sections/CompanyIntroduction.jsx'))),
-  ServicesOverview: shadeOf(sectionClass(read('../src/sections/ServicesOverview.jsx'))),
-  ProjectPreview: shadeOf(sectionClass(read('../src/sections/ProjectPreview.jsx'))),
-  PresenceTeaser: shadeOf(sectionClass(teaser)),
+  ...Object.fromEntries(Object.entries(sectionSrc).map(([k, src]) => [k, shadeOf(sectionClass(src))])),
   EnquirySection: shadeOf((home.match(/<section\s+id="contact"\s+className="([^"]+)"/) || ['', ''])[1]),
 };
 const order = sections.map((name) => shades[name]);
 const footerShade = shadeOf((read('../src/components/layout/Footer.jsx').match(/<footer className="([^"]+)"/) || ['', ''])[1]);
-assert(sections.join(',') === 'Hero,CompanyIntroduction,ServicesOverview,ProjectPreview,PresenceTeaser,EnquirySection' && order.join(',') === '950,800,950,800,950,800' && footerShade === 'footer',
+assert(sections.join(',') === 'Hero,PresenceTeaser,ServicesList,AboutArham,EnquirySection', `Order: hero, map teaser (right after the hero), what we do, about, enquiry (${sections.join(', ')})`);
+assert(order.join(',') === '950,800,950,800,950' && footerShade === 'footer',
   `Sections alternate navy-950 / navy-800 (${sections.map((n, i) => `${n}:${order[i]}`).join(' ')}), then the #08090A footer`);
-assert(!/\bbg-(white|light|slate-50|slate-100)\b(?!\/)/.test(home + teaser + read('../src/sections/Hero.jsx') + read('../src/sections/CompanyIntroduction.jsx') + read('../src/sections/ServicesOverview.jsx') + read('../src/sections/ProjectPreview.jsx')), 'No white / light backgrounds on the homepage');
+assert(!/\bbg-(white|light|slate-50|slate-100)\b(?!\/)/.test(home + Object.values(sectionSrc).join('\n')), 'No white / light backgrounds on the homepage');
+assert(['CompanyIntroduction', 'ServicesOverview', 'ProjectPreview'].every((f) => !fs.existsSync(path.resolve(here, `../src/sections/${f}.jsx`))), 'Repeated service / intro / stock-photo sections removed');
 
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);

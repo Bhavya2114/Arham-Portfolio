@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const CITY_EMPTY_STATE_COPY = 'Project locations will appear here as approved project information becomes available.';
+export const CITY_EMPTY_STATE_COPY = 'Project photos for this city are on the way.';
 
 /**
  * State-level hint as plain small grey text (no box): how to continue, or that no cities are

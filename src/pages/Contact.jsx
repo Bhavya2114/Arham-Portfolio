@@ -1,264 +1,90 @@
-import React, { useEffect } from 'react';
-import { useSearchParams, Link } from 'react-router-dom';
+import React from 'react';
+import { Phone, MessageCircle, Mail, MapPin, Clock } from 'lucide-react';
 import Container from '../components/ui/Container';
 import PageHero from '../components/ui/PageHero';
-import SectionHeading from '../components/ui/SectionHeading';
-import Badge from '../components/ui/Badge';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
 import EnquiryForm from '../components/contact/EnquiryForm';
-import { COMPANY_CONTACT } from '../data/contactConfig';
-import { 
-  Phone, 
-  Mail, 
-  MapPin, 
-  Clock, 
-  MessageSquare, 
-  MessageCircle,
-  Building2, 
-  ShieldCheck, 
-  FileText, 
-  ArrowRight,
-  ExternalLink,
-  Briefcase
-} from 'lucide-react';
 import usePageMetadata from '../lib/usePageMetadata';
+import { COMPANY, pageTitle, whatsappHref, WHATSAPP_HELLO } from '../data/company';
 
 /**
- * Dedicated Contact & Lead Generation Page — Phase 7: Contact & Lead Generation
- * 
- * Invariants & Standards:
- * 1. Only displays verified corporate contact information. No fabricated phone numbers,
- *    emails, office locations, or business hours.
- * 2. Pre-selects service category from query parameter ?service=...
- * 3. Incorporates the honest, privacy-respecting EnquiryForm component.
- * 4. Preserves backward compatibility with #contact anchors.
+ * Contact: Call / WhatsApp / Email first, then the enquiry form (sent on WhatsApp or by email), then
+ * the office. All details come from data/company.js.
  */
-export const Contact = () => {
-  const [searchParams] = useSearchParams();
-  const serviceParam = searchParams.get('service');
+const ACTION =
+  'flex items-center gap-4 rounded-2xl bg-card border border-white/[0.07] p-4 min-h-[64px] hover:border-accent/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent';
 
+export const Contact = () => {
   usePageMetadata(
-    'Contact & Commercial Inquiries | Arham',
-    'Initiate a commercial consultation or tender inquiry with Arham\'s electrical engineering team. Discuss drawings, switchgear, or lighting.'
+    pageTitle('Contact'),
+    `Call, WhatsApp or email ${COMPANY.name}: ${COMPANY.phoneDisplay}, ${COMPANY.email}. Send us your project details.`
   );
 
+  const actions = [
+    { href: COMPANY.phoneHref, icon: Phone, label: 'Call', value: COMPANY.phoneDisplay },
+    { href: whatsappHref(WHATSAPP_HELLO), icon: MessageCircle, label: 'WhatsApp', value: COMPANY.phoneDisplay, external: true },
+    { href: COMPANY.emailHref, icon: Mail, label: 'Email', value: COMPANY.email },
+  ];
+
   return (
-    <div className="w-full bg-navy-800 min-h-screen">
+    <div className="w-full bg-navy-800 flex-1">
       <PageHero breadcrumb="Contact">
-        <header className="space-y-4 max-w-4xl">
-          <SectionHeading
-            tone="dark"
-            as="h1"
-            badge={
-              <Badge variant="neutral-dark" icon={MessageSquare}>
-                Commercial Inquiries
-              </Badge>
-            }
-            title="Commercial Inquiries & Project Coordination"
-            subtitle="Connect with our electrical engineering and contracting team to discuss facility electrification, HT/LT switchgear distribution, tender submissions, or architectural lighting installations."
-            align="left"
-          />
-        </header>
+        <div className="space-y-3 max-w-3xl">
+          <h1 className="text-3xl sm:text-4xl font-bold font-heading text-heading tracking-tight">Contact us</h1>
+          <p className="text-base sm:text-lg text-body leading-[1.65]">Call, WhatsApp or send us your project details.</p>
+        </div>
       </PageHero>
 
-      <Container size="default" className="space-y-12 sm:space-y-16 py-10 sm:py-14 lg:py-18">
-        
+      <Container size="default" className="py-10 sm:py-14 space-y-10">
+        {/* Call · WhatsApp · Email */}
+        <ul className="grid grid-cols-1 md:grid-cols-3 gap-3" aria-label="Ways to contact us">
+          {actions.map(({ href, icon: Icon, label, value, external }) => (
+            <li key={label}>
+              <a href={href} className={ACTION} {...(external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+                <span className="w-11 h-11 shrink-0 rounded-xl bg-accent/10 text-accent flex items-center justify-center">
+                  <Icon className="w-5 h-5" aria-hidden="true" />
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-base font-semibold text-heading">{label}</span>
+                  <span className="block text-sm text-body break-all">{value}</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
 
-        {/* 2. Main Two-Column Contact Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-          
-          {/* Left / Primary Column: Enquiry Form (7 cols) */}
-          <main className="lg:col-span-7 space-y-6" aria-label="Project Enquiry Form Section">
-            <Card
-              variant="default"
-              padding="lg"
-              className="bg-card border border-brand-border shadow-subtle space-y-6 text-left"
-            >
-              <div className="space-y-1 border-b border-brand-border pb-4">
-                <h2 className="text-lg sm:text-xl font-bold font-heading text-brand-navy">
-                  Initiate a Project Consultation
-                </h2>
-                <p className="text-base text-brand-slate leading-[1.65]">
-                  Provide your technical requirements below. We review single-line diagrams, containment specifications, and project schedules.
-                </p>
-              </div>
+        {/* Enquiry form */}
+        <section aria-labelledby="contact-form-heading" className="max-w-3xl bg-card rounded-2xl border border-white/[0.07] p-5 sm:p-8 space-y-5">
+          <div className="space-y-1.5">
+            <h2 id="contact-form-heading" className="text-2xl font-bold font-heading text-heading tracking-tight">
+              Send us your project details
+            </h2>
+            <p className="text-base text-body leading-[1.65]">Tenders and drawings: email them to {COMPANY.email}.</p>
+          </div>
+          <EnquiryForm idPrefix="contact" />
+          <p className="text-sm text-muted">We only use your details to reply to you.</p>
+        </section>
 
-              {/* Embedded Enquiry Form with Preselection Support */}
-              <EnquiryForm 
-                initialService={serviceParam || 'general'} 
-                idPrefix="contact-page" 
-              />
-            </Card>
-          </main>
-
-          {/* Right Column: Corporate Coordinates & Tender Submission Guidance (5 cols) */}
-          <aside className="lg:col-span-5 space-y-6" aria-label="Corporate Contact Information">
-            
-            {/* Direct Contact Cards */}
-            <Card
-              variant="default"
-              padding="lg"
-              className="bg-card border border-brand-border space-y-5 text-left shadow-subtle"
-            >
-              <div className="flex items-center gap-2 pb-3 border-b border-brand-border">
-                <Building2 className="w-4 h-4 text-accent" aria-hidden="true" />
-                <h2 className="text-sm font-bold font-heading uppercase tracking-wider text-brand-navy">
-                  Corporate Coordinates
-                </h2>
-              </div>
-
-              <div className="space-y-4 text-xs">
-                
-                {/* Telephone */}
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 mt-0.5">
-                    <Phone className="w-4 h-4" aria-hidden="true" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <span className="font-semibold text-brand-navy block">Direct Telephone / Mobile:</span>
-                    {COMPANY_CONTACT.isPhoneConfigured ? (
-                      <a 
-                        href={`tel:${COMPANY_CONTACT.phone}`} 
-                        className="text-accent font-medium hover:underline text-xs"
-                      >
-                        {COMPANY_CONTACT.phone}
-                      </a>
-                    ) : (
-                      <span className="text-muted italic block">
-                        Awaiting management confirmation
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* WhatsApp */}
-                {COMPANY_CONTACT.isWhatsAppConfigured && (
-                  <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-brand-border">
-                    <div className="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 mt-0.5">
-                      <MessageCircle className="w-4 h-4" aria-hidden="true" />
-                    </div>
-                    <div className="space-y-0.5">
-                      <span className="font-semibold text-brand-navy block">WhatsApp Business:</span>
-                      <a 
-                        href={COMPANY_CONTACT.whatsappUrl} 
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 text-emerald-300 hover:text-emerald-200 font-medium hover:underline text-xs"
-                        aria-label={`Open WhatsApp chat with Arham at ${COMPANY_CONTACT.whatsapp}`}
-                      >
-                        <span>{COMPANY_CONTACT.whatsapp}</span>
-                        <ExternalLink className="w-3 h-3" aria-hidden="true" />
-                      </a>
-                    </div>
-                  </div>
-                )}
-
-                {/* Email */}
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 mt-0.5">
-                    <Mail className="w-4 h-4" aria-hidden="true" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <span className="font-semibold text-brand-navy block">Commercial Inquiries:</span>
-                    {COMPANY_CONTACT.hasEmail ? (
-                      <a 
-                        href={`mailto:${COMPANY_CONTACT.email}`} 
-                        className="text-accent font-medium hover:underline text-xs"
-                      >
-                        {COMPANY_CONTACT.email}
-                      </a>
-                    ) : (
-                      <span className="text-muted italic block">
-                        Awaiting management confirmation
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Registered Office */}
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 mt-0.5">
-                    <MapPin className="w-4 h-4" aria-hidden="true" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <span className="font-semibold text-brand-navy block">Registered Corporate Office:</span>
-                    {COMPANY_CONTACT.isAddressConfigured ? (
-                      <span className="text-brand-slate block">
-                        {COMPANY_CONTACT.address}
-                      </span>
-                    ) : (
-                      <span className="text-muted italic block">
-                        Official address to be provided
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-                {/* Operational Hours */}
-                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.04] border border-brand-border">
-                  <div className="w-8 h-8 rounded-lg bg-accent/10 text-accent flex items-center justify-center shrink-0 mt-0.5">
-                    <Clock className="w-4 h-4" aria-hidden="true" />
-                  </div>
-                  <div className="space-y-0.5">
-                    <span className="font-semibold text-brand-navy block">Operational Hours:</span>
-                    {COMPANY_CONTACT.isHoursConfigured ? (
-                      <span className="text-brand-slate block">
-                        {COMPANY_CONTACT.businessHours}
-                      </span>
-                    ) : (
-                      <span className="text-muted italic block">
-                        Standard business hours to be confirmed
-                      </span>
-                    )}
-                  </div>
-                </div>
-
-              </div>
-            </Card>
-
-            {/* Tender & Proposal Protocol Box */}
-            <Card
-              variant="default"
-              padding="lg"
-              className="bg-card border border-brand-border space-y-4 text-left shadow-subtle"
-            >
-              <div className="flex items-center gap-2 pb-2 border-b border-brand-border">
-                <FileText className="w-4 h-4 text-accent" aria-hidden="true" />
-                <h3 className="text-xs font-bold font-heading uppercase tracking-wider text-brand-navy">
-                  Tender & RFP Submissions
-                </h3>
-              </div>
-              <p className="text-xs text-brand-slate leading-relaxed">
-                For commercial tenders, bill-of-quantities (BOQ) estimations, and formal electrical contracting RFPs, please ensure drawing packages include single-line diagrams, voltage requirements, and physical site constraints.
-              </p>
-              <div className="pt-1">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  as={Link}
-                  to="/projects"
-                  icon={ArrowRight}
-                  iconPosition="right"
-                  className="w-full justify-center text-xs"
-                >
-                  Inspect Authenticated Portfolio
-                </Button>
-              </div>
-            </Card>
-
-            {/* Confidentiality Notice */}
-            <div className="p-4 rounded-xl bg-accent/10 border border-accent/15 flex items-start gap-2.5 text-xs text-body text-left">
-              <ShieldCheck className="w-4 h-4 text-accent shrink-0 mt-0.5" aria-hidden="true" />
-              <p className="leading-relaxed">
-                <strong className="font-semibold text-brand-navy">Privacy Assurance:</strong> Arham does not distribute or sell commercial enquiry details. All shared drawings and project specifications remain protected under corporate nondisclosure principles.
-              </p>
-            </div>
-
-          </aside>
-
-        </div>
-
+        {/* Office */}
+        <section aria-labelledby="contact-office-heading" className="space-y-3">
+          <h2 id="contact-office-heading" className="text-xl font-bold font-heading text-heading">Office</h2>
+          <ul className="space-y-2 text-base text-body">
+            <li className="flex items-start gap-3">
+              <MapPin className="w-5 h-5 mt-0.5 shrink-0 text-accent" aria-hidden="true" />
+              <a
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(COMPANY.address)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-heading underline decoration-accent decoration-2 underline-offset-4 hover:text-accent rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                {COMPANY.address}
+              </a>
+            </li>
+            <li className="flex items-start gap-3">
+              <Clock className="w-5 h-5 mt-0.5 shrink-0 text-accent" aria-hidden="true" />
+              {COMPANY.hours}
+            </li>
+          </ul>
+        </section>
       </Container>
     </div>
   );

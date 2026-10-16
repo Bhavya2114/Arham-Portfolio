@@ -13,7 +13,8 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { PROJECTS } from '../src/data/projects.js';
-import { COMPANY_CONTACT } from '../src/data/contactConfig.js';
+import { COMPANY } from '../src/data/company.js';
+import { getPresenceTotals } from '../src/data/presenceCoverage.js';
 import { NAV_ITEMS } from '../src/data/navigation.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -52,10 +53,10 @@ assert(fs.existsSync(sitemapPath), 'public/sitemap.xml file exists');
 const sitemapContent = fs.readFileSync(sitemapPath, 'utf-8');
 assert(sitemapContent.includes('<urlset'), 'sitemap.xml contains valid XML urlset root element');
 assert(sitemapContent.includes('<loc>/</loc>'), 'sitemap.xml includes "/" home route');
-assert(sitemapContent.includes('<loc>/about</loc>'), 'sitemap.xml includes "/about" route');
+assert(sitemapContent.includes('<loc>/our-work</loc>'), 'sitemap.xml includes "/our-work" route');
 assert(sitemapContent.includes('<loc>/services</loc>'), 'sitemap.xml includes "/services" route');
-assert(sitemapContent.includes('<loc>/projects</loc>'), 'sitemap.xml includes "/projects" route');
 assert(sitemapContent.includes('<loc>/contact</loc>'), 'sitemap.xml includes "/contact" route');
+assert(!/<loc>\/(about|projects|presence)<\/loc>/.test(sitemapContent), 'sitemap.xml lists no removed / redirected routes (/about, /projects, /presence)');
 assert(!sitemapContent.includes('/projects/proj-'), 'sitemap.xml does NOT index fictional or unpublished project IDs');
 
 // 3. Static HTML Metadata (index.html)
@@ -63,7 +64,7 @@ console.log('\n3. Static HTML Metadata (index.html):');
 const indexPath = path.resolve(__dirname, '../index.html');
 const indexContent = fs.readFileSync(indexPath, 'utf-8');
 assert(!indexContent.includes('premier'), 'index.html description avoids unverified superlative "premier"');
-assert(!indexContent.includes('across India'), 'index.html description avoids unverified "across India" claim');
+assert(indexContent.includes('<title>Arham Power Solutions') && indexContent.includes('content="Arham Power Solutions"') && indexContent.includes('"@type": "Electrician"'), 'index.html: Arham Power Solutions title, og:site_name and schema.org business block');
 assert(indexContent.includes('property="og:type"'), 'index.html includes Open Graph og:type tag');
 assert(indexContent.includes('property="og:title"'), 'index.html includes Open Graph og:title tag');
 assert(indexContent.includes('property="og:description"'), 'index.html includes Open Graph og:description tag');
@@ -82,10 +83,8 @@ assert(hookContent.includes('window.scrollTo'), 'usePageMetadata resets scroll p
 
 const pages = [
   'Home.jsx',
-  'About.jsx',
+  'Presence.jsx',
   'Services.jsx',
-  'ProjectsGallery.jsx',
-  'ProjectDetail.jsx',
   'Contact.jsx',
   'NotFound.jsx',
 ];
@@ -102,23 +101,17 @@ pages.forEach((pageFile) => {
 console.log('\n5. Content Accuracy & Corporate Claims Audit:');
 const heroCode = fs.readFileSync(path.resolve(__dirname, '../src/sections/Hero.jsx'), 'utf-8');
 assert(!heroCode.includes('high-voltage infrastructure wiring'), 'Hero does not claim unverified high-voltage wiring');
-assert(!heroCode.includes('across India'), 'Hero does not claim nationwide "across India" coverage');
-
-const companyIntroCode = fs.readFileSync(path.resolve(__dirname, '../src/sections/CompanyIntroduction.jsx'), 'utf-8');
-assert(!companyIntroCode.includes('across India'), 'CompanyIntroduction does not claim nationwide coverage');
+// "Across India" is now the company's own description, and it is backed by the coverage map.
+const totals = getPresenceTotals();
+assert(totals.stateCount >= 10 && totals.cityCount >= 27, `"Across India" is backed by the map coverage (${totals.cityCount} cities, ${totals.stateCount} states)`);
 
 const footerCode = fs.readFileSync(path.resolve(__dirname, '../src/components/layout/Footer.jsx'), 'utf-8');
-assert(!footerCode.includes('across India'), 'Footer does not claim nationwide coverage');
 assert(!footerCode.includes('high-voltage infrastructure wiring'), 'Footer does not claim high-voltage infrastructure wiring');
-
-const navCode = fs.readFileSync(path.resolve(__dirname, '../src/data/navigation.js'), 'utf-8');
-assert(!navCode.includes('across India'), 'navigation.js does not claim "across India"');
 
 // 6. Security Hygiene & Dataset Purity
 console.log('\n6. Security Hygiene & Privacy Audit:');
 assert(Array.isArray(PROJECTS) && PROJECTS.length === 0, 'Production PROJECTS dataset is strictly empty');
-assert(COMPANY_CONTACT.isEmailConfigured === false, 'COMPANY_CONTACT automated enquiry delivery remains unconfigured');
-assert(COMPANY_CONTACT.isPhoneConfigured === true, 'COMPANY_CONTACT phone channel is configured with verified number 7878787878');
+assert(COMPANY.phoneHref === 'tel:+916378391640' && COMPANY.email === 'arhampower@gmail.com', 'Company phone and email set in src/data/company.js');
 
 const enquiryCode = fs.readFileSync(path.resolve(__dirname, '../src/components/contact/EnquiryForm.jsx'), 'utf-8');
 assert(!enquiryCode.includes('localStorage.set'), 'EnquiryForm does NOT write to localStorage');

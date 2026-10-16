@@ -1,62 +1,33 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import BrandLogo from '../components/ui/BrandLogo';
-import Card from '../components/ui/Card';
-import Button from '../components/ui/Button';
+import { Home as HomeIcon, Map as MapIcon, Phone } from 'lucide-react';
 import Container from '../components/ui/Container';
-import Badge from '../components/ui/Badge';
-import { ArrowLeft, Home, Briefcase, PhoneCall } from 'lucide-react';
+import Button from '../components/ui/Button';
 import usePageMetadata from '../lib/usePageMetadata';
+import { pageTitle } from '../data/company';
 
+/**
+ * 404: plain message and the three useful ways on: Home, Our Work, Contact.
+ */
 export const NotFound = () => {
-  // Sets document.title = 'Page Not Found (404) | Arham' via dynamic metadata hook
-  usePageMetadata(
-    'Page Not Found (404) | Arham',
-    'The requested page could not be found on the Arham corporate website.'
-  );
+  usePageMetadata(pageTitle('Page not found'), 'This page does not exist or has moved.');
 
   return (
     <div className="flex-1 flex items-center justify-center py-16 px-4 bg-navy-800 min-h-[60vh]">
-      <Container size="narrow" className="flex justify-center">
-        <Card variant="dark" padding="lg" className="max-w-md w-full text-center space-y-6">
-          <div className="flex justify-center">
-            <BrandLogo size="default" variant="light" />
-          </div>
-
-          <div className="space-y-2">
-            <span className="text-4xl sm:text-5xl font-bold text-accent font-heading tracking-tight">404</span>
-            <h1 className="text-xl sm:text-2xl font-bold font-heading text-heading">Route Not Found</h1>
-            <p className="text-base text-muted-dark leading-[1.65]">
-              The requested URL path does not correspond to an active page on the Arham corporate website.
-            </p>
-          </div>
-
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
-            <Button 
-              variant="primary" 
-              size="md" 
-              icon={Home} 
-              iconPosition="left"
-              as={Link}
-              to="/"
-              className="w-full sm:w-auto"
-            >
-              Return Home
-            </Button>
-            <Button 
-              variant="outline" 
-              onDark
-              size="md" 
-              icon={Briefcase} 
-              iconPosition="left"
-              as={Link}
-              to="/projects"
-              className="w-full sm:w-auto"
-            >
-              View Projects
-            </Button>
-          </div>
-        </Card>
+      <Container size="narrow" className="text-center space-y-5">
+        <h1 className="text-3xl sm:text-4xl font-bold font-heading text-heading tracking-tight">Page not found</h1>
+        <p className="text-base text-body leading-[1.65] max-w-md mx-auto">The page you are looking for does not exist or has moved.</p>
+        <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3">
+          <Button as={Link} to="/" variant="primary" icon={HomeIcon} className="justify-center min-h-[44px]">
+            Home
+          </Button>
+          <Button as={Link} to="/our-work" variant="outline" onDark icon={MapIcon} className="justify-center min-h-[44px]">
+            Our Work
+          </Button>
+          <Button as={Link} to="/contact" variant="outline" onDark icon={Phone} className="justify-center min-h-[44px]">
+            Contact
+          </Button>
+        </div>
       </Container>
     </div>
   );

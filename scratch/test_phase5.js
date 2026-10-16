@@ -230,10 +230,12 @@ assert(missingImagesRecord.scope === undefined, 'scope undefined handled cleanly
 // 7. Navigation Configuration Integrity
 // -------------------------------------------------------------
 console.log('\n7. Navigation Configuration Integrity:');
-const projectsNavItem = NAV_ITEMS.find(item => item.name === 'Projects');
-assert(projectsNavItem !== undefined, 'Projects exists in NAV_ITEMS');
-assert(projectsNavItem.path === '/projects', 'Projects path is /projects');
-assert(projectsNavItem.isAvailable === true, 'Projects nav item is active (isAvailable === true)');
+// The projects gallery was merged into Our Work (/our-work): the map with the project cards under it.
+const ourWorkNavItem = NAV_ITEMS.find(item => item.name === 'Our Work');
+assert(ourWorkNavItem !== undefined, 'Our Work exists in NAV_ITEMS');
+assert(ourWorkNavItem.path === '/our-work', 'Our Work path is /our-work');
+assert(NAV_ITEMS.indexOf(ourWorkNavItem) === 0, 'Our Work is the first nav item');
+assert(!NAV_ITEMS.some(item => item.name === 'Projects' || item.path === '/projects'), 'No separate Projects nav item');
 
 // -------------------------------------------------------------
 // Summary

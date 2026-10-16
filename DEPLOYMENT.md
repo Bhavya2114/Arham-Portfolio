@@ -1,4 +1,4 @@
-# Arham Corporate Website — Production Deployment & Handover Guide
+# Arham Power Solutions Website — Deployment & Handover Guide
 
 > **Document Status**: Production Readiness & Handover Documentation  
 > **Applicable Version**: 0.1.0  
@@ -9,7 +9,7 @@
 
 ## 1. Project Overview & Architecture
 
-The Arham Corporate Website is a standalone, public-facing static web application built for electrical engineering, contracting, industrial wiring, and architectural lighting solutions.
+The Arham Power Solutions website is a standalone, public-facing static web application for an electrical contractor: wiring, lighting and power distribution across India.
 
 - **Frontend Core**: React 18 (`react`, `react-dom`, `react-router-dom` v6)
 - **Tooling & Bundler**: Vite 5 (`vite`, `@vitejs/plugin-react`)
@@ -220,18 +220,13 @@ In `<head>` of `index.html`, add:
 
 Before making the website publicly accessible, the website owner should configure genuine business information:
 
-### Step 1: Corporate Contact Channels (`src/data/contactConfig.js`)
-Populate official management-approved details in `COMPANY_CONTACT`:
-```javascript
-export const COMPANY_CONTACT = {
-  email: 'contact@yourdomain.com',          // Official commercial inquiry inbox
-  phone: '+91-XXXXXXXXXX',                  // Official telephone or WhatsApp
-  address: 'Registered Office Address...',  // Corporate office coordinates
-  businessHours: 'Mon - Sat: 9:00 AM - 6:00 PM IST',
-  ...
-};
-```
-*Note: When `email` is populated, the `EnquiryForm` component automatically activates the `mailto:` proposal generation with the official recipient.*
+### Step 1: Company Details (`src/data/company.js`)
+Name, phone / WhatsApp, email, office address and hours live in `COMPANY` in `src/data/company.js`. The header,
+footer, contact page, enquiry form and phone action bar all read from it. `index.html` repeats the name, phone
+and email in its static `<title>`, share tags and schema.org block: keep them in step.
+
+The enquiry form has no backend: the visitor sends the filled-in enquiry on WhatsApp (`wa.me`) or by email
+(`mailto:`), both to the numbers / address in `COMPANY`.
 
 ### Step 2: Verified Project Records (`src/data/projects.js`)
 Add authenticated project records to `PROJECTS` following the strict schema:

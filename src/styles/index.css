@@ -90,6 +90,13 @@ p {
   }
 }
 
+/* Phone action bar (MobileActionBar, under 768 px): the spacer after the footer matches the bar's height
+   (52 px buttons + 2 × 8 px padding + 1 px border + the safe area). On /our-work the bar and its spacer
+   hide while a city's project card / panel is open (Presence sets <html data-map-card="open">). */
+.mobile-bar-spacer { height: calc(69px + env(safe-area-inset-bottom)); }
+html[data-map-card="open"] .mobile-action-bar,
+html[data-map-card="open"] .mobile-bar-spacer { display: none; }
+
 /* Architectural Subtle Background Grid */
 .bg-grid-subtle {
   background-size: 32px 32px;

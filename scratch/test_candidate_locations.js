@@ -106,7 +106,7 @@ assert(getPublishedProjects(C).length === 0, 'Even if passed to public selectors
 assert(getMappedProjectsByStateAndCity('IN-RJ', 'Kota', C).length === 0 && getMappedProjectsByStateAndCity('IN-RJ', 'Jaipur', C).length === 0, 'Candidates cannot become map pins');
 assert(getPublishedProjectsByStateAndCity('IN-RJ', 'Jaipur').length === 0 && getMappedProjectsByStateAndCity('IN-RJ', 'Kota').length === 0, 'Public Kota/Jaipur selectors stay empty');
 assert(PRESENCE_COVERAGE.length === 11 && PRESENCE_COVERAGE.reduce((s, e) => s + e.cities.length, 0) === 27, 'Approved coverage unchanged (11 states, 27 cities)');
-const publicFiles = ['../src/components/map/PresenceMap.jsx', '../src/sections/PresenceTeaser.jsx', '../src/pages/Home.jsx', '../src/pages/ProjectsGallery.jsx', '../src/App.jsx', '../src/data/projectSelectors.js', '../src/data/projects.js'];
+const publicFiles = ['../src/components/map/PresenceMap.jsx', '../src/sections/PresenceTeaser.jsx', '../src/pages/Home.jsx', '../src/App.jsx', '../src/data/projectSelectors.js', '../src/data/projects.js'];
 assert(publicFiles.every((f) => !/cand-|candidate/i.test(read(f))), 'Map, homepage, gallery, routes, selectors and projects.js contain no candidate references');
 if (process.env.BUILD_DIR) {
   const assets = path.resolve(process.env.BUILD_DIR, 'assets');

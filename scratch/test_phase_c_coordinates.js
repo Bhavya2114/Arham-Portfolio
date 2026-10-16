@@ -161,7 +161,7 @@ const sheetSrc = read('../src/components/presence/BottomSheet.jsx');
 assert(sheetSrc.includes('lg:hidden') && sheetSrc.includes("['peek', 'half', 'full']"), 'Bottom sheet is mobile-only with three snap points');
 assert(sheetSrc.includes('Expand details') && sheetSrc.includes('Close details'), 'Sheet has expand/collapse and close buttons');
 const statusSrc = read('../src/components/presence/CityStatus.jsx');
-assert(statusSrc.includes('Project locations will appear here as approved project information becomes available.'), 'Selected city shows a compact, honest empty state');
+assert(statusSrc.includes('Project photos for this city are on the way.'), 'Selected city shows a compact, honest empty state');
 const previewSrc = read('../src/sections/PresenceTeaser.jsx');
 assert(!previewSrc.includes('PresenceMap') && !previewSrc.includes('cityCoordinates'), 'Homepage teaser does not use markers or the Phase C map (static image only)');
 

@@ -1,6 +1,6 @@
 /**
- * Arham project showcase — the projects shown in the /presence project card (the only place project
- * info is shown) and as project pins on the map.
+ * Arham project showcase — the projects shown in the /our-work project card, as project pins on the
+ * map, and as the project cards under the map.
  *
  * One record per project:
  *   id         stable unique id
@@ -17,7 +17,7 @@
  *              otherwise the selected city's pin is highlighted instead
  *
  * Records without a city are never shown (nothing is guessed). Separate from data/projects.js, which
- * is the publication-gated source for the /projects gallery. While USE_PLACEHOLDER_PROJECTS is on,
+ * is the publication-gated source for the map's verified-project pins. While USE_PLACEHOLDER_PROJECTS is on,
  * cities without their own records show PLACEHOLDER_PROJECTS (see below).
  */
 
@@ -99,6 +99,15 @@ export const getShowcaseProjectsForCity = (stateCode, city) => {
 /** All shown projects in a state (records with a city only). */
 export const getShowcaseProjectsForState = (stateCode) =>
   !stateCode ? [] : SHOWCASE_PROJECTS.filter((p) => p.city && p.stateCode === stateCode);
+
+/**
+ * Every project for the /our-work project cards under the map: the records with a city, in data
+ * order; while USE_PLACEHOLDER_PROJECTS is on and there are none yet, the placeholders.
+ */
+export const getShowcaseProjectList = () => {
+  const own = SHOWCASE_PROJECTS.filter((p) => p.city && p.stateCode);
+  return own.length > 0 || !USE_PLACEHOLDER_PROJECTS ? own : PLACEHOLDER_PROJECTS;
+};
 
 /** A project's photos (at most MAX_PHOTOS). */
 export const projectPhotos = (p) => (Array.isArray(p?.photos) ? p.photos.filter(Boolean).slice(0, MAX_PHOTOS) : []);

@@ -8,20 +8,22 @@ import CampusCard from '../components/presence/CampusCard';
 import { ProjectDetails, ProjectChooser, CityProjectList } from '../components/presence/ProjectDetails';
 import { getPresenceStateCodes, getPresenceState } from '../data/presenceCoverage.js';
 import {
-  getPublishedProjects,
   getPublishedProjectsByStateAndCity,
   getMappedProjectsByStateAndCity,
 } from '../data/projectSelectors.js';
 import { CITY_COORDINATES } from '../data/cityCoordinates.js';
-import { getShowcaseProjectsForCity, getShowcaseProjectsForState, hasSiteCoordinates } from '../data/showcaseProjects.js';
+import { getShowcaseProjectsForCity, getShowcaseProjectsForState, getShowcaseProjectList, hasSiteCoordinates } from '../data/showcaseProjects.js';
+import ProjectGrid from '../components/presence/ProjectGrid';
+import { PRESENCE_TEASER_STATS } from '../data/presenceTeaser';
+import { COMPANY, pageTitle, whatsappHref, WHATSAPP_HELLO } from '../data/company';
 import { projectLatLon } from '../lib/mapProjection.js';
 import { loadStateGeography } from '../data/geo/stateGeography.js';
 import { presenceNavReducer, INITIAL_PRESENCE_NAV } from '../lib/presenceNavigation.js';
 import usePageMetadata from '../lib/usePageMetadata';
-import { MapPin, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { MapPin, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, X, Phone, MessageCircle } from 'lucide-react';
 
 /**
- * Our Presence Page — project discovery map
+ * Our Work page (/our-work; /presence and /projects redirect here): the India map, then the project cards.
  *
  * India → State → City (project list) → Project details.
  * - Coverage (11 states / 27 cities) comes from `presenceCoverage.js`.
@@ -35,17 +37,25 @@ import { MapPin, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, X } from 'luc
  */
 export const Presence = () => {
   usePageMetadata(
-    'Our Presence — ARHAM Electrical & Lighting Installations',
-    "Explore the Indian states and cities covered by Arham's electrical wiring and lighting installation work."
+    pageTitle('Our Work'),
+    `See where ${COMPANY.name} has done electrical wiring, lighting and power distribution work across India.`
   );
 
   const [nav, dispatch] = useReducer(presenceNavReducer, INITIAL_PRESENCE_NAV);
 
   const coverageStateCodes = useMemo(() => getPresenceStateCodes(), []);
-  const publishedCount = useMemo(() => getPublishedProjects().length, []);
+  const projectList = useMemo(() => getShowcaseProjectList(), []);
 
   const selectedState = useMemo(() => getPresenceState(nav.stateCode), [nav.stateCode]);
   const selectedCity = nav.city;
+
+  // Phone action bar (MobileActionBar) hides while a city's project card or panel is open.
+  useEffect(() => {
+    const root = document.documentElement;
+    if (selectedCity) root.setAttribute('data-map-card', 'open');
+    else root.removeAttribute('data-map-card');
+    return () => root.removeAttribute('data-map-card');
+  }, [selectedCity]);
 
   // District lines for the selected state, fetched only when that state is selected (code-split).
   const [geo, setGeo] = useState({ stateCode: null, data: null, status: 'idle' });
@@ -179,7 +189,7 @@ export const Presence = () => {
       ? `${clusterProjects.length} nearby projects. Choose one.`
       : selectedCity
         ? `${selectedCity}, ${selectedState.name}. ${
-            cityProjects.length > 0 ? `${cityProjects.length} verified ${cityProjects.length === 1 ? 'project' : 'projects'} listed.` : 'No approved projects yet.'
+            cityProjects.length > 0 ? `${cityProjects.length} verified ${cityProjects.length === 1 ? 'project' : 'projects'} listed.` : 'No projects listed yet.'
           }${projectCardOnly ? (cityShowcase.length > 0 ? ` ${cityShowcase.length} ${cityShowcase.length === 1 ? 'project' : 'projects'} shown.` : ' Projects coming soon.') : ''}`
         : selectedState
           ? `${selectedState.name} selected. ${
@@ -245,13 +255,10 @@ export const Presence = () => {
               Our Work
             </p>
             <h1 id="presence-heading" className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-heading tracking-tight text-white">
-              Where We&apos;ve Worked
+              Our work across India
             </h1>
-            <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-              Explore the cities where Arham has delivered electrical wiring and lighting projects.
-            </p>
-            <p className="text-xs sm:text-sm text-slate-400 tracking-wide leading-relaxed">
-              Interactive map · Project locations · Electrical and lighting work
+            <p className="text-base text-slate-300 leading-[1.65]">
+              {PRESENCE_TEASER_STATS.map((s) => `${s.value} ${s.label.toLowerCase()}`).join(' in ')}, and growing.
             </p>
           </header>
 
@@ -324,28 +331,33 @@ export const Presence = () => {
         </Container>
       </section>
 
-      {/* Project showcase status + enquiry */}
+      {/* Project cards (the old /projects gallery, merged here) + enquiry */}
       <section className="border-t border-white/10 bg-navy-800" aria-labelledby="presence-projects-heading">
-        <Container size="default" className="py-10 sm:py-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-          <div className="space-y-1.5 max-w-xl">
-            <h2 id="presence-projects-heading" className="text-lg font-bold font-heading text-heading">
-              Project showcase
-            </h2>
-            <p className="text-sm text-slate-400 leading-relaxed">
-              {publishedCount > 0
-                ? `${publishedCount} published ${publishedCount === 1 ? 'project is' : 'projects are'} available in our project gallery.`
-                : 'Project case studies with photographs are being prepared and will appear here once approved for publication.'}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {publishedCount > 0 && (
-              <Button as={Link} to="/projects" variant="outline" onDark icon={ArrowRight} iconPosition="right" className="min-h-[44px]">
-                View projects
+        <Container size="default" className="py-10 sm:py-14 space-y-6">
+          <h2 id="presence-projects-heading" className="text-2xl sm:text-3xl font-bold font-heading text-heading tracking-tight">
+            Projects
+          </h2>
+          {projectList.length > 0 ? (
+            <ProjectGrid projects={projectList} />
+          ) : (
+            <p className="text-base text-body leading-[1.65]">Project photos are on the way. Ask us about work in your city.</p>
+          )}
+          <div className="rounded-2xl bg-card border border-white/[0.07] p-5 sm:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="space-y-1">
+              <h3 className="text-lg font-bold font-heading text-heading">Have a project in your city?</h3>
+              <p className="text-base text-body">Call or WhatsApp us, or send your details.</p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Button as="a" href={COMPANY.phoneHref} variant="outline" onDark icon={Phone} className="min-h-[44px]">
+                Call
               </Button>
-            )}
-            <Button as={Link} to="/contact" variant="primary" icon={ArrowRight} iconPosition="right" className="min-h-[44px] focus-visible:ring-offset-brand-navy-dark">
-              Discuss a project
-            </Button>
+              <Button as="a" href={whatsappHref(WHATSAPP_HELLO)} target="_blank" rel="noopener noreferrer" variant="outline" onDark icon={MessageCircle} className="min-h-[44px]">
+                WhatsApp
+              </Button>
+              <Button as={Link} to="/contact" variant="primary" icon={ArrowRight} iconPosition="right" className="min-h-[44px] focus-visible:ring-offset-brand-navy-dark">
+                Enquire
+              </Button>
+            </div>
           </div>
         </Container>
       </section>

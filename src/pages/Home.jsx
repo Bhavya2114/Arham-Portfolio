@@ -1,78 +1,58 @@
 import React from 'react';
 import Hero from '../sections/Hero';
-import CompanyIntroduction from '../sections/CompanyIntroduction';
-import ServicesOverview from '../sections/ServicesOverview';
-import ProjectPreview from '../sections/ProjectPreview';
 import PresenceTeaser from '../sections/PresenceTeaser';
+import ServicesList from '../sections/ServicesList';
+import AboutArham from '../sections/AboutArham';
 import Container from '../components/ui/Container';
-import Badge from '../components/ui/Badge';
 import EnquiryForm from '../components/contact/EnquiryForm';
-import { MessageSquare } from 'lucide-react';
 import usePageMetadata from '../lib/usePageMetadata';
+import { COMPANY, pageTitle } from '../data/company';
 
+/**
+ * Homepage, top to bottom: hero → India map teaser → what we do → about → enquiry form.
+ * Sections alternate the two Graphite shades (bg / bg2 = navy-950 / navy-800).
+ */
 export const Home = () => {
   usePageMetadata(
-    'ARHAM — Electrical Engineering, Contracting & Lighting Solutions',
-    'Arham is an electrical engineering, contracting, industrial wiring, and architectural lighting solutions firm delivering code-compliant installations.'
+    pageTitle(),
+    `${COMPANY.name} does electrical wiring, lighting installation and power distribution for buildings across India. Call or WhatsApp ${COMPANY.phoneDisplay}.`
   );
-
-  const handleScrollToContact = () => {
-    const contactElem = document.getElementById('contact');
-    if (contactElem) {
-      contactElem.scrollIntoView({ behavior: 'smooth' });
-      window.history.pushState(null, '', '#contact');
-    }
-  };
 
   return (
     <div className="flex-1 w-full flex flex-col">
-      
-      {/* 1. Hero Section */}
-      <Hero onOpenEnquiry={handleScrollToContact} />
+      {/* 1. Hero */}
+      <Hero />
 
-      {/* 2. Company Introduction Section (Phase 2.2 & 6) */}
-      <CompanyIntroduction />
-
-      {/* 3. Services Overview Section (Phase 2.3 & 6) */}
-      <ServicesOverview />
-
-      {/* 4. Homepage Project Preview Section (Phase 2.4 & 5) */}
-      <ProjectPreview />
-
-      {/* 5. Our work across India: static teaser for /presence (dark; the interactive map lives only there) */}
+      {/* 2. Our work across India: static teaser for /our-work (the interactive map lives only there) */}
       <PresenceTeaser />
 
-      {/* 6. Commercial Enquiry Section (Phase 7) */}
-      <section 
-        id="contact" 
-        className="w-full py-16 sm:py-20 border-t border-brand-border bg-navy-800 text-body scroll-mt-20"
+      {/* 3. What we do */}
+      <ServicesList />
+
+      {/* 4. About Arham */}
+      <AboutArham />
+
+      {/* 5. Enquiry */}
+      <section
+        id="contact"
+        className="w-full py-12 sm:py-16 border-t border-white/[0.08] bg-navy-950 text-body scroll-mt-20"
         aria-labelledby="home-contact-heading"
       >
-        <Container size="default" className="space-y-10">
-          <div className="max-w-2xl mx-auto text-center space-y-3">
-            <div className="inline-flex">
-              <Badge variant="accent" icon={MessageSquare}>
-                Commercial Consultations
-              </Badge>
-            </div>
-            <h2 id="home-contact-heading" className="text-2xl sm:text-3xl md:text-4xl font-bold font-heading text-ink tracking-tight">
-              Ready to Discuss Your Project Requirements?
+        <Container size="default" className="space-y-6">
+          <div className="max-w-2xl space-y-2">
+            <h2 id="home-contact-heading" className="text-2xl sm:text-3xl font-bold font-heading text-heading tracking-tight">
+              Tell us about your project
             </h2>
-            <p className="text-base text-muted leading-[1.65]">
-              Connect with our electrical engineering and lighting team to discuss facility drawings, power distribution requirements, or tender specifications.
+            <p className="text-base text-body leading-[1.65]">
+              Fill in a few details and send them to us on WhatsApp or by email.
             </p>
           </div>
 
-          <div className="max-w-3xl mx-auto bg-card rounded-2xl border border-brand-border p-6 sm:p-8 lg:p-10 text-ink shadow-card">
+          <div className="max-w-3xl bg-card rounded-2xl border border-white/[0.07] p-5 sm:p-8">
             <EnquiryForm idPrefix="home-contact" />
           </div>
-
-          <p className="text-center text-xs text-muted max-w-xl mx-auto">
-            * Direct corporate telephone, email, and WhatsApp coordinates are available on our Contact page. Automated enquiry delivery remains unconfigured pending executive routing decisions.
-          </p>
         </Container>
       </section>
-
     </div>
   );
 };

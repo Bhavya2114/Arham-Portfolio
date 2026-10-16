@@ -125,7 +125,7 @@ const detailsSrc = read('../src/components/presence/ProjectDetails.jsx');
 assert(detailsSrc.includes('onError') && detailsSrc.includes('Project photographs will be added when approved.'), 'Image failures / missing images handled without placeholder photos');
 assert(detailsSrc.includes('project photograph'), 'Gallery provides descriptive alt text');
 const statusSrc = read('../src/components/presence/CityStatus.jsx');
-assert(statusSrc.includes('Project locations will appear here as approved project information becomes available.'), 'City empty state copy');
+assert(statusSrc.includes('Project photos for this city are on the way.'), 'City empty state copy');
 assert(!pageSrc.includes('<CityDetails'), 'The removed CityDetails component is not used');
 const previewSrc = read('../src/sections/PresenceTeaser.jsx');
 assert(!previewSrc.includes('PresenceMap') && !previewSrc.includes('ProjectDetails'), 'Homepage teaser stays lightweight (static image, no map)');

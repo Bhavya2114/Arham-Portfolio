@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Calendar, ImageOff } from 'lucide-react';
-import { CATEGORY_META } from '../map/ProjectCard';
+import { CATEGORY_META } from './categoryMeta';
 import { CITY_EMPTY_STATE_COPY } from './CityStatus';
 
 /**
