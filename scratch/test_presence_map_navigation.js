@@ -60,7 +60,9 @@ assert(/if \(e\.key !== 'Escape'\) return;[\s\S]*?dispatch\(\{ type: 'back' \}\)
 
 console.log('\n4. Kept controls');
 assert(/\{selectedState\.name\}\s*\{selectedCity && <span className="text-brand-accent"> · \{selectedCity\}<\/span>\}/.test(mapSrc), 'State · city selection pill kept');
-assert(/aria-label="Zoom in"|Zoom in/.test(mapSrc) && /Maximize2/.test(mapSrc), 'Zoom controls kept');
+assert(!/aria-label="Zoom in"|Map zoom controls/.test(mapSrc) && !/\b(zoomBy|fitView|ZOOM_STEP|controlsAtTop|controlButton)\b/.test(mapSrc) && !/\b(Plus|Minus|Maximize2)\b/.test(mapSrc), 'Zoom +/−/fit buttons removed, with their now-unused code and icon imports');
+assert(/Drag to pan · pinch to zoom/.test(mapSrc) && !/use the controls/.test(mapSrc), 'Hint: "Drag to pan · pinch to zoom"');
+assert(/clamp\(g\.view\.k \* \(now\.spread \/ start\.spread\), 1, MAX_ZOOM\)/.test(mapSrc) && /onPointerDown=/.test(mapSrc) && /onSelectCluster/.test(mapSrc) && /animateTo\(getTargetView\(\)\);/.test(mapSrc), 'Pinch-to-zoom, drag, cluster zoom and state fit kept');
 assert(!/LocationExplorer|Explore locations|toolbar=/.test(pageSrc) && !/toolbar/.test(mapSrc), '"Explore locations" button and the unused toolbar slot are removed');
 
 console.log('\n5. Background tap resets; clicks outside the map do not');

@@ -149,7 +149,7 @@ assert(cardSrc.includes('{current + 1} / {count}') && cardSrc.includes('aria-lab
 assert(!/Chevron(Left|Right)|aria-label="(Previous|Next) campus"/.test(cardSrc), 'No large previous / next arrow buttons');
 assert(pageSrcC.includes('<CampusCard key={`${nav.stateCode}|${selectedCity}`} city={selectedCity} locations={campusLocations} demo={campusDemo} />'), 'Card is keyed by city, so it resets to 1 / n when the city changes');
 assert(/const campusCardOnly = Boolean\(\s*selectedCity && !selectedProject && clusterProjects\.length === 0 && cityProjects\.length === 0 && campusLocations\.length > 0/.test(pageSrcC), 'Card replaces the panel / bottom sheet only for campus-only cities');
-assert(mapSrcC.includes('overlay = null,') && mapSrcC.includes('data-map-overlay=') && mapSrcC.includes("controlsAtTop ? 'top-2' : 'bottom-2'"), 'Map hosts the card as an overlay; zoom controls move out of its way');
+assert(mapSrcC.includes('overlay = null,') && mapSrcC.includes('data-map-overlay=') && !mapSrcC.includes('controlsAtTop'), 'Map hosts the card as an overlay (no zoom controls to move out of its way)');
 assert(mapSrcC.includes('const getTargetView = useCallback(() => getStateFitView(selectedCode), [selectedCode, getStateFitView]);'), 'Showing the card never changes the map zoom (fit depends only on the state)');
 if (process.env.BUILD_DIR) {
   assert(fs.readdirSync(path.resolve(process.env.BUILD_DIR, 'assets')).some((f) => /^allen image-.+\.png$/.test(f)), 'Production build emits the allen image as a hashed Vite asset');
@@ -165,7 +165,7 @@ assert(mapSrcC.includes('animateTo({ ...v, cy: v.cy + shiftUnits }, {') && mapSr
 assert(mapSrcC.includes('if (overlayShifted.current) {') && mapSrcC.includes('animateTo(getTargetView());'), 'Closing the card undoes its own shift (back to the state view)');
 assert(mapSrcC.includes('{ duration: MAP_SHIFT_MS, onDone: go }') && mapSrcC.includes("'transition-none translate-y-[calc(100%+1rem)] opacity-0 pointer-events-none'"), 'Card slides up from the bottom after the map adjustment (sequence: scratch/test_overlay_entrance.js)');
 assert(/useLayoutEffect\(\(\) => \{\s*if \(!overlayKey\) \{/.test(mapSrcC) && mapSrcC.includes('}, [overlayKey]);'), 'Re-evaluated per city (Kota / Jaipur) — repositions only if needed');
-assert(mapSrcC.includes('const controlsAtTop = hasOverlay;'), 'Zoom controls move to the top while the card is shown (stay accessible)');
+assert(!/Map zoom controls|aria-label="Zoom in"/.test(mapSrcC), 'No zoom control buttons over the map or the card');
 const shiftEffect = (mapSrcC.match(/useLayoutEffect\(\(\) => \{[\s\S]*?\}, \[overlayKey\]\);/) || [''])[0].replace(/\/\/.*$/gm, '');
 assert(shiftEffect && !/candidate|campus/i.test(shiftEffect), 'Uses only the selected city marker — no campus coordinates or pins');
 

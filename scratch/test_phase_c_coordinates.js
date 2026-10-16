@@ -145,7 +145,7 @@ PRESENCE_COVERAGE.forEach((entry) => {
 assert(markersFor('IN-UP').length === 0, 'Uttar Pradesh stays highlighted with no city marker');
 assert(CITY_COORDINATES.every((c) => getPublishedProjectsByStateAndCity(c.stateCode, c.city).length === 0), 'All marker project counts are 0 (no badges rendered)');
 assert(Array.isArray(PROJECTS) && PROJECTS.length === 0, 'PROJECTS remains empty');
-assert(mapSrc.includes('aria-label="Zoom in"') && mapSrc.includes('aria-label="Zoom out"') && mapSrc.includes('Fit map to'), 'Zoom in / out / fit controls present');
+assert(!mapSrc.includes('aria-label="Zoom in"') && !mapSrc.includes('aria-label="Zoom out"') && !mapSrc.includes('Fit map to') && !/Map zoom controls/.test(mapSrc), 'Zoom in / out / fit controls removed (no replacement button)');
 assert(mapSrc.includes('prefers-reduced-motion'), 'Zoom animation respects prefers-reduced-motion');
 assert(mapSrc.includes("touchAction: isZoomed ? 'none' : 'pan-y pinch-zoom'"), 'Map captures touch only while zoomed (page scroll unaffected at overview)');
 assert(mapSrc.includes('role="button"') && mapSrc.includes('tabIndex={0}') && mapSrc.includes('aria-pressed={isSelected}'), 'Markers are keyboard-operable buttons');

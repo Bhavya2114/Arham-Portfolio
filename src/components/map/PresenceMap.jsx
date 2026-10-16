@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
-import { MousePointerClick, Plus, Minus, Maximize2, Move } from 'lucide-react';
+import { MousePointerClick, Move } from 'lucide-react';
 import IndiaMapSvg, { MAP_COLORS } from './IndiaMapSvg';
 import { startOverlayEntrance, OVERLAY_ENTER } from '../../lib/overlayEntrance.js';
 import { isMapBackgroundTap } from '../../lib/mapBackgroundTap.js';
@@ -27,7 +27,7 @@ import { kmPerUnitAt } from '../../lib/mapProjection.js';
  * - Optional `overlay` (e.g. the floating campus card) is anchored to the bottom of the map container
  *   (full width on narrow maps; on wide maps the bottom corner away from the selected city). If the
  *   selected city marker would sit under or too close to it, the map pans up by just that amount (zoom
- *   unchanged); then the overlay slides up from the bottom edge. Zoom controls move to the top-right.
+ *   unchanged); then the overlay slides up from the bottom edge.
  */
 
 // Crops the 1000×1000 source canvas to the geometry extent (x 100–900, y 45–955) plus a small margin.
@@ -38,7 +38,6 @@ const MAX_ZOOM = 320; // lets project sites roughly 1 km+ apart separate on scre
 const STATE_FIT_MAX_ZOOM = 8;
 const PROJECT_PIN_PX = 9;
 const CLUSTER_RADIUS_PX = 36;
-const ZOOM_STEP = 1.6;
 const DRAG_THRESHOLD_PX = 6;
 const MARKER_RADIUS_PX = 5;
 // Overview city dots: a small bright white dot, ~3 px across (screen px radius).
@@ -186,12 +185,10 @@ export const PresenceMap = ({
     animateTo(getTargetView());
   }, [getTargetView, animateTo]);
 
-  // ---- Zoom controls ----
+  // ---- Zoom state ----
   const isZoomed = view.k > 1.001;
   // While zooming, panning or dragging the map draws only state fills and their edges.
   const moving = isAnimating || isDragging;
-  const zoomBy = (factor) => animateTo({ ...viewRef.current, k: viewRef.current.k * factor });
-  const fitView = () => animateTo(getTargetView());
 
   // ---- Drag / pinch (only while zoomed) ----
   const pointers = useRef(new Map());
@@ -552,7 +549,6 @@ export const PresenceMap = ({
   const overlayClass = overlaySide === 'full'
     ? 'inset-x-2 bottom-2'
     : `bottom-3 w-[min(24rem,calc(100%-1.5rem))] ${overlaySide === 'right' ? 'right-3' : 'left-3'}`;
-  const controlsAtTop = hasOverlay;
 
   // Pan (map units) needed so the marker sits MARKER_CLEARANCE_PX above the card, measured against the
   // view the map has settled on (viewRef), not an animation frame or a not-yet-rendered viewBox.
@@ -624,8 +620,6 @@ export const PresenceMap = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [overlayKey]);
 
-  const controlButton =
-    'inline-flex items-center justify-center w-11 h-11 text-slate-100 hover:bg-white/10 disabled:opacity-35 disabled:hover:bg-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-accent';
 
   return (
     <div className="relative rounded-2xl border border-white/10 bg-brand-navy/60 p-3 sm:p-6 shadow-[0_0_60px_-20px_rgba(16,185,129,0.25)]">
@@ -701,28 +695,6 @@ export const PresenceMap = ({
             {overlay}
           </div>
         )}
-
-        {/* Zoom controls */}
-        <div
-          className={`absolute ${controlsAtTop ? 'top-2' : 'bottom-2'} right-2 z-10 flex flex-col overflow-hidden rounded-xl border border-white/15 bg-brand-navy-dark/90 backdrop-blur divide-y divide-white/10`}
-          role="group"
-          aria-label="Map zoom controls"
-        >
-          <button type="button" className={controlButton} onClick={() => zoomBy(ZOOM_STEP)} disabled={view.k >= MAX_ZOOM - 0.001} aria-label="Zoom in">
-            <Plus className="w-4 h-4" aria-hidden="true" />
-          </button>
-          <button type="button" className={controlButton} onClick={() => zoomBy(1 / ZOOM_STEP)} disabled={!isZoomed} aria-label="Zoom out">
-            <Minus className="w-4 h-4" aria-hidden="true" />
-          </button>
-          <button
-            type="button"
-            className={controlButton}
-            onClick={fitView}
-            aria-label={selectedState ? `Fit map to ${selectedState.name}` : 'Reset map to India'}
-          >
-            <Maximize2 className="w-4 h-4" aria-hidden="true" />
-          </button>
-        </div>
       </div>
 
       {footer && <div className="mt-3">{footer}</div>}
@@ -766,7 +738,7 @@ export const PresenceMap = ({
         {isZoomed && (
           <p className="inline-flex items-center gap-1.5 text-[11px] text-slate-500">
             <Move className="w-3 h-3" aria-hidden="true" />
-            Drag to pan · pinch or use the controls to zoom
+            Drag to pan · pinch to zoom
           </p>
         )}
         {markers.length > 0 && (
