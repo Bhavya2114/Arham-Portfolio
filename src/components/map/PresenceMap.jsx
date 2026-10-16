@@ -724,42 +724,9 @@ export const PresenceMap = ({
 
       {footer && <div className="relative z-20 mt-3">{footer}</div>}
 
-      {/* Legend & attribution (float on the page background, above the map's fade band) */}
+      {/* Pan hint and data attribution (required by the licences): small, low-contrast text floating
+          on the page background, above the map's fade band. No legend. */}
       <div className="relative z-20 mt-3 space-y-1.5 text-center">
-        <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-slate-400" aria-label="Map legend">
-          <li className="inline-flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm bg-[#5C7E1C] border-[1.5px] border-[#D9E35A]" aria-hidden="true" />
-            Selected
-          </li>
-          <li className="inline-flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm bg-[#2F4A10] border border-[#D9E35A]/40" aria-hidden="true" />
-            Worked locations
-          </li>
-          <li className="inline-flex items-center gap-1.5">
-            <span className="w-3 h-3 rounded-sm bg-[#070A1F]/50 border-[1.5px] border-[#3FD0E6]" aria-hidden="true" />
-            Other states
-          </li>
-          {markers.length > 0 && (
-            <li className="inline-flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-white border border-[#070A1F]" aria-hidden="true" />
-              City
-            </li>
-          )}
-          {markers.length > 0 && (
-            <li className="inline-flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#D9E35A] border border-[#070A1F]" aria-hidden="true" />
-              Selected city
-            </li>
-          )}
-          {projectMarkers.length > 0 && (
-            <li className="inline-flex items-center gap-1.5">
-              <svg viewBox="-10 -26 20 27" className="w-2.5 h-3.5" aria-hidden="true">
-                <path d="M0 0 C -3 -5 -9 -9 -9 -15 A 9 9 0 1 1 9 -15 C 9 -9 3 -5 0 0 Z" className="fill-white stroke-brand-navy-dark" strokeWidth="2" />
-              </svg>
-              Project site
-            </li>
-          )}
-        </ul>
         {isZoomed && (
           <p className="inline-flex items-center gap-1.5 text-[11px] text-slate-500">
             <Move className="w-3 h-3" aria-hidden="true" />

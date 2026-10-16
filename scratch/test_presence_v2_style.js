@@ -88,7 +88,14 @@ assert((fade.match(/linear-gradient\(to (bottom|top|right|left), \$\{PAGE_NAVY\}
 assert(/margin: 'calc\(-1 \* var\(--map-fade\)\)',\s*padding: 'var\(--map-fade\)',/.test(mapSrc) && /overflow-visible/.test(mapSrc), 'Fade band sits outside the content area, so the map itself is never faded (svg spills into it when zoomed)');
 assert(/style=\{\{ inset: 'var\(--map-fade\)' \}\} data-map-frame/.test(mapSrc) && /const w = \(card\.offsetParent \|\| wrapper\)\.getBoundingClientRect\(\);/.test(mapSrc), 'Card and scale bar anchored to the map content area (card offsets measured against it)');
 assert(/<div className="relative z-20 mb-2 flex/.test(mapSrc) && /<div className="relative z-20 mt-3 space-y-1\.5 text-center">/.test(mapSrc), 'State chip above and legend below float on the page background');
-assert(/>\s*Selected\s*</.test(mapSrc) && /border-\[#D9E35A\]/.test(mapSrc) && /Worked locations/.test(mapSrc) && /Other states/.test(mapSrc) && /bg-white border border-\[#070A1F\]" aria-hidden="true" \/>\s*City\s*</.test(mapSrc) && /bg-\[#D9E35A\] border border-\[#070A1F\]" aria-hidden="true" \/>\s*Selected city\s*</.test(mapSrc), 'Legend: Selected, Worked locations, Other states, City (white), Selected city (yellow)');
+assert(!/Map legend|Worked locations|Other states|Selected city|Project site/.test(mapSrc) && !/<ul/.test(mapCode), 'Legend row and its code removed');
+assert(/\{isZoomed && \(\s*<p className="inline-flex items-center gap-1\.5 text-\[11px\] text-slate-500">[\s\S]*?Drag to pan · pinch to zoom/.test(mapSrc), 'Pan hint kept while zoomed');
+assert(/<p className="text-\[11px\] text-slate-500">\s*City locations ©/.test(mapSrc) && /href="https:\/\/www\.openstreetmap\.org\/copyright"/.test(mapSrc) && (mapSrc.match(/href="https:\/\/www\.geoboundaries\.org\/"/g) || []).length === 2, 'Attribution (OpenStreetMap / geoBoundaries) kept as small, low-contrast text');
+
+console.log('\n2e. Quiet islands');
+assert(/const ISLAND_IDS = new Set\(\['IN-LD', 'IN-AN'\]\);/.test(svgSrc) && /const ISLAND_LINE = \{ width: 0\.8, opacity: 0\.3 \};/.test(svgSrc), 'Lakshadweep and Andaman & Nicobar: faint cyan outline, 0.8 px at 30 %');
+assert(/const others = INDIA_MAP_STATES\.filter\(\(state\) => !set\.has\(state\.id\) && !ISLAND_IDS\.has\(state\.id\)\);/.test(svgSrc) && /islands: strokes\(islands, ISLAND_LINE\.width, ISLAND_LINE\.opacity, MAP_COLORS\.cyan\)/.test(svgSrc), 'Islands get no fill and no offset echo (excluded from the other-state layers)');
+assert(/<g \{\.\.\.deco\} data-layer="islands">\{L\.islands\}<\/g>/.test(svgSrc) && /vectorEffect="non-scaling-stroke"/.test(svgSrc), 'Islands kept on the map, non-clickable (decorative layer), non-scaling stroke');
 assert(!/texture|slab|SLAB/i.test(svgCode + mapCode), 'No texture lines or slab');
 
 console.log('\n3. Structure kept');

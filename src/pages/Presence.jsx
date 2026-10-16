@@ -224,7 +224,8 @@ export const Presence = () => {
       {/* One background for the map section: page navy, with the map's own radial glow fading into it.
           overflow-x clip: the map wrapper's fade band may extend past the page gutter. */}
       <section aria-labelledby="presence-heading" className="relative overflow-x-clip" style={{ background: PAGE_NAVY }}>
-        <Container size="default" className="relative py-10 sm:py-14 lg:py-16 space-y-8 sm:space-y-10">
+        {/* Bottom padding ≥ the map's fade band (40 / 80 px), so the band stays inside this section. */}
+        <Container size="default" className="relative pt-10 sm:pt-14 lg:pt-16 pb-16 sm:pb-24 lg:pb-28 space-y-8 sm:space-y-10">
           {/* Page Header */}
           <header className="max-w-2xl space-y-3">
             <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-brand-accent">

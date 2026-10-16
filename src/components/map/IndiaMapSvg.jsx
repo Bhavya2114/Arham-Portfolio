@@ -13,6 +13,7 @@ import { splitRegionEdges } from './regionEdges';
  * - Accessible keyboard navigation and screen reader support for active states.
  * - `variant="dark"` (Our Presence page): a cheap "neon" look —
  *   · other states: cyan outline over a dark land tint, plus a faint second outline 3 px lower;
+ *     the island territories (LD, AN) only a faint cyan outline, not clickable;
  *   · worked states: one dark olive radial fill for the whole map (lighter over central India);
  *   · the worked region's outer outline gets the yellow edge; borders shared by two worked states
  *     are thinner and dimmer (outline split once per coverage set, see `regionEdges.js`);
@@ -46,6 +47,10 @@ const EDGE_WIDTH = 1.5;
 const SHARED_EDGE = { width: 0.8, opacity: 0.5 }; // borders between two worked states
 const FAKE_GLOW = [[10, 0.07], [5, 0.18]]; // [stroke width px, stroke opacity], widest first
 const DIM = 0.35; // other worked states while one is selected
+// Island territories (Lakshadweep, Andaman & Nicobar): kept, but quiet — faint cyan outline only,
+// no fill, no offset echo, not clickable.
+const ISLAND_IDS = new Set(['IN-LD', 'IN-AN']);
+const ISLAND_LINE = { width: 0.8, opacity: 0.3 };
 // One fill gradient for the whole map, in map coordinates: centred on central India, lighter in the
 // middle and darker toward the outer edges of the worked region.
 const FILL_GRADIENT = { cx: 481, cy: 496, r: 440 };
@@ -152,7 +157,8 @@ export const IndiaMapSvg = ({
   const L = useMemo(() => {
     if (!isDark) return null;
     const set = new Set(activeKey ? activeKey.split(',') : []);
-    const others = INDIA_MAP_STATES.filter((state) => !set.has(state.id));
+    const others = INDIA_MAP_STATES.filter((state) => !set.has(state.id) && !ISLAND_IDS.has(state.id));
+    const islands = INDIA_MAP_STATES.filter((state) => !set.has(state.id) && ISLAND_IDS.has(state.id));
     const worked = INDIA_MAP_STATES.filter((state) => set.has(state.id));
     const hero = selectedStateCode ? worked.find((state) => state.id === selectedStateCode) || null : null;
     const dimmed = hero ? worked.filter((state) => state !== hero) : [];
@@ -216,6 +222,7 @@ export const IndiaMapSvg = ({
     return {
       echo: strokes(others, 1.5, ECHO.opacity, MAP_COLORS.cyan),
       otherStates: others.map(otherState),
+      islands: strokes(islands, ISLAND_LINE.width, ISLAND_LINE.opacity, MAP_COLORS.cyan),
       dimmedStates: dimmed.map((state) => workedState(state, DIM)),
       litStates: lit.map((state) => workedState(state)),
       regionLines,
@@ -266,6 +273,7 @@ export const IndiaMapSvg = ({
             <>
               {!moving && <g {...deco} data-layer="outline-echo" transform={`translate(0 ${ECHO.offsetPx * unit})`}>{L.echo}</g>}
               {L.otherStates}
+              <g {...deco} data-layer="islands">{L.islands}</g>
               {L.dimmedStates}
               {L.litStates}
               <g {...deco} data-layer="region-edges">{L.regionLines}</g>
