@@ -140,7 +140,7 @@ assert(/const MAP_SHIFT_MS = 240;/.test(mapSrc) && /animateTo\(\{ \.\.\.v, cy: v
 assert(!/setTimeout\(/.test(mapSrc.slice(mapSrc.indexOf('const overlayShifted'), mapSrc.indexOf('const controlButton'))), 'No fixed timer in the entrance effect');
 assert(/if \(onDone\) settle\.add\(onDone\);/.test(mapSrc) && /commitView\(to\);\s*stopAnimation\('finished'\);\s*return;/.test(mapSrc) && /settle\.flush\(reason\);/.test(mapSrc), 'animateTo signals completion when finished, interrupted or skipped (reduced motion)');
 const pageSrc = read('../src/pages/Presence.jsx');
-assert(pageSrc.includes('<CampusCard key={`${nav.stateCode}|${selectedCity}`}'), 'Card content remounts per city → carousel resets to 1 / 8; the map is not remounted');
+assert(/<CampusCard\s*key=\{`\$\{nav\.stateCode\}\|\$\{selectedCity\}`\}/.test(pageSrc), 'Card content remounts per city → carousel resets to 1 / 8; the map is not remounted');
 const cardSrc = read('../src/components/presence/CampusCard.jsx');
 assert(cardSrc.includes('const SLIDE_MS = 320;') && /campus-in-from-right/.test(cardSrc), 'Horizontal 320 ms campus slide unchanged');
 

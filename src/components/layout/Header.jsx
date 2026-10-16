@@ -7,6 +7,11 @@ import Badge from '../ui/Badge';
 import { NAV_ITEMS } from '../../data/navigation';
 import { Menu, X, ArrowRight, Info } from 'lucide-react';
 
+// Dark header (Graphite): solid #0C0D0F with a white/7 % bottom border (no backdrop blur), white links, the
+// active page in accent yellow with a yellow underline.
+const FOCUS_ON_DARK = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-navy-950';
+const ACTIVE_UNDERLINE = 'relative after:absolute after:left-3 after:right-3 after:bottom-0.5 after:h-0.5 after:rounded-full after:bg-accent';
+
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [notice, setNotice] = useState(null);
@@ -79,17 +84,17 @@ export const Header = () => {
 
   return (
     <>
-      <header className="w-full bg-white border-b border-brand-border sticky top-0 z-40 shadow-subtle transition-colors">
+      <header className="w-full bg-navy-950 border-b border-white/[0.07] sticky top-0 z-40 transition-colors">
         <Container size="default">
           <div className="h-20 flex items-center justify-between gap-4">
             
             {/* 1. Brand Mark (Clickable to Home) */}
             <Link 
               to="/" 
-              className="flex items-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue rounded-lg p-1"
+              className={`flex items-center rounded-lg p-1 ${FOCUS_ON_DARK}`}
               aria-label="Arham Home"
             >
-              <BrandLogo size="default" variant="dark" />
+              <BrandLogo size="default" variant="light" />
             </Link>
 
             {/* 2. Desktop Navigation Links */}
@@ -104,10 +109,10 @@ export const Header = () => {
                       key={item.name}
                       to={item.path}
                       className={({ isActive }) =>
-                        `px-3 py-2 rounded-lg text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue ${
+                        `px-3 py-2 rounded-lg text-sm transition-colors ${FOCUS_ON_DARK} ${
                           isActive
-                            ? 'text-brand-blue font-semibold bg-blue-50/70'
-                            : 'text-brand-slate font-medium hover:text-brand-navy hover:bg-slate-50'
+                            ? `text-accent font-semibold ${ACTIVE_UNDERLINE}`
+                            : 'text-white/85 font-medium hover:text-white hover:bg-white/5'
                         }`
                       }
                     >
@@ -122,7 +127,7 @@ export const Header = () => {
                     key={item.name}
                     type="button"
                     onClick={(e) => handleNavClick(e, item)}
-                    className="px-3 py-2 rounded-lg text-sm font-medium text-brand-slate hover:text-brand-navy hover:bg-slate-50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue"
+                    className={`px-3 py-2 rounded-lg text-sm font-medium text-white/85 hover:text-white hover:bg-white/5 transition-colors ${FOCUS_ON_DARK}`}
                     title={item.description}
                   >
                     <span>{item.name}</span>
@@ -152,15 +157,15 @@ export const Header = () => {
               <button
                 type="button"
                 onClick={() => setIsMenuOpen((prev) => !prev)}
-                className="lg:hidden p-2 rounded-lg text-brand-navy hover:bg-slate-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue transition-colors"
+                className={`lg:hidden inline-flex h-11 w-11 items-center justify-center rounded-lg text-white hover:bg-white/10 transition-colors ${FOCUS_ON_DARK}`}
                 aria-label={isMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
                 aria-expanded={isMenuOpen}
                 aria-controls="mobile-navigation-menu"
               >
                 {isMenuOpen ? (
-                  <X className="w-6 h-6 text-brand-navy" aria-hidden="true" />
+                  <X className="w-6 h-6" aria-hidden="true" />
                 ) : (
-                  <Menu className="w-6 h-6 text-brand-navy" aria-hidden="true" />
+                  <Menu className="w-6 h-6" aria-hidden="true" />
                 )}
               </button>
             </div>
@@ -172,7 +177,7 @@ export const Header = () => {
         {isMenuOpen && (
           <div
             id="mobile-navigation-menu"
-            className="lg:hidden border-t border-brand-border bg-white px-4 py-5 shadow-elevated"
+            className="lg:hidden border-t border-white/10 bg-navy-950 px-4 py-5"
             role="region"
             aria-label="Mobile Navigation Menu"
           >
@@ -186,15 +191,15 @@ export const Header = () => {
                         to={item.path}
                         onClick={() => setIsMenuOpen(false)}
                         className={({ isActive }) =>
-                          `px-4 py-3 rounded-lg text-base transition-colors flex items-center justify-between ${
+                          `px-4 py-3 rounded-lg text-base transition-colors flex items-center justify-between ${FOCUS_ON_DARK} ${
                             isActive
-                              ? 'text-brand-blue font-semibold bg-blue-50'
-                              : 'text-brand-navy font-medium hover:bg-slate-50'
+                              ? 'text-accent font-semibold bg-white/5 border-l-2 border-accent'
+                              : 'text-white font-medium hover:bg-white/5'
                           }`
                         }
                       >
                         <span>{item.name}</span>
-                        <Badge variant="blue" size="sm">Active</Badge>
+                        <Badge variant="neutral-dark" size="sm">Active</Badge>
                       </NavLink>
                     );
                   }
@@ -204,16 +209,16 @@ export const Header = () => {
                       key={item.name}
                       type="button"
                       onClick={(e) => handleNavClick(e, item)}
-                      className="w-full text-left px-4 py-3 rounded-lg text-base font-medium text-brand-slate hover:text-brand-navy hover:bg-slate-50 transition-colors flex items-center justify-between"
+                      className={`w-full text-left px-4 py-3 rounded-lg text-base font-medium text-white/85 hover:text-white hover:bg-white/5 transition-colors flex items-center justify-between ${FOCUS_ON_DARK}`}
                     >
                       <span>{item.name}</span>
-                      <ArrowRight className="w-4 h-4 text-slate-400" aria-hidden="true" />
+                      <ArrowRight className="w-4 h-4 text-muted-dark" aria-hidden="true" />
                     </button>
                   );
                 })}
               </nav>
 
-              <div className="pt-2 border-t border-brand-border sm:hidden">
+              <div className="pt-2 border-t border-white/10 sm:hidden">
                 <Button
                   variant="primary"
                   size="md"
@@ -240,9 +245,9 @@ export const Header = () => {
           aria-modal="true"
           aria-labelledby="notice-dialog-title"
         >
-          <div className="bg-white rounded-xl shadow-elevated border border-brand-border max-w-md w-full p-6 space-y-4">
+          <div className="bg-card rounded-xl shadow-elevated border border-white/[0.07] max-w-md w-full p-6 space-y-4">
             <div className="flex items-start gap-3">
-              <div className="p-2 rounded-lg bg-blue-50 text-brand-blue shrink-0">
+              <div className="p-2 rounded-lg bg-accent/10 text-accent shrink-0">
                 <Info className="w-5 h-5" />
               </div>
               <div className="space-y-1">

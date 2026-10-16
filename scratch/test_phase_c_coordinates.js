@@ -130,8 +130,9 @@ const consumers = srcFiles
 assert(consumers.join(',') === 'pages/Presence.jsx', `Only pages/Presence.jsx reads cityCoordinates.js (got ${consumers.join(', ')})`);
 const read = (rel) => fs.readFileSync(path.resolve(__dirname, rel), 'utf-8');
 const mapSrc = read('../src/components/map/PresenceMap.jsx');
-assert(mapSrc.includes('https://www.openstreetmap.org/copyright') && mapSrc.includes('OpenStreetMap contributors'), 'Map shows OpenStreetMap attribution');
-assert(/markers\.length > 0 && \(\s*<p/.test(mapSrc), 'Attribution is shown whenever markers are visible');
+const creditsSrc = read('../src/components/map/MapCredits.jsx');
+assert(creditsSrc.includes('https://www.openstreetmap.org/copyright') && creditsSrc.includes('OpenStreetMap contributors'), 'Map shows OpenStreetMap attribution (Map data popover)');
+assert(/<MapCredits cities=\{markers\.length > 0\}/.test(mapSrc) && /if \(!cities && !districts\) return null;/.test(creditsSrc), 'Attribution is available whenever markers are visible');
 
 console.log('\n4. Phase C Marker Wiring:');
 // Mirrors the marker derivation in Presence.jsx
@@ -155,14 +156,14 @@ assert(!pageSrc.includes('States we cover'), 'No permanent "States we cover" gri
 // Project discovery phase: details open only after a project pin (or same-site cluster) is chosen.
 assert((pageSrc.match(/\{detailsOpen && \(/g) || []).length === 2, 'Desktop panel and mobile sheet render only while project details are open');
 assert(pageSrc.includes('hidden lg:block') && pageSrc.includes('<BottomSheet'), 'Desktop side panel + mobile bottom sheet');
-assert((pageSrc.match(/dispatch\(\{ type: 'selectCity'/g) || []).length === 1, 'City markers drive the selected-city state through the one reducer');
+assert((pageSrc.match(/dispatch\(\{ type: 'selectCity'/g) || []).length === 2 && /onSelectCity=\{\(city\) => dispatch\(\{ type: 'selectCity'/.test(pageSrc) && /if \(project\.city !== nav\.city\) dispatch\(\{ type: 'selectCity'/.test(pageSrc), 'City markers (and a tapped project pin in another city) drive the selected-city state through the one reducer');
 const sheetSrc = read('../src/components/presence/BottomSheet.jsx');
 assert(sheetSrc.includes('lg:hidden') && sheetSrc.includes("['peek', 'half', 'full']"), 'Bottom sheet is mobile-only with three snap points');
 assert(sheetSrc.includes('Expand details') && sheetSrc.includes('Close details'), 'Sheet has expand/collapse and close buttons');
 const statusSrc = read('../src/components/presence/CityStatus.jsx');
 assert(statusSrc.includes('Project locations will appear here as approved project information becomes available.'), 'Selected city shows a compact, honest empty state');
-const previewSrc = read('../src/sections/PresencePreview.jsx');
-assert(!previewSrc.includes('PresenceMap') && !previewSrc.includes('cityCoordinates'), 'Homepage preview does not use markers or the Phase C map');
+const previewSrc = read('../src/sections/PresenceTeaser.jsx');
+assert(!previewSrc.includes('PresenceMap') && !previewSrc.includes('cityCoordinates'), 'Homepage teaser does not use markers or the Phase C map (static image only)');
 
 console.log(`\nResults: ${passed} passed, ${failed} failed`);
 process.exit(failed > 0 ? 1 : 0);

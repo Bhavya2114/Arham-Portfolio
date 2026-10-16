@@ -16,17 +16,17 @@ export const NotFound = () => {
   );
 
   return (
-    <div className="flex-1 flex items-center justify-center py-16 px-4 bg-brand-bg min-h-[60vh]">
+    <div className="flex-1 flex items-center justify-center py-16 px-4 bg-navy-800 min-h-[60vh]">
       <Container size="narrow" className="flex justify-center">
-        <Card variant="default" padding="lg" className="max-w-md w-full text-center space-y-6 shadow-subtle bg-white border border-brand-border">
+        <Card variant="dark" padding="lg" className="max-w-md w-full text-center space-y-6">
           <div className="flex justify-center">
-            <BrandLogo size="default" variant="dark" />
+            <BrandLogo size="default" variant="light" />
           </div>
 
           <div className="space-y-2">
-            <span className="text-4xl sm:text-5xl font-extrabold text-brand-blue font-heading tracking-tight">404</span>
-            <h1 className="text-xl sm:text-2xl font-bold font-heading text-brand-navy">Route Not Found</h1>
-            <p className="text-xs sm:text-sm text-brand-slate leading-relaxed">
+            <span className="text-4xl sm:text-5xl font-bold text-accent font-heading tracking-tight">404</span>
+            <h1 className="text-xl sm:text-2xl font-bold font-heading text-heading">Route Not Found</h1>
+            <p className="text-base text-muted-dark leading-[1.65]">
               The requested URL path does not correspond to an active page on the Arham corporate website.
             </p>
           </div>
@@ -45,6 +45,7 @@ export const NotFound = () => {
             </Button>
             <Button 
               variant="outline" 
+              onDark
               size="md" 
               icon={Briefcase} 
               iconPosition="left"

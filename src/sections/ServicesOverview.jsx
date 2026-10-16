@@ -20,7 +20,7 @@ export const ServicesOverview = () => {
       description:
         'Installation of electrical wiring systems, structured cable routing, conduits, and containment infrastructure designed for dependable, long-term operational continuity.',
       icon: Cable,
-      iconColor: 'text-brand-blue bg-blue-50 border-blue-100',
+      iconColor: 'text-accent bg-accent/10 border-transparent',
     },
     {
       id: 'power-distribution',
@@ -28,7 +28,7 @@ export const ServicesOverview = () => {
       description:
         'Placement, configuration, and integration of electrical distribution equipment, main panels, and sub-distribution units for stable and secure facility power delivery.',
       icon: Zap,
-      iconColor: 'text-brand-blue bg-blue-50 border-blue-100',
+      iconColor: 'text-accent bg-accent/10 border-transparent',
     },
     {
       id: 'architectural-lighting',
@@ -36,14 +36,14 @@ export const ServicesOverview = () => {
       description:
         'Engineered lighting installations for commercial spaces, offices, and built environments, balancing visual aesthetics, safety standards, and energy efficiency.',
       icon: Lightbulb,
-      iconColor: 'text-amber-700 bg-amber-50 border-amber-200',
+      iconColor: 'text-accent bg-accent/10 border-transparent',
     },
   ];
 
   return (
     <section
       id="services"
-      className="w-full py-16 sm:py-20 lg:py-24 border-t border-brand-border bg-brand-bg scroll-mt-20"
+      className="w-full py-16 sm:py-20 lg:py-24 border-t border-white/[0.08] bg-navy-950 scroll-mt-20"
       aria-labelledby="services-heading"
     >
       <Container size="default" className="space-y-12 sm:space-y-16">
@@ -51,9 +51,10 @@ export const ServicesOverview = () => {
         {/* Section Header */}
         <div className="max-w-3xl">
           <SectionHeading
+            tone="dark"
             id="services-heading"
             badge={
-              <Badge variant="blue" icon={Layers}>
+              <Badge variant="neutral-dark" icon={Layers}>
                 Our Capabilities
               </Badge>
             }
@@ -70,9 +71,9 @@ export const ServicesOverview = () => {
             return (
               <Card
                 key={service.id}
-                variant="default"
+                variant="dark"
                 padding="lg"
-                className="flex flex-col justify-between space-y-6 border border-brand-border hover:border-blue-300 hover:shadow-elevated transition-all duration-200 group"
+                className="flex flex-col justify-between space-y-6 hover:border-white/20 transition-all duration-200 group"
               >
                 <div className="space-y-4">
                   {/* Icon & Category Indicator */}
@@ -82,29 +83,29 @@ export const ServicesOverview = () => {
                     >
                       <Icon className="w-6 h-6" aria-hidden="true" />
                     </div>
-                    <span className="text-xs font-mono font-medium text-slate-400">
+                    <span className="text-xs font-mono font-medium text-muted-dark">
                       0{index + 1}
                     </span>
                   </div>
 
                   {/* Service Heading */}
-                  <h3 className="text-lg font-bold font-heading text-brand-navy leading-snug">
+                  <h3 className="text-lg font-bold font-heading text-heading leading-snug">
                     {service.title}
                   </h3>
 
                   {/* General Description */}
-                  <p className="text-sm text-brand-slate leading-relaxed">
+                  <p className="text-base text-body leading-[1.65]">
                     {service.description}
                   </p>
                 </div>
 
                 {/* Provisional Badge Indicator */}
-                <div className="pt-4 border-t border-brand-border/60 flex items-center justify-between text-xs text-brand-slate">
-                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-500">
-                    <span className="w-1.5 h-1.5 rounded-full bg-slate-400" aria-hidden="true" />
+                <div className="pt-4 border-t border-white/10 flex items-center justify-between text-xs text-muted-dark">
+                  <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-muted-dark">
+                    <span className="w-1.5 h-1.5 rounded-full bg-muted-dark" aria-hidden="true" />
                     Provisional Category
                   </span>
-                  <span className="text-[11px] text-slate-400">Subject to confirmation</span>
+                  <span className="text-[11px] text-muted-dark">Subject to confirmation</span>
                 </div>
               </Card>
             );
@@ -112,12 +113,12 @@ export const ServicesOverview = () => {
         </div>
 
         {/* Call to action linking to dedicated Services page */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-white border border-brand-border shadow-subtle">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 sm:p-6 rounded-2xl bg-card border border-white/[0.07]">
           <div className="space-y-1 text-left">
-            <h4 className="text-sm font-bold font-heading text-brand-navy">
+            <h4 className="text-sm font-bold font-heading text-heading">
               Detailed Scope & Execution Methodology
             </h4>
-            <p className="text-xs text-brand-slate">
+            <p className="text-xs text-muted-dark">
               Learn how Arham coordinates site engineering, raceway containment, and inspection compliance across project disciplines.
             </p>
           </div>
@@ -135,9 +136,9 @@ export const ServicesOverview = () => {
         </div>
 
         {/* Informational Disclosure / Footnote */}
-        <div className="p-4 rounded-xl bg-white border border-brand-border text-left">
-          <p className="text-xs text-brand-slate leading-relaxed">
-            <span className="font-semibold text-brand-navy">Scope Disclosure:</span> Capability categories and service scopes outlined above represent provisional business domains. Specific technical capacities, load parameters, and project classifications are subject to formal confirmation by company management prior to publication.
+        <div className="p-4 rounded-xl bg-card border border-white/[0.07] text-left">
+          <p className="text-xs text-body leading-relaxed">
+            <span className="font-semibold text-white">Scope Disclosure:</span> Capability categories and service scopes outlined above represent provisional business domains. Specific technical capacities, load parameters, and project classifications are subject to formal confirmation by company management prior to publication.
           </p>
         </div>
 

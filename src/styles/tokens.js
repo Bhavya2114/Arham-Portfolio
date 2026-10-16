@@ -7,61 +7,63 @@
  */
 
 export const DESIGN_TOKENS = {
-  // Provisional Core Color Palette
+  // "Graphite" palette (same values as tailwind.config.js). One accent: yellow = important /
+  // clickable; text on yellow is always dark.
   palette: {
-    primaryNavy: '#101D2C',       // Primary authority, dark backgrounds, high-contrast text
-    navyDark: '#0B141F',          // Deepest surface elevation for dark mode/cards
-    navyLight: '#1B2C42',         // Subtle container elevation on dark surfaces
-    primaryBlue: '#2563EB',       // Primary interactive actions & engineering precision
-    blueHover: '#1D4ED8',         // Interactive active/hover state
-    blueLight: '#EFF6FF',         // Tinted blue surface / badge background
-    background: '#F8FAFC',        // Default body & page canvas
-    secondaryText: '#64748B',     // Architectural secondary typography & metadata
-    slateLight: '#94A3B8',        // Muted/placeholder typography
-    warmAccent: '#F5B544',        // Illumination warmth & amber highlights
-    warmAccentHover: '#E09F2B',   // Warm accent hover state
-    white: '#FFFFFF',             // Clean card backgrounds & pure highlights
-    mainBorder: '#E2E8F0',        // Structural borders and dividers
-    borderSubtle: '#F1F5F9',      // Subtle table & item dividers
+    navy950: '#0C0D0F',           // Dark base (bg)
+    navy900: '#101114',           // Form inputs
+    navy800: '#141518',           // bg2: alternating sections
+    footer: '#08090A',            // Footer
+    surface: '#1B1D21',           // Cards on dark
+    accent: '#D9E35A',            // Buttons, highlights, active states
+    accentHover: '#E6EE7A',       // Accent hover
+    accentInk: '#14180A',         // Text on accent
+    olive: '#3F5A14',             // Secondary; links / icons / focus rings on light
+    cyan: '#3FD0E6',              // Thin detail lines only, sparingly
+    light: '#F7F8FA',             // Light section background
+    ink: '#0F172A',               // Text on light
+    muted: '#627289',             // Muted text on light (AA 4.6:1 on #F7F8FA)
+    mutedDark: '#8F9298',         // Muted text on dark
+    white: '#FFFFFF',             // Cards on light
+    mainBorder: '#E2E8F0',        // Borders and dividers on light
+    borderSubtle: '#F1F5F9',      // Subtle dividers on light
   },
 
   // Semantic Design Tokens
   semantic: {
     text: {
-      primary: '#101D2C',
-      secondary: '#64748B',
-      muted: '#94A3B8',
-      inverse: '#FFFFFF',
-      brand: '#2563EB',
-      accent: '#F5B544',
+      primary: '#0F172A',
+      secondary: '#627289',
+      onDark: '#FFFFFF',
+      onDarkMuted: '#8F9298',
+      onAccent: '#14180A',
+      link: '#3F5A14',
+      accent: '#D9E35A',
     },
     background: {
-      page: '#F8FAFC',
+      page: '#F7F8FA',
       card: '#FFFFFF',
-      surfaceMuted: '#F1F5F9',
-      surfaceDark: '#101D2C',
-      surfaceDarkSubtle: '#1B2C42',
+      dark: '#0C0D0F',
+      darkGradientTop: '#141518',
+      cardOnDark: '#1B1D21',
     },
     action: {
-      primary: '#2563EB',
-      primaryHover: '#1D4ED8',
-      primaryText: '#FFFFFF',
-      secondary: '#101D2C',
-      secondaryHover: '#1B2C42',
-      secondaryText: '#FFFFFF',
-      outlineBorder: '#E2E8F0',
-      outlineHover: '#EFF6FF',
+      primary: '#D9E35A',
+      primaryHover: '#E6EE7A',
+      primaryText: '#14180A',
+      secondaryBorderOnLight: 'rgba(15, 23, 42, 0.2)',
+      secondaryTextOnLight: '#0F172A',
+      secondaryBorderOnDark: 'rgba(255, 255, 255, 0.3)',
+      secondaryTextOnDark: '#FFFFFF',
     },
     border: {
       default: '#E2E8F0',
       subtle: '#F1F5F9',
-      strong: '#CBD5E1',
-      dark: '#1B2C42',
-      focus: '#2563EB',
+      onDark: 'rgba(255, 255, 255, 0.08)',
     },
     focusRing: {
-      color: '#2563EB',
-      offset: '#FFFFFF',
+      color: '#D9E35A',
+      offset: '#14180A',
       width: '2px',
     },
     status: {
@@ -74,44 +76,45 @@ export const DESIGN_TOKENS = {
       error: '#DC2626',
       errorBg: '#FEF2F2',
       errorBorder: '#FECACA',
-      info: '#2563EB',
-      infoBg: '#EFF6FF',
-      infoBorder: '#BFDBFE',
+      info: '#3F5A14',
+      infoBg: '#F4F7E8',
+      infoBorder: '#D5DFB0',
     },
   },
 
-  // Typography System
+  // Typography System (self-hosted via @fontsource)
   typography: {
     fontSans: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-    fontHeading: "'Outfit', 'Inter', sans-serif",
+    fontHeading: "'Sora', 'Inter', sans-serif",
     scale: {
       hero: {
         fontSize: '2.5rem',       // 40px
-        lineHeight: '1.15',
-        letterSpacing: '-0.025em',
-        fontWeight: '800',
+        lineHeight: '1.1',
+        letterSpacing: '-0.02em',
+        fontWeight: '700',
       },
       h1: {
         fontSize: '2rem',         // 32px
-        lineHeight: '1.2',
+        lineHeight: '1.1',
         letterSpacing: '-0.02em',
         fontWeight: '700',
       },
       h2: {
         fontSize: '1.5rem',       // 24px
-        lineHeight: '1.25',
-        letterSpacing: '-0.015em',
+        lineHeight: '1.1',
+        letterSpacing: '-0.02em',
         fontWeight: '700',
       },
       h3: {
         fontSize: '1.25rem',      // 20px
-        lineHeight: '1.3',
-        letterSpacing: '-0.01em',
+        lineHeight: '1.15',
+        letterSpacing: '-0.02em',
         fontWeight: '600',
       },
       h4: {
         fontSize: '1.125rem',     // 18px
-        lineHeight: '1.35',
+        lineHeight: '1.15',
+        letterSpacing: '-0.02em',
         fontWeight: '600',
       },
       bodyLarge: {

@@ -117,7 +117,7 @@ export const ProjectDetails = ({ project, stateName, showHeading = true, heading
       <div className="flex flex-wrap gap-x-5">
         <Link
           to={`/projects/${project.id}`}
-          className="inline-flex items-center gap-1.5 min-h-[44px] text-sm font-medium text-brand-accent hover:text-amber-300 transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+          className="inline-flex items-center gap-1.5 min-h-[44px] text-sm font-medium text-brand-accent hover:text-accent-hover transition-colors rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
         >
           View full project
           <ArrowRight className="w-4 h-4" aria-hidden="true" />
@@ -145,7 +145,7 @@ export const ProjectChooser = ({ projects = [], onSelect }) => (
           <button
             type="button"
             onClick={() => onSelect?.(p.id)}
-            className="w-full min-h-[44px] rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm text-slate-100 hover:border-emerald-400/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+            className="w-full min-h-[44px] rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-left text-sm text-slate-100 hover:border-accent/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
           >
             <span className="block font-medium">{p.name}</span>
             {CATEGORY_META[p.category] && <span className="block text-xs text-emerald-300">{CATEGORY_META[p.category].label}</span>}
@@ -210,7 +210,7 @@ const CityVerifiedProjects = ({ city, projects, onSelect }) => (
           <button
             type="button"
             onClick={() => onSelect?.(p.id)}
-            className="w-full min-h-[44px] flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-left hover:border-emerald-400/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+            className="w-full min-h-[44px] flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.03] px-3 py-2 text-left hover:border-accent/50 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
           >
             <span className="mt-0.5 text-xs font-semibold text-slate-500 tabular-nums" aria-hidden="true">{i + 1}</span>
             <span className="min-w-0">

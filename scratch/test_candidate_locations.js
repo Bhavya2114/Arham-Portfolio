@@ -97,29 +97,29 @@ const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).forEach((d) =
 });
 walk(path.resolve(__dirname, '../src'));
 const importers = srcFiles.filter((f) => !f.endsWith('candidateProjectLocations.js') && /^import .*candidateProjectLocations/m.test(fs.readFileSync(f, 'utf-8')));
-// Site-owner decision (2026-10-15): the only consumer is the Presence page's city panel (name + address).
-assert(importers.map((f) => path.basename(f)).join(',') === 'Presence.jsx', `Only Presence.jsx imports the candidate data (${importers.map((f) => path.basename(f)).join(', ') || 'none'})`);
+// Site-owner decision (presence-projects): the ALLEN campus cards were demo data, not Arham projects,
+// and are no longer shown. The candidate records stay as internal research data only.
+assert(importers.length === 0, `No page or component imports the candidate data (${importers.map((f) => path.basename(f)).join(', ') || 'none'})`);
 assert(Array.isArray(PROJECTS) && PROJECTS.length === 0, 'Published PROJECTS remains empty');
 assert(C.every((c) => !PROJECTS.some((p) => p.id === c.id)), 'No candidate id in PROJECTS');
 assert(getPublishedProjects(C).length === 0, 'Even if passed to public selectors, candidates are not "published"');
 assert(getMappedProjectsByStateAndCity('IN-RJ', 'Kota', C).length === 0 && getMappedProjectsByStateAndCity('IN-RJ', 'Jaipur', C).length === 0, 'Candidates cannot become map pins');
 assert(getPublishedProjectsByStateAndCity('IN-RJ', 'Jaipur').length === 0 && getMappedProjectsByStateAndCity('IN-RJ', 'Kota').length === 0, 'Public Kota/Jaipur selectors stay empty');
 assert(PRESENCE_COVERAGE.length === 11 && PRESENCE_COVERAGE.reduce((s, e) => s + e.cities.length, 0) === 27, 'Approved coverage unchanged (11 states, 27 cities)');
-const publicFiles = ['../src/components/map/PresenceMap.jsx', '../src/sections/PresencePreview.jsx', '../src/pages/Home.jsx', '../src/pages/ProjectsGallery.jsx', '../src/App.jsx', '../src/data/projectSelectors.js', '../src/data/projects.js'];
+const publicFiles = ['../src/components/map/PresenceMap.jsx', '../src/sections/PresenceTeaser.jsx', '../src/pages/Home.jsx', '../src/pages/ProjectsGallery.jsx', '../src/App.jsx', '../src/data/projectSelectors.js', '../src/data/projects.js'];
 assert(publicFiles.every((f) => !/cand-|candidate/i.test(read(f))), 'Map, homepage, gallery, routes, selectors and projects.js contain no candidate references');
 if (process.env.BUILD_DIR) {
   const assets = path.resolve(process.env.BUILD_DIR, 'assets');
-  const carriers = fs.readdirSync(assets).filter((f) => /\.js$/.test(f) && /cand-kota|cand-jaipur|ALLEN Sankalp|Samachar Jagat/.test(fs.readFileSync(path.join(assets, f), 'utf-8')));
-  assert(carriers.length === 1 && /^Presence-/.test(carriers[0]), `Candidate data ships only in the lazy /presence chunk (${carriers.join(', ') || 'none'})`);
+  const carriers = fs.readdirSync(assets).filter((f) => /\.js$/.test(f) && /cand-kota|cand-jaipur|CP-6, Indra Vihar|Samachar Jagat|324005/.test(fs.readFileSync(path.join(assets, f), 'utf-8')));
+  assert(carriers.length === 0, `Candidate records (ids, supplied addresses) are not shipped in any bundle (${carriers.join(', ') || 'none'}); only the placeholder campus names are`);
 }
 
-console.log('\n4a. Kota / Jaipur City Panels (campus locations, not projects):');
+console.log('\n4a. Kota / Jaipur Campus Records (internal data, no longer shown on /presence):');
 const pageSrcC = read('../src/pages/Presence.jsx');
 const listSrc = read('../src/components/presence/ProjectDetails.jsx');
 // Mirrors the page: the selected city's group from the existing helper, filtered to the selected state.
 const panelFor = (stateCode, city) => (getCandidateLocationsByCity()[city] || []).filter((c) => c.stateCode === stateCode);
-const demoAdapterSrc = read('../src/data/demoCampusCards.js');
-assert(pageSrcC.includes('getCampusCardsForCity(getCandidateLocationsByCity(), selectedState.code, selectedCity)') && demoAdapterSrc.includes('(recordsByCity[city] || []).filter((c) => c.stateCode === stateCode)'), 'Page uses the existing city-grouping helper, matched by state (via the temporary demo adapter)');
+assert(!/getCampusCardsForCity|getCandidateLocationsByCity|campusLocations/.test(pageSrcC) && !fs.existsSync(path.resolve(__dirname, '../src/data/demoCampusCards.js')), 'The demo campus records (Kota records reused for every city) are no longer used; the card shows showcase projects');
 assert(panelFor('IN-RJ', 'Kota').length === 8 && panelFor('IN-RJ', 'Jaipur').length === 9, 'Kota panel lists 8 campus locations, Jaipur lists 9');
 assert(panelFor('IN-RJ', 'Kota').map((c) => c.id).join() === C.filter((c) => c.city === 'Kota').map((c) => c.id).join(), 'Kota entries are the existing records (no duplicates or re-creation)');
 assert(panelFor('IN-RJ', 'Kota').concat(panelFor('IN-RJ', 'Jaipur')).filter((c) => !c.coordinates).length === 13, 'The 13 records without coordinates are included');
@@ -130,29 +130,13 @@ assert(listSrc.includes('No verified Arham projects are listed for {city} yet.')
 assert(listSrc.includes('projects.length === 0 && campusLocations.length === 0') && listSrc.includes('data-empty-state="city"'), 'Cities without projects or campus records keep the existing empty state');
 assert(!/campusLocations[^;\n]*(onSelect|openProject|projectMarkers|selectProject)/.test(pageSrcC + listSrc), 'Campus locations open no project details and create no map pins');
 
-console.log('\n4c. Floating Glass Campus Card:');
-const cardSrc = read('../src/components/presence/CampusCard.jsx');
+console.log('\n4c. Floating Card (now the project card, see test_presence_projects.js):');
 const mapSrcC = read('../src/components/map/PresenceMap.jsx');
-assert(cardSrc.includes("import allenCampusImage from '../../../Images/allen image.png';") && fs.existsSync(path.resolve(__dirname, '../Images/allen image.png')), 'Uses the existing local Images/allen image.png via a Vite import');
-assert(cardSrc.includes('src={allenCampusImage}') && /object-cover/.test(cardSrc) && /aspect-\[4\/3\]/.test(cardSrc) && /rounded-xl object-cover/.test(cardSrc), 'Image: cover-fit, fixed 4:3 ratio, rounded');
-const cardContainerClass = (cardSrc.match(/className=(?:\{`|")flex gap-3 rounded-2xl[^`"]*[`"]/) || [''])[0];
-assert(/bg-teal-700\/35/.test(cardContainerClass) && /backdrop-blur-md/.test(cardContainerClass) && /border-teal-200\/25/.test(cardContainerClass) && !/\bbg-white\b/.test(cardContainerClass), 'Translucent teal glass card container (no solid white card)');
-assert(cardSrc.includes('{loc.name}') && cardSrc.includes('{loc.suppliedAddress}') && cardSrc.includes('Campus location'), 'Card shows campus name, supplied address and a "Campus location" pill');
-assert(!/loc\.(coordinates|notes|status|sources|lat|lon|phone)/.test(cardSrc) && !/tel:/.test(cardSrc), 'No coordinates, notes, status or phone action (no verified phone numbers)');
-assert(/encodeURIComponent\(`\$\{loc\.name\}, \$\{loc\.suppliedAddress\}`\)/.test(cardSrc) && cardSrc.includes('https://www.google.com/maps/search/?api=1&query='), 'Directions search the supplied address text only (no invented coordinates)');
-assert(!/rating|review|hours|completed|verified project/i.test(cardSrc.replace(/\/\*[\s\S]*?\*\//g, '')), 'No ratings, hours, reviews or completion claims on the card');
-assert(cardSrc.includes("Arham's work at this campus has not been confirmed."), 'Unconfirmed Arham work stated (screen-reader text)');
-assert(/dx <= -SWIPE_PX\) go\(current \+ 1\)/.test(cardSrc) && /dx >= SWIPE_PX\) go\(current - 1\)/.test(cardSrc), 'Swipe right→left = next, left→right = previous');
-assert(cardSrc.includes("e.key === 'ArrowRight'") && cardSrc.includes("e.key === 'ArrowLeft'"), 'Keyboard ←/→ also navigate');
-assert(/onPointerDown=\{handlePointerDown\}/.test(cardSrc) && /const handlePointerDown = \(e\) => \{\s*stop\(e\);/.test(cardSrc) && cardSrc.includes("touchAction: 'pan-y'"), 'Swipes are stopped from reaching the map (no accidental pan)');
-assert(cardSrc.includes('{current + 1} / {count}') && cardSrc.includes('aria-label={`Show campus ${i + 1} of ${count}: ${l.name}`}'), 'Counter "n / total" and pagination dots');
-assert(!/Chevron(Left|Right)|aria-label="(Previous|Next) campus"/.test(cardSrc), 'No large previous / next arrow buttons');
-assert(pageSrcC.includes('<CampusCard key={`${nav.stateCode}|${selectedCity}`} city={selectedCity} locations={campusLocations} demo={campusDemo} />'), 'Card is keyed by city, so it resets to 1 / n when the city changes');
-assert(/const campusCardOnly = Boolean\(\s*selectedCity && !selectedProject && clusterProjects\.length === 0 && cityProjects\.length === 0 && campusLocations\.length > 0/.test(pageSrcC), 'Card replaces the panel / bottom sheet only for campus-only cities');
+assert(/<CampusCard\s*key=\{`\$\{nav\.stateCode\}\|\$\{selectedCity\}`\}/.test(pageSrcC) && /projects=\{cityShowcase\}/.test(pageSrcC), 'The floating card shows the selected city\'s showcase projects, keyed per city');
 assert(mapSrcC.includes('overlay = null,') && mapSrcC.includes('data-map-overlay=') && !mapSrcC.includes('controlsAtTop'), 'Map hosts the card as an overlay (no zoom controls to move out of its way)');
 assert(mapSrcC.includes('const getTargetView = useCallback(() => getStateFitView(selectedCode), [selectedCode, getStateFitView]);'), 'Showing the card never changes the map zoom (fit depends only on the state)');
 if (process.env.BUILD_DIR) {
-  assert(fs.readdirSync(path.resolve(process.env.BUILD_DIR, 'assets')).some((f) => /^allen image-.+\.png$/.test(f)), 'Production build emits the allen image as a hashed Vite asset');
+  assert(fs.readdirSync(path.resolve(process.env.BUILD_DIR, 'assets')).filter((f) => /^allen image-.+\.png$/.test(f)).length === 1, 'The ALLEN campus photo is bundled once, as the placeholder project photo');
 }
 
 console.log('\n4e. Bottom-Anchored Card & Minimal Map Shift:');
@@ -169,19 +153,7 @@ assert(!/Map zoom controls|aria-label="Zoom in"/.test(mapSrcC), 'No zoom control
 const shiftEffect = (mapSrcC.match(/useLayoutEffect\(\(\) => \{[\s\S]*?\}, \[overlayKey\]\);/) || [''])[0].replace(/\/\/.*$/gm, '');
 assert(shiftEffect && !/candidate|campus/i.test(shiftEffect), 'Uses only the selected city marker — no campus coordinates or pins');
 
-console.log('\n4d. Campus Card Slide Animation:');
-const cssSrc = read('../src/styles/index.css');
-assert(cardSrc.includes('const SLIDE_MS = 320;') && /\.campus-slide \{[^}]*animation-duration: 320ms;[^}]*cubic-bezier\(0\.16, 1, 0\.3, 1\)/.test(cssSrc), 'Slide lasts ~320 ms with an ease-out curve');
-assert(cardSrc.includes("slide.dir === 'next' ? 'campus-in-from-right' : 'campus-in-from-left'") && cardSrc.includes("slide.dir === 'next' ? 'campus-out-to-left' : 'campus-out-to-right'"), 'Next: out left / in from right; previous: out right / in from left');
-assert(cardSrc.includes("setSlide({ from: current, dir: target > current ? 'next' : 'prev' })"), 'Direction follows the target (swipe, ←/→ keys and dots share go())');
-assert(/@keyframes campus-in-from-right \{ from \{ transform: translateX\(100%\); opacity: 0\.85; \}/.test(cssSrc) && /@keyframes campus-out-to-left \{[^}]*\} to \{ transform: translateX\(-100%\); opacity: 0\.85; \}/.test(cssSrc), 'Horizontal movement with only a subtle opacity change');
-assert(cardSrc.includes('if (target === current || sliding.current) return;') && /sliding\.current\) return;\s*drag\.current =/.test(cardSrc), 'One transition at a time: rapid input and drags are ignored while sliding');
-assert(cardSrc.includes('if (!prefersReducedMotion()) {') && cssSrc.includes('prefers-reduced-motion: reduce'), 'Reduced motion: no slide (instant switch), plus the global CSS override');
-assert(!/style=\{\{ touchAction: 'pan-y', transform/.test(cardSrc) && cardSrc.includes("style={{ touchAction: 'pan-y' }}"), 'Glass card stays stationary; only its content moves');
-assert(cardSrc.includes('className="relative min-w-0 flex-1 overflow-hidden') && cardSrc.includes("style={dragX ? { transform: `translateX(${dragX}px)` } : undefined}"), 'Content is clipped inside the card and follows the finger while dragging');
-assert(/aria-hidden="true"\s*className=\{`absolute inset-1 pointer-events-none campus-slide/.test(cardSrc) && cardSrc.includes('tabIndex={ghost ? -1 : undefined}'), 'Outgoing copy is inert (hidden from AT, not clickable or focusable)');
-assert(cardSrc.includes('slideTimer.current = setTimeout(') && cardSrc.includes('useEffect(() => () => clearTimeout(slideTimer.current), [])'), 'Slide ends on a timer (works when hidden) and is cleaned up on unmount');
-assert(/verified \$\{cityProjects\.length === 1 \? 'project' : 'projects'\}\$\{\s*campusLocations\.length > 0 \? ` · \$\{campusLocations\.length\} campus locations`/.test(pageSrcC), 'Subtitle counts verified projects and campus locations separately');
+console.log('\n4d. Campus Records Unchanged:');
 assert(C.every((c) => c.arhamWorkConfirmed === false && ['UNVERIFIED', 'PENDING_REVIEW'].includes(c.status)), 'Statuses unchanged; Arham work still unconfirmed');
 
 console.log('\n4b. City Lists Without Coordinates & Supplied Details:');

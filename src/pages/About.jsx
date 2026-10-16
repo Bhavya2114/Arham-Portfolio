@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Container from '../components/ui/Container';
+import PageHero from '../components/ui/PageHero';
 import SectionHeading from '../components/ui/SectionHeading';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
@@ -48,21 +49,21 @@ export const About = () => {
       title: 'Electrical Infrastructure & Cabling',
       description:
         'Industrial cable trays, ladder racks, conduit routing, and heavy-duty containment networks engineered for lasting physical protection and operational durability.',
-      badgeVariant: 'amber',
+      badgeVariant: 'accent',
     },
     {
       icon: Zap,
       title: 'Power Distribution & Switchboards',
       description:
         'Main switchboards, motor control centers (MCC), sub-distribution panels, busbar trunking, and protection coordination built for steady facility electrification.',
-      badgeVariant: 'blue',
+      badgeVariant: 'accent',
     },
     {
       icon: Lightbulb,
       title: 'Architectural & Commercial Lighting',
       description:
         'Engineered commercial interior layouts, facade accent illumination, and energy-efficient LED luminaires designed to balance visual comfort and structural elegance.',
-      badgeVariant: 'amber',
+      badgeVariant: 'accent',
     },
   ];
 
@@ -121,22 +122,14 @@ export const About = () => {
   ];
 
   return (
-    <div className="w-full bg-brand-bg min-h-screen py-10 sm:py-14 lg:py-18">
-      <Container size="default" className="space-y-12 sm:space-y-16">
-        
-        {/* Breadcrumb Navigation */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500">
-          <Link to="/" className="hover:text-brand-blue transition-colors">Home</Link>
-          <span aria-hidden="true">/</span>
-          <span className="text-brand-navy font-semibold" aria-current="page">About</span>
-        </nav>
-
-        {/* 1. Page Header & Introduction */}
+    <div className="w-full bg-navy-800 min-h-screen">
+      <PageHero breadcrumb="About">
         <header className="space-y-4 max-w-4xl">
           <SectionHeading
+            tone="dark"
             as="h1"
             badge={
-              <Badge variant="navy" icon={Building2}>
+              <Badge variant="neutral-dark" icon={Building2}>
                 Company Profile & Principles
               </Badge>
             }
@@ -145,6 +138,10 @@ export const About = () => {
             align="left"
           />
         </header>
+      </PageHero>
+
+      <Container size="default" className="space-y-12 sm:space-y-16 py-10 sm:py-14 lg:py-18">
+        
 
         {/* 2. Who Arham Is: Company Overview & Image Composition */}
         <section aria-labelledby="company-overview-heading" className="space-y-8">
@@ -156,16 +153,16 @@ export const About = () => {
                 Delivering Resilient Infrastructure for Modern Facilities
               </h2>
               
-              <p className="text-sm sm:text-base text-brand-navy/90 leading-relaxed">
+              <p className="text-base text-brand-navy/90 leading-[1.65]">
                 In modern built environments, electrical infrastructure is not merely a utility—it is the backbone of facility operations, workplace safety, and energy efficiency. From industrial manufacturing plants requiring dependable continuous power to high-end commercial spaces demanding sophisticated architectural illumination, our work focuses on precision execution.
               </p>
 
-              <p className="text-sm text-brand-slate leading-relaxed">
+              <p className="text-base text-brand-slate leading-[1.65]">
                 We work closely with project managers, general contractors, and facility engineers to ensure installations satisfy both aesthetic objectives and stringent electrical code mandates. Every cable pathway, distribution switchboard, and lighting luminaire is installed with deliberate care for longevity, serviceability, and maintenance safety.
               </p>
 
-              <div className="p-4 rounded-xl bg-blue-50/70 border border-blue-100 flex items-start gap-3 text-xs text-brand-slate">
-                <ShieldCheck className="w-4 h-4 text-brand-blue shrink-0 mt-0.5" aria-hidden="true" />
+              <div className="p-4 rounded-xl bg-accent/10 border border-accent/15 flex items-start gap-3 text-xs text-body">
+                <ShieldCheck className="w-4 h-4 text-accent shrink-0 mt-0.5" aria-hidden="true" />
                 <div>
                   <span className="font-semibold text-brand-navy block">
                     Corporate Verification Standard:
@@ -179,17 +176,17 @@ export const About = () => {
 
             {/* Visual Technical Panel (5 cols) */}
             <div className="lg:col-span-5 w-full">
-              <div className="rounded-2xl bg-white p-2.5 sm:p-3 border border-brand-border shadow-card space-y-2">
-                <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-100">
+              <div className="rounded-2xl bg-card p-2.5 sm:p-3 border border-brand-border shadow-card space-y-2">
+                <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-white/[0.06]">
                   <img
                     src="/images/about-engineering.jpg"
                     alt="Industrial power distribution control room and cable management infrastructure"
-                    className="w-full h-full object-cover object-center"
+                    className="w-full h-full object-cover object-center rounded-xl border border-white/[0.08]"
                     loading="lazy"
                   />
                   <div className="absolute top-3 left-3">
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-brand-navy/85 text-white backdrop-blur-sm border border-white/10 shadow-sm">
-                      <Sparkles className="w-3 h-3 text-brand-accent" aria-hidden="true" />
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-navy-950/85 text-white backdrop-blur-sm border border-white/10 shadow-sm">
+                      <Sparkles className="w-3 h-3 text-white/80" aria-hidden="true" />
                       Engineering & Contracting
                     </span>
                   </div>
@@ -224,20 +221,20 @@ export const About = () => {
                   key={idx}
                   variant="default"
                   padding="lg"
-                  className="bg-white border border-brand-border hover:border-blue-300 hover:shadow-elevated transition-all flex flex-col justify-between space-y-4"
+                  className="bg-card border border-brand-border hover:border-accent/40 hover:shadow-elevated transition-all flex flex-col justify-between space-y-4"
                 >
                   <div className="space-y-3">
-                    <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-brand-blue">
+                    <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/15 flex items-center justify-center text-accent">
                       <Icon className="w-5 h-5" aria-hidden="true" />
                     </div>
                     <h3 className="text-base font-bold font-heading text-brand-navy leading-snug">
                       {item.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-brand-slate leading-relaxed">
+                    <p className="text-base text-brand-slate leading-[1.65]">
                       {item.description}
                     </p>
                   </div>
-                  <div className="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-brand-slate">
+                  <div className="pt-3 border-t border-white/[0.07] flex items-center justify-between text-xs text-brand-slate">
                     <Badge variant={item.badgeVariant} size="sm">
                       Core Discipline
                     </Badge>
@@ -268,9 +265,9 @@ export const About = () => {
                 key={step.step}
                 variant="default"
                 padding="md"
-                className="bg-white border border-brand-border space-y-3 relative overflow-hidden"
+                className="bg-card border border-brand-border space-y-3 relative overflow-hidden"
               >
-                <div className="text-2xl font-extrabold font-mono text-blue-600/25">
+                <div className="text-2xl font-bold font-mono text-accent/70">
                   {step.step}
                 </div>
                 <h3 className="text-sm font-bold font-heading text-brand-navy leading-snug">
@@ -303,16 +300,16 @@ export const About = () => {
                   key={idx}
                   variant="default"
                   padding="lg"
-                  className="bg-white border border-brand-border flex items-start gap-4"
+                  className="bg-card border border-brand-border flex items-start gap-4"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-brand-navy shrink-0 mt-0.5">
-                    <Icon className="w-5 h-5 text-brand-blue" aria-hidden="true" />
+                  <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center text-accent shrink-0 mt-0.5">
+                    <Icon className="w-5 h-5 text-accent" aria-hidden="true" />
                   </div>
                   <div className="space-y-1.5">
                     <h3 className="text-base font-bold font-heading text-brand-navy">
                       {item.title}
                     </h3>
-                    <p className="text-xs sm:text-sm text-brand-slate leading-relaxed">
+                    <p className="text-base text-brand-slate leading-[1.65]">
                       {item.description}
                     </p>
                   </div>
@@ -324,18 +321,18 @@ export const About = () => {
 
         {/* 6. Action Callout: Project Gallery & Enquiries */}
         <section 
-          className="rounded-2xl bg-brand-navy text-white p-6 sm:p-8 lg:p-10 shadow-elevated"
+          className="rounded-2xl bg-card border border-white/[0.07] text-white p-6 sm:p-8 lg:p-10 shadow-elevated"
           aria-labelledby="explore-projects-cta-heading"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-3">
-              <Badge variant="blue" icon={CheckCircle2}>
+              <Badge variant="neutral-dark" icon={CheckCircle2}>
                 Verified Portfolio
               </Badge>
-              <h2 id="explore-projects-cta-heading" className="text-xl sm:text-2xl font-bold font-heading text-white">
+              <h2 id="explore-projects-cta-heading" className="text-xl sm:text-2xl font-bold font-heading text-heading">
                 Inspect Our Authenticated Projects & Case Studies
               </h2>
-              <p className="text-sm text-slate-300 leading-relaxed max-w-2xl">
+              <p className="text-base text-body leading-[1.65] max-w-2xl">
                 Review our published installation profiles across power infrastructure, electrical switchgear, and architectural lighting. Each published profile is filtered for client confidentiality and authenticated against company documentation.
               </p>
             </div>
@@ -354,10 +351,11 @@ export const About = () => {
               </Button>
               <Button
                 variant="outline"
+                onDark
                 size="md"
                 as="a"
                 href="/#contact"
-                className="w-full justify-center bg-transparent text-white border-white/20 hover:bg-white/10"
+                className="w-full justify-center"
               >
                 Discuss a Project
               </Button>

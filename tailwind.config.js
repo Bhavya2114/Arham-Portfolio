@@ -7,30 +7,46 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Base brand palette
-        brand: {
-          navy: "#101D2C",
-          "navy-dark": "#0B141F",
-          "navy-light": "#1B2C42",
-          blue: "#2563EB",
-          "blue-hover": "#1D4ED8",
-          "blue-light": "#EFF6FF",
-          bg: "#F8FAFC",
-          "warm-white": "#F8FAFC", // backwards-compatible alias
-          slate: "#64748B",
-          "slate-light": "#94A3B8",
-          "slate-dark": "#475569",
-          accent: "#F5B544",
-          "accent-hover": "#E09F2B",
-          border: "#E2E8F0",
-          "border-subtle": "#F1F5F9",
+        // "Graphite" palette: all dark, no light sections. One accent only: yellow = important / clickable.
+        // The navy-* names are kept (now graphite) so components need no class changes.
+        navy: {
+          950: "#0C0D0F", // bg: main page background, header (sections alternate 950 / 800)
+          900: "#101114", // form inputs
+          800: "#141518", // bg2: alternating section background
         },
-        // Semantic surface and status tokens
-        surface: {
-          DEFAULT: "#FFFFFF",
-          muted: "#F1F5F9",
-          page: "#F8FAFC",
-          dark: "#101D2C",
+        surface: "#1B1D21", // panels (= card)
+        footer: "#08090A",
+        card: "#1B1D21", // cards, form box, panels (1px white/7 % border)
+        heading: "#F1F1EF", // headings (not pure white)
+        body: "#B4B6BA", // body text
+        accent: {
+          DEFAULT: "#D9E35A", // buttons, highlights, active states
+          hover: "#E6EE7A",
+          ink: "#14180A", // text on accent (always dark)
+        },
+        olive: "#3F5A14", // secondary (also links / icons / focus rings on light: AA on white)
+        cyan: "#3FD0E6", // thin detail lines only, sparingly
+        // Legacy names from the light theme, now pointing at their tonal-dark equivalents.
+        light: "#141518", // = navy-800 (was the light section background)
+        ink: "#F1F1EF", // = heading (was text on light)
+        muted: {
+          DEFAULT: "#8F9298", // muted text
+          dark: "#8F9298", // muted text on dark
+        },
+        // Legacy names, kept as aliases onto the new palette until the pages are restyled (stage 2).
+        // The old brand blue is gone; its uses were moved to accent / olive.
+        brand: {
+          navy: "#F1F1EF", // = heading
+          "navy-dark": "#0C0D0F", // = navy-950
+          "navy-light": "#1B1D21", // = surface
+          bg: "#141518", // = navy-800
+          "warm-white": "#141518",
+          slate: "#B4B6BA", // = body
+          "slate-light": "#8F9298", // = muted
+          "slate-dark": "#B4B6BA",
+          accent: "#D9E35A", // = accent
+          border: "#FFFFFF12", // white / 7 %
+          "border-subtle": "#FFFFFF0A",
         },
         status: {
           success: "#059669",
@@ -42,21 +58,23 @@ export default {
           error: "#DC2626",
           "error-bg": "#FEF2F2",
           "error-border": "#FECACA",
-          info: "#2563EB",
-          "info-bg": "#EFF6FF",
-          "info-border": "#BFDBFE",
+          info: "#3F5A14",
+          "info-bg": "#F4F7E8",
+          "info-border": "#D5DFB0",
         },
       },
       fontFamily: {
+        // Self-hosted via @fontsource (src/main.jsx).
         sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        heading: ['Outfit', 'Inter', 'sans-serif'],
+        display: ['Sora', 'Inter', 'sans-serif'],
+        heading: ['Sora', 'Inter', 'sans-serif'], // legacy alias of font-display
       },
       fontSize: {
-        'hero': ['2.5rem', { lineHeight: '1.15', letterSpacing: '-0.025em', fontWeight: '800' }],
-        'h1': ['2rem', { lineHeight: '1.2', letterSpacing: '-0.02em', fontWeight: '700' }],
-        'h2': ['1.5rem', { lineHeight: '1.25', letterSpacing: '-0.015em', fontWeight: '700' }],
-        'h3': ['1.25rem', { lineHeight: '1.3', letterSpacing: '-0.01em', fontWeight: '600' }],
-        'h4': ['1.125rem', { lineHeight: '1.35', fontWeight: '600' }],
+        'hero': ['2.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'h1': ['2rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'h2': ['1.5rem', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'h3': ['1.25rem', { lineHeight: '1.15', letterSpacing: '-0.02em', fontWeight: '600' }],
+        'h4': ['1.125rem', { lineHeight: '1.15', letterSpacing: '-0.02em', fontWeight: '600' }],
         'body-lg': ['1.125rem', { lineHeight: '1.6', fontWeight: '400' }],
         'body': ['1rem', { lineHeight: '1.5', fontWeight: '400' }],
         'body-sm': ['0.875rem', { lineHeight: '1.5', fontWeight: '400' }],

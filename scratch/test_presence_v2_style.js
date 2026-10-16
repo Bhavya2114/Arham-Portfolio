@@ -6,7 +6,7 @@
  * radial fill for the whole map, a bright outer outline with quieter shared borders, a fake glow made
  * of two faint strokes, 35 % dimming per path, overview city dots,
  * white pins with a yellow ring when selected, a plain CSS navy background and the legend. The
- * homepage light variant keeps its original rendering.
+ * light variant is gone: the homepage shows a static image of the /presence overview.
  */
 
 import fs from 'fs';
@@ -41,7 +41,7 @@ assert(/\{L\.otherStates\}/.test(svgSrc) && /<g \{\.\.\.deco\} data-layer="edges
 assert(/const overviewCityLayer = !selectedCode && !moving && overviewCities\.length > 0 &&/.test(mapSrc), 'Overview city dots hidden while moving');
 
 console.log('\n2. Styles');
-assert(/cyan: '#3FD0E6'/.test(svgSrc) && /land: '#070A1F'/.test(svgSrc) && /const OTHER_FILL_OPACITY = 0\.45;/.test(svgSrc) && /stroke=\{MAP_COLORS\.cyan\}\s*strokeWidth=\{1\.5\}/.test(svgSrc), 'Other states: cyan 1.5 px outline over #070A1F at 45 %');
+assert(/cyan: '#3FD0E6'/.test(svgSrc) && /land: '#0C0D0F'/.test(svgSrc) && /const OTHER_FILL_OPACITY = 0\.45;/.test(svgSrc) && /stroke=\{MAP_COLORS\.cyan\}\s*strokeWidth=\{1\.5\}/.test(svgSrc), 'Other states: cyan 1.5 px outline over the graphite page colour #0C0D0F at 45 %');
 assert(/const ECHO = \{ offsetPx: 3, opacity: 0\.22 \};/.test(svgSrc) && /transform=\{`translate\(0 \$\{ECHO\.offsetPx \* unit\}\)`\}/.test(svgSrc), 'Faint second cyan outline 3 px lower (22 %)');
 assert(/workedCenter: '#5C7E1C'/.test(svgSrc) && /workedEdge: '#2F4A10'/.test(svgSrc) && /<radialGradient id="india-map-worked-fill-hover"/.test(svgSrc) && /el\.setAttribute\('fill', `url\(#india-map-worked-fill-\$\{kind\}\)`\);/.test(svgSrc), 'Worked states: dark olive fill, lighter in the centre; brighter on hover (highlight path)');
 assert(/const FILL_GRADIENT = \{ cx: 481, cy: 496, r: 440 \};/.test(svgSrc)
@@ -72,11 +72,12 @@ assert(/\{isSelected && \(\s*<text[\s\S]*?paintOrder="stroke"[\s\S]*?className="
 assert(/<g aria-hidden="true" className="pointer-events-none" data-layer="overview-cities">/.test(mapSrc) && /\{overviewCityLayer\}/.test(mapSrc), 'Overview dots are decorative and not interactive');
 assert(/overviewCities=\{overviewCities\}/.test(presenceSrc) && /const overviewCities = useMemo\(/.test(presenceSrc), 'Presence page passes every worked city');
 assert(/const r = MARKER_RADIUS_PX \* unit \* \(isSelected \? 1\.3 : 1\);/.test(mapSrc) && /const MARKER_RADIUS_PX = 5;/.test(mapSrc) && /fill=\{isSelected \? MAP_COLORS\.edge : '#FFFFFF'\}\s*stroke=\{MAP_COLORS\.land\}/.test(mapSrc), 'City pins: 10 px white dots with a thin dark outline; the selected pin is filled with the edge yellow');
-assert(/\{isSelected && !moving && \(\s*<g className="presence-beacon motion-reduce:hidden" aria-hidden="true">\s*<circle r=\{r\} fill="none" stroke=\{MAP_COLORS\.edge\} strokeWidth=\{2\} vectorEffect="non-scaling-stroke" \/>/.test(mapSrc), 'One pulse ring on the selected pin only, removed while moving');
+assert(/\{isSelected && cityBeacon && !moving && \(\s*<g className="presence-beacon motion-reduce:hidden" aria-hidden="true">\s*<circle r=\{r\} fill="none" stroke=\{MAP_COLORS\.edge\} strokeWidth=\{2\} vectorEffect="non-scaling-stroke" \/>/.test(mapSrc)
+  && /\{isSelected && !moving && \(\s*<g className="presence-beacon motion-reduce:hidden" aria-hidden="true" data-project-beacon="">/.test(mapSrc), 'One pulse ring on the highlighted pin only (selected city, or the card project\'s pin), removed while moving');
 const beacon = (css.match(/@keyframes presence-beacon \{([\s\S]*?)\n\}/) || [])[1] || '';
 assert(/0% \{ transform: scale\(1\); opacity: 0\.6; \}/.test(beacon) && /100% \{ transform: scale\(2\.4\); opacity: 0; \}/.test(beacon) && !/(^|[\s{;])(r|stroke-width)\s*:/.test(beacon) && /transform-box: fill-box;\s*transform-origin: center;[\s\S]*?animation: presence-beacon 2s ease-out infinite;/.test(css), 'Pulse: scale 1 to 2.4 while fading 60 % to 0, every 2 s ease-out; animates only transform and opacity');
 assert(/@media \(prefers-reduced-motion: reduce\) \{\s*\.presence-beacon \{ animation: none; display: none; \}/.test(css), 'Pulse disabled under prefers-reduced-motion');
-assert(/export const PAGE_NAVY = '#070A1F';/.test(mapSrc) && /const MAP_BACKGROUND = `radial-gradient\(ellipse farthest-side at 50% 50%, #0B1030 0%, \$\{PAGE_NAVY\} 100%\)`;/.test(mapSrc) && /style=\{\{\s*background: MAP_BACKGROUND,/.test(mapSrc) && !/dot-grid|DOT_GRID/.test(mapSrc), 'Plain navy radial CSS background (#0B1030 → #070A1F) ending in the page navy, no dot grid');
+assert(/export const PAGE_NAVY = '#0C0D0F';/.test(mapSrc) && /const MAP_BACKGROUND = `radial-gradient\(ellipse farthest-side at 50% 50%, #141518 0%, \$\{PAGE_NAVY\} 100%\)`;/.test(mapSrc) && /style=\{\{\s*background: MAP_BACKGROUND,/.test(mapSrc) && !/dot-grid|DOT_GRID/.test(mapSrc), 'Plain graphite radial CSS background (#141518 → #0C0D0F) ending in the page background, no dot grid');
 
 console.log('\n2d. No boxes around the map');
 const presenceCode = code(presenceSrc);
@@ -87,10 +88,16 @@ const fade = (mapSrc.match(/const EDGE_FADE = \[([\s\S]*?)\]\.join/) || [])[1] |
 assert((fade.match(/linear-gradient\(to (bottom|top|right|left), \$\{PAGE_NAVY\}, transparent\)/g) || []).length === 4 && /<div className="absolute inset-0 z-10 pointer-events-none" style=\{\{ background: EDGE_FADE \}\} aria-hidden="true" data-layer="edge-fade" \/>/.test(mapSrc), 'Edges hidden by one pointer-events-none overlay: four plain linear gradients, page navy → transparent');
 assert(/margin: 'calc\(-1 \* var\(--map-fade\)\)',\s*padding: 'var\(--map-fade\)',/.test(mapSrc) && /overflow-visible/.test(mapSrc), 'Fade band sits outside the content area, so the map itself is never faded (svg spills into it when zoomed)');
 assert(/style=\{\{ inset: 'var\(--map-fade\)' \}\} data-map-frame/.test(mapSrc) && /const w = \(card\.offsetParent \|\| wrapper\)\.getBoundingClientRect\(\);/.test(mapSrc), 'Card and scale bar anchored to the map content area (card offsets measured against it)');
-assert(/<div className="relative z-20 mb-2 flex/.test(mapSrc) && /<div className="relative z-20 mt-3 space-y-1\.5 text-center">/.test(mapSrc), 'State chip above and legend below float on the page background');
+assert(/<div className="relative z-20 mb-2 flex/.test(mapSrc) && !/mt-3 space-y-1\.5 text-center/.test(mapSrc), 'State chip above the map; no text under it');
 assert(!/Map legend|Worked locations|Other states|Selected city|Project site/.test(mapSrc) && !/<ul/.test(mapCode), 'Legend row and its code removed');
-assert(/\{isZoomed && \(\s*<p className="inline-flex items-center gap-1\.5 text-\[11px\] text-slate-500">[\s\S]*?Drag to pan · pinch to zoom/.test(mapSrc), 'Pan hint kept while zoomed');
-assert(/<p className="text-\[11px\] text-slate-500">\s*City locations ©/.test(mapSrc) && /href="https:\/\/www\.openstreetmap\.org\/copyright"/.test(mapSrc) && (mapSrc.match(/href="https:\/\/www\.geoboundaries\.org\/"/g) || []).length === 2, 'Attribution (OpenStreetMap / geoBoundaries) kept as small, low-contrast text');
+assert(!/Drag to pan/.test(mapSrc), 'No "Drag to pan · pinch to zoom" hint');
+const creditsSrc = read('../src/components/map/MapCredits.jsx');
+assert(/City locations ©/.test(creditsSrc) && /href="https:\/\/www\.openstreetmap\.org\/copyright"/.test(creditsSrc) && /href="https:\/\/www\.geoboundaries\.org\/"/.test(creditsSrc) && /\/ LGD \(ODbL\)/.test(creditsSrc) && /\(ODbL\) and Wikipedia/.test(creditsSrc), 'Credits kept, with the same links, in the "Map data" popover');
+assert(/className="absolute right-0 top-0 z-30 flex flex-col items-end pointer-events-auto"/.test(creditsSrc) && /<MapCredits cities=/.test(mapSrc), '"ⓘ Map data" in the top-right corner of the map area (never over the bottom-anchored card)');
+assert(/inline-flex h-11 min-w-\[44px\] items-center justify-center gap-1 rounded-md px-2 text-\[11px\] text-slate-500/.test(creditsSrc) && /<Info className="h-3 w-3" aria-hidden="true" \/>\s*Map data/.test(creditsSrc), 'Tiny (11 px), low-contrast grey button with a 44 px tap target');
+assert(/onClick=\{\(\) => setOpen\(\(v\) => !v\)\}/.test(creditsSrc) && /aria-expanded=\{open\}/.test(creditsSrc), 'Tap toggles the popover (a second tap closes it)');
+assert(/window\.addEventListener\('keydown', onKey, true\);/.test(creditsSrc) && /e\.key !== 'Escape'/.test(creditsSrc) && /e\.stopPropagation\(\);\s*setOpen\(false\);/.test(creditsSrc), 'Escape closes it (and only it)');
+assert(/document\.addEventListener\('pointerdown', onPointerDown, true\);/.test(creditsSrc) && /if \(!rootRef\.current\?\.contains\(e\.target\)\) setOpen\(false\);/.test(creditsSrc), 'A tap outside closes it');
 
 console.log('\n2e. Quiet islands');
 assert(/const ISLAND_IDS = new Set\(\['IN-LD', 'IN-AN'\]\);/.test(svgSrc) && /const ISLAND_LINE = \{ width: 0\.8, opacity: 0\.3 \};/.test(svgSrc), 'Lakshadweep and Andaman & Nicobar: faint cyan outline, 0.8 px at 30 %');
@@ -99,7 +106,7 @@ assert(/<g \{\.\.\.deco\} data-layer="islands">\{L\.islands\}<\/g>/.test(svgSrc)
 assert(!/texture|slab|SLAB/i.test(svgCode + mapCode), 'No texture lines or slab');
 
 console.log('\n3. Structure kept');
-assert(/const renderLightState = /.test(svgSrc) && /'fill-blue-50 hover:fill-blue-100'/.test(svgSrc) && /\{!isDark && INDIA_MAP_STATES\.map\(renderLightState\)\}/.test(svgSrc), 'Homepage light variant rendered by its original code path');
+assert(!/renderLightState|fill-blue/.test(svgSrc) && /variant = 'dark'/.test(svgSrc), 'Light (homepage) variant removed: the map is dark-only and lives on /presence');
 assert(/role="button"\s*tabIndex=\{0\}\s*aria-label=\{`\$\{state\.name\} \(\$\{state\.type\}\)`\}\s*aria-pressed=\{selectedStateCode === state\.id\}/.test(svgSrc), 'Worked states keep button role, focus and aria-pressed');
 assert(/live\.current = \{ activeSet, onSelectState, onSelectInactiveState, selectedStateCode \};/.test(svgSrc) && /const L = useMemo\(/.test(svgSrc), 'Static layers memoised; handlers read through a ref');
 

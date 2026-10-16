@@ -5,7 +5,6 @@ import Button from '../components/ui/Button';
 import PresenceMap, { PAGE_NAVY } from '../components/map/PresenceMap';
 import BottomSheet, { PEEK_HEIGHT } from '../components/presence/BottomSheet';
 import CampusCard from '../components/presence/CampusCard';
-import { StateStatus } from '../components/presence/CityStatus';
 import { ProjectDetails, ProjectChooser, CityProjectList } from '../components/presence/ProjectDetails';
 import { getPresenceStateCodes, getPresenceState } from '../data/presenceCoverage.js';
 import {
@@ -14,8 +13,7 @@ import {
   getMappedProjectsByStateAndCity,
 } from '../data/projectSelectors.js';
 import { CITY_COORDINATES } from '../data/cityCoordinates.js';
-import { getCandidateLocationsByCity } from '../data/candidateProjectLocations.js';
-import { getCampusCardsForCity } from '../data/demoCampusCards.js'; // TEMPORARY UI-testing adapter
+import { getShowcaseProjectsForCity, getShowcaseProjectsForState, hasSiteCoordinates } from '../data/showcaseProjects.js';
 import { projectLatLon } from '../lib/mapProjection.js';
 import { loadStateGeography } from '../data/geo/stateGeography.js';
 import { presenceNavReducer, INITIAL_PRESENCE_NAV } from '../lib/presenceNavigation.js';
@@ -95,36 +93,52 @@ export const Presence = () => {
     () => (selectedState ? selectedState.cities.flatMap((c) => getMappedProjectsByStateAndCity(selectedState.code, c)) : []),
     [selectedState]
   );
+  // Showcase projects (data/showcaseProjects.js) in the selected state (records with a city only).
+  const stateShowcase = useMemo(() => (selectedState ? getShowcaseProjectsForState(selectedState.code) : []), [selectedState]);
+  // Pins: published projects with verified coordinates, plus showcase projects that have lat / lng.
   const projectMarkers = useMemo(
-    () => stateMappedProjects.map((p) => ({ id: p.id, name: p.name, city: p.city, ...projectLatLon(p.coordinates.lat, p.coordinates.lon) })),
-    [stateMappedProjects]
+    () => [
+      ...stateMappedProjects.map((p) => ({ id: p.id, name: p.name, city: p.city, ...projectLatLon(p.coordinates.lat, p.coordinates.lon) })),
+      ...stateShowcase.filter(hasSiteCoordinates).map((p) => ({ id: p.id, name: p.name, city: p.city, ...projectLatLon(p.lat, p.lng) })),
+    ],
+    [stateMappedProjects, stateShowcase]
   );
   const cityProjects = useMemo(
     () => (selectedState && selectedCity ? getPublishedProjectsByStateAndCity(selectedState.code, selectedCity) : []),
     [selectedState, selectedCity]
   );
 
-  // Internal ALLEN campus location records for the city (name + supplied address only). Listed
-  // separately from verified projects; never counted as projects, never pinned on the map.
-  // TEMPORARY: the demo adapter reuses Kota's records for every marked city (`campusDemo` = true).
-  const { locations: campusLocations, demo: campusDemo } = useMemo(
-    () => (selectedState && selectedCity
-      ? getCampusCardsForCity(getCandidateLocationsByCity(), selectedState.code, selectedCity)
-      : { locations: [], demo: false }),
+  // Showcase projects (data/showcaseProjects.js) for the floating card: only the selected city's own
+  // records, never another city's. `cardProjectId` is the project shown in the card; it falls back to
+  // the city's first project, so switching city always starts at that city's own projects.
+  const cityShowcase = useMemo(
+    () => (selectedState && selectedCity ? getShowcaseProjectsForCity(selectedState.code, selectedCity) : []),
     [selectedState, selectedCity]
   );
+  const [cardProjectId, setCardProjectId] = useState(null);
+  const cardProject = cityShowcase.find((p) => p.id === cardProjectId) || cityShowcase[0] || null;
 
   const selectedProject = stateProjects.find((p) => p.id === nav.projectId) || null;
   const clusterProjects = nav.clusterIds ? stateMappedProjects.filter((p) => nav.clusterIds.includes(p.id)) : [];
-  // A city with campus locations but no verified projects is browsed with the floating campus card
-  // over the map instead of the panel / bottom sheet.
-  const campusCardOnly = Boolean(
-    selectedCity && !selectedProject && clusterProjects.length === 0 && cityProjects.length === 0 && campusLocations.length > 0
-  );
+  // A city without published gallery projects is browsed with the floating project card over the map
+  // (its showcase projects, or "Projects coming soon") instead of the panel / bottom sheet.
+  const projectCardOnly = Boolean(selectedCity && !selectedProject && clusterProjects.length === 0 && cityProjects.length === 0);
   // The panel opens for a selected city (project list / empty state), a project, or a same-site cluster.
-  const detailsOpen = Boolean((selectedCity && !campusCardOnly) || selectedProject || clusterProjects.length > 0);
+  const detailsOpen = Boolean((selectedCity && !projectCardOnly) || selectedProject || clusterProjects.length > 0);
+
+  // Card <-> map: the card's project is highlighted on the map: its own pin when it has lat / lng,
+  // otherwise its city pin. A tapped showcase pin switches the card to that project (and its city).
+  const highlightedProjectId = nav.projectId || (projectCardOnly && cardProject && hasSiteCoordinates(cardProject) ? cardProject.id : null);
+  const showShowcaseProject = (projectId) => {
+    const project = stateShowcase.find((p) => p.id === projectId);
+    if (!project) return false;
+    if (project.city !== nav.city) dispatch({ type: 'selectCity', stateCode: nav.stateCode, city: project.city });
+    setCardProjectId(project.id);
+    return true;
+  };
 
   const openProject = (projectId) => {
+    if (showShowcaseProject(projectId)) return;
     const project = stateProjects.find((p) => p.id === projectId);
     if (project) dispatch({ type: 'selectProject', projectId, city: project.city });
   };
@@ -166,7 +180,7 @@ export const Presence = () => {
       : selectedCity
         ? `${selectedCity}, ${selectedState.name}. ${
             cityProjects.length > 0 ? `${cityProjects.length} verified ${cityProjects.length === 1 ? 'project' : 'projects'} listed.` : 'No approved projects yet.'
-          }${campusLocations.length > 0 ? ` ${campusLocations.length} ${campusDemo ? 'demonstration campus cards (sample Kota data) shown.' : 'campus locations listed.'}` : ''}`
+          }${projectCardOnly ? (cityShowcase.length > 0 ? ` ${cityShowcase.length} ${cityShowcase.length === 1 ? 'project' : 'projects'} shown.` : ' Projects coming soon.') : ''}`
         : selectedState
           ? `${selectedState.name} selected. ${
               selectedState.cities.length > 0
@@ -185,9 +199,7 @@ export const Presence = () => {
     : clusterProjects.length > 0
       ? selectedState?.name || ''
       : selectedState && selectedCity
-        ? `${selectedState.name} · ${cityProjects.length} verified ${cityProjects.length === 1 ? 'project' : 'projects'}${
-            campusLocations.length > 0 ? ` · ${campusLocations.length} campus locations` : ''
-          }`
+        ? `${selectedState.name} · ${cityProjects.length} verified ${cityProjects.length === 1 ? 'project' : 'projects'}`
         : '';
   const stepButton =
     'inline-flex items-center gap-1 min-h-[44px] px-2 text-sm text-slate-300 hover:text-white disabled:opacity-35 disabled:hover:text-slate-300 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent';
@@ -216,19 +228,19 @@ export const Presence = () => {
   ) : clusterProjects.length > 0 ? (
     <ProjectChooser projects={clusterProjects} onSelect={openProject} />
   ) : (
-    <CityProjectList city={selectedCity} projects={cityProjects} onSelect={openProject} campusLocations={campusLocations} campusDemo={campusDemo} />
+    <CityProjectList city={selectedCity} projects={cityProjects} onSelect={openProject} />
   );
 
   return (
     <div className="flex-1 w-full bg-brand-navy-dark text-slate-100">
-      {/* One background for the map section: page navy, with the map's own radial glow fading into it.
+      {/* One background for the map section: page background (graphite), with the map's own radial glow fading into it.
           overflow-x clip: the map wrapper's fade band may extend past the page gutter. */}
       <section aria-labelledby="presence-heading" className="relative overflow-x-clip" style={{ background: PAGE_NAVY }}>
         {/* Bottom padding ≥ the map's fade band (40 / 80 px), so the band stays inside this section. */}
         <Container size="default" className="relative pt-10 sm:pt-14 lg:pt-16 pb-16 sm:pb-24 lg:pb-28 space-y-8 sm:space-y-10">
           {/* Page Header */}
           <header className="max-w-2xl space-y-3">
-            <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-brand-accent">
+            <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-muted-dark">
               <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
               Our Work
             </p>
@@ -262,13 +274,24 @@ export const Presence = () => {
                 geography={geography}
                 referenceLat={cityMarkers[0]?.lat ?? null}
                 projectMarkers={projectMarkers}
-                selectedProjectId={nav.projectId}
+                selectedProjectId={highlightedProjectId}
+                cityBeacon={!highlightedProjectId}
                 onSelectProject={openProject}
-                onSelectCluster={(projectIds) => dispatch({ type: 'showCluster', projectIds })}
-                footer={selectedState ? <StateStatus stateName={selectedState.name} cityCount={selectedState.cities.length} /> : null}
+                onSelectCluster={(projectIds) => {
+                  // A cluster with showcase projects switches the card to the first of them.
+                  const showcaseId = projectIds.find((id) => stateShowcase.some((p) => p.id === id));
+                  if (showcaseId) showShowcaseProject(showcaseId);
+                  else dispatch({ type: 'showCluster', projectIds });
+                }}
                 overlay={
-                  campusCardOnly ? (
-                    <CampusCard key={`${nav.stateCode}|${selectedCity}`} city={selectedCity} locations={campusLocations} demo={campusDemo} />
+                  projectCardOnly && cardProject ? (
+                    <CampusCard
+                      key={`${nav.stateCode}|${selectedCity}`}
+                      city={selectedCity}
+                      projects={cityShowcase}
+                      currentId={cardProject.id}
+                      onChange={setCardProjectId}
+                    />
                   ) : null
                 }
               />
@@ -277,7 +300,7 @@ export const Presence = () => {
             {/* Desktop panel — rendered only while a city, project or cluster is selected */}
             {detailsOpen && (
               <aside
-                className="hidden lg:block relative z-30 w-[22rem] shrink-0 lg:sticky lg:top-24 rounded-2xl border border-white/10 bg-brand-navy/80 p-5"
+                className="hidden lg:block relative z-30 w-[22rem] shrink-0 lg:sticky lg:top-24 rounded-2xl border border-white/[0.08] bg-surface p-5"
                 aria-label={`${detailsTitle} details`}
               >
                 <div className="flex items-start justify-between gap-2 mb-4">
@@ -302,10 +325,10 @@ export const Presence = () => {
       </section>
 
       {/* Project showcase status + enquiry */}
-      <section className="border-t border-white/10" aria-labelledby="presence-projects-heading">
+      <section className="border-t border-white/10 bg-navy-800" aria-labelledby="presence-projects-heading">
         <Container size="default" className="py-10 sm:py-12 flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div className="space-y-1.5 max-w-xl">
-            <h2 id="presence-projects-heading" className="text-lg font-bold font-heading text-white">
+            <h2 id="presence-projects-heading" className="text-lg font-bold font-heading text-heading">
               Project showcase
             </h2>
             <p className="text-sm text-slate-400 leading-relaxed">
@@ -316,7 +339,7 @@ export const Presence = () => {
           </div>
           <div className="flex flex-wrap gap-3">
             {publishedCount > 0 && (
-              <Button as={Link} to="/projects" variant="outline" icon={ArrowRight} iconPosition="right" className="min-h-[44px]">
+              <Button as={Link} to="/projects" variant="outline" onDark icon={ArrowRight} iconPosition="right" className="min-h-[44px]">
                 View projects
               </Button>
             )}

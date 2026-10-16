@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Container from '../components/ui/Container';
+import PageHero from '../components/ui/PageHero';
 import SectionHeading from '../components/ui/SectionHeading';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
@@ -103,22 +104,15 @@ export const ProjectsGallery = () => {
   };
 
   return (
-    <div className="w-full bg-brand-bg min-h-screen py-10 sm:py-14 lg:py-18">
-      <Container size="default" className="space-y-10 sm:space-y-12">
-        
-        {/* Page Header */}
+    <div className="w-full bg-navy-800 min-h-screen">
+      <PageHero breadcrumb="Projects">
         <header className="space-y-4 max-w-4xl">
-          {/* Breadcrumb Navigation */}
-          <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500">
-            <Link to="/" className="hover:text-brand-blue transition-colors">Home</Link>
-            <span aria-hidden="true">/</span>
-            <span className="text-brand-navy font-semibold" aria-current="page">Projects</span>
-          </nav>
 
           <SectionHeading
+            tone="dark"
             as="h1"
             badge={
-              <Badge variant="blue" icon={Briefcase}>
+              <Badge variant="neutral-dark" icon={Briefcase}>
                 Corporate Portfolio
               </Badge>
             }
@@ -127,12 +121,16 @@ export const ProjectsGallery = () => {
             align="left"
           />
         </header>
+      </PageHero>
+
+      <Container size="default" className="space-y-10 sm:space-y-12 py-10 sm:py-14 lg:py-18">
+        
 
         {/* Filter Controls Bar (Visible even if empty, to reflect available criteria) */}
-        <div className="bg-white rounded-2xl border border-brand-border p-5 sm:p-6 shadow-subtle space-y-5">
+        <div className="bg-card rounded-2xl border border-brand-border p-5 sm:p-6 shadow-subtle space-y-5">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-4 border-b border-brand-border">
             <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4 text-brand-blue" aria-hidden="true" />
+              <Filter className="w-4 h-4 text-accent" aria-hidden="true" />
               <h2 className="text-sm font-bold font-heading uppercase tracking-wider text-brand-navy">
                 Filter Portfolio
               </h2>
@@ -162,7 +160,7 @@ export const ProjectsGallery = () => {
                   onClick={handleResetFilters}
                   icon={RotateCcw}
                   iconPosition="left"
-                  className="text-xs text-brand-blue hover:text-brand-navy"
+                  className="text-xs text-accent hover:text-brand-navy"
                   aria-label="Clear all active filters"
                 >
                   Reset Filters
@@ -179,10 +177,10 @@ export const ProjectsGallery = () => {
               <button
                 type="button"
                 onClick={() => setSelectedCategory('all')}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue ${
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                   selectedCategory === 'all'
-                    ? 'bg-brand-navy text-white shadow-subtle'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    ? 'bg-accent text-accent-ink shadow-subtle'
+                    : 'bg-white/[0.06] text-body hover:bg-white/10'
                 }`}
                 aria-pressed={selectedCategory === 'all'}
               >
@@ -199,10 +197,10 @@ export const ProjectsGallery = () => {
                     key={catKey}
                     type="button"
                     onClick={() => setSelectedCategory(catKey)}
-                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue ${
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent ${
                       isSelected
-                        ? 'bg-brand-blue text-white shadow-subtle'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                        ? 'bg-accent text-accent-ink shadow-subtle'
+                        : 'bg-white/[0.06] text-body hover:bg-white/10'
                     }`}
                     aria-pressed={isSelected}
                   >
@@ -226,7 +224,7 @@ export const ProjectsGallery = () => {
                     value={selectedState}
                     onChange={(e) => setSelectedState(e.target.value)}
                     disabled={activeStateCodes.length === 0}
-                    className="w-full text-xs font-medium bg-slate-50 border border-brand-border rounded-lg px-3 py-2 text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-brand-blue disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                    className="w-full text-xs font-medium bg-white/[0.04] border border-brand-border rounded-lg px-3 py-2 text-brand-navy focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent focus:border-accent disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                   >
                     <option value="">All States ({activeStateCodes.length})</option>
                     {activeStateCodes.map((code) => {
@@ -252,7 +250,7 @@ export const ProjectsGallery = () => {
                     value={selectedCity}
                     onChange={(e) => setSelectedCity(e.target.value)}
                     disabled={availableCities.length === 0}
-                    className="w-full text-xs font-medium bg-slate-50 border border-brand-border rounded-lg px-3 py-2 text-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-blue focus:border-brand-blue disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+                    className="w-full text-xs font-medium bg-white/[0.04] border border-brand-border rounded-lg px-3 py-2 text-brand-navy focus:outline-none focus:border-ink focus:ring-[3px] focus:ring-accent focus:border-accent disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
                   >
                     <option value="">All Cities ({availableCities.length})</option>
                     {availableCities.map((cityName) => (
@@ -276,9 +274,9 @@ export const ProjectsGallery = () => {
             <Card
               variant="default"
               padding="lg"
-              className="bg-white border border-brand-border text-center py-12 px-6 sm:px-10 max-w-3xl mx-auto space-y-6"
+              className="bg-card border border-brand-border text-center py-12 px-6 sm:px-10 max-w-3xl mx-auto space-y-6"
             >
-              <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-brand-blue mx-auto shadow-subtle">
+              <div className="w-16 h-16 rounded-2xl bg-accent/10 border border-accent/15 flex items-center justify-center text-accent mx-auto shadow-subtle">
                 <ShieldCheck className="w-8 h-8" aria-hidden="true" />
               </div>
 
@@ -289,10 +287,10 @@ export const ProjectsGallery = () => {
                 <h3 className="text-xl sm:text-2xl font-bold font-heading text-brand-navy">
                   Project Portfolio Under Authentication & Curation
                 </h3>
-                <p className="text-sm text-brand-slate leading-relaxed max-w-xl mx-auto">
+                <p className="text-base text-brand-slate leading-[1.65] max-w-xl mx-auto">
                   Arham's project case studies are currently undergoing rigorous authentication against executed work orders and client nondisclosure standards. Verified project profiles and installation records will be published here upon executive authorization.
                 </p>
-                <p className="text-xs text-slate-500 max-w-lg mx-auto italic">
+                <p className="text-xs text-muted max-w-lg mx-auto italic">
                   Arham specializes in electrical engineering contracting and architectural illumination. Project profiles are published exclusively following verification against corporate work orders and client nondisclosure requirements.
                 </p>
               </div>
@@ -327,15 +325,15 @@ export const ProjectsGallery = () => {
             <Card
               variant="default"
               padding="lg"
-              className="bg-white border border-brand-border text-center py-12 px-6 space-y-4 max-w-lg mx-auto"
+              className="bg-card border border-brand-border text-center py-12 px-6 space-y-4 max-w-lg mx-auto"
             >
-              <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 mx-auto">
+              <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center text-accent mx-auto">
                 <Search className="w-6 h-6" aria-hidden="true" />
               </div>
               <h3 className="text-lg font-bold font-heading text-brand-navy">
                 No Projects Match Your Filter Criteria
               </h3>
-              <p className="text-xs sm:text-sm text-brand-slate leading-relaxed">
+              <p className="text-base text-brand-slate leading-[1.65]">
                 No published projects were found for the selected category and geographic filters. Try selecting a different category or clearing geographic constraints.
               </p>
               <div className="pt-2">
@@ -369,19 +367,19 @@ export const ProjectsGallery = () => {
 
         {/* Clear Path to Geographic Presence and Direct Inquiries */}
         <section 
-          className="rounded-2xl bg-white border border-brand-border p-6 sm:p-8 lg:p-10 shadow-subtle"
+          className="rounded-2xl bg-card border border-brand-border p-6 sm:p-8 lg:p-10 shadow-subtle"
           aria-labelledby="explore-presence-heading"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-3">
-              <div className="inline-flex items-center gap-2 text-xs font-bold font-heading uppercase tracking-wider text-brand-blue">
+              <div className="inline-flex items-center gap-2 text-xs font-bold font-heading uppercase tracking-wider text-accent">
                 <Building2 className="w-4 h-4" aria-hidden="true" />
                 Regional Execution Footprint
               </div>
               <h2 id="explore-presence-heading" className="text-xl sm:text-2xl font-bold font-heading text-brand-navy">
                 Explore Projects Region by Region
               </h2>
-              <p className="text-sm text-brand-slate leading-relaxed max-w-2xl">
+              <p className="text-base text-brand-slate leading-[1.65] max-w-2xl">
                 Looking for regional engineering execution? Navigate our interactive state-by-state administrative map to inspect verified municipal project hubs and execution capabilities.
               </p>
             </div>

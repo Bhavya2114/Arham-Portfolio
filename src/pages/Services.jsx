@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Container from '../components/ui/Container';
+import PageHero from '../components/ui/PageHero';
 import SectionHeading from '../components/ui/SectionHeading';
 import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
@@ -47,7 +48,7 @@ export const Services = () => {
       title: 'Electrical Infrastructure & Industrial Cabling',
       icon: Cable,
       tag: 'Cabling & Containment',
-      badgeVariant: 'amber',
+      badgeVariant: 'accent',
       image: '/images/project-infrastructure.jpg',
       alt: 'Illustrative technical view of organized overhead industrial cable trays and wiring networks',
       summary:
@@ -66,7 +67,7 @@ export const Services = () => {
       title: 'HT/LT Power Distribution & Switchboards',
       icon: Zap,
       tag: 'Panels & Distribution',
-      badgeVariant: 'blue',
+      badgeVariant: 'accent',
       image: '/images/project-distribution.jpg',
       alt: 'Illustrative engineering view of industrial switchgear panels and electrical control room',
       summary:
@@ -85,7 +86,7 @@ export const Services = () => {
       title: 'Architectural & Commercial Lighting Solutions',
       icon: Lightbulb,
       tag: 'Commercial Lighting',
-      badgeVariant: 'amber',
+      badgeVariant: 'accent',
       image: '/images/project-lighting.jpg',
       alt: 'Illustrative architectural view of commercial building lobby and linear LED lighting installation',
       summary:
@@ -123,22 +124,14 @@ export const Services = () => {
   ];
 
   return (
-    <div className="w-full bg-brand-bg min-h-screen py-10 sm:py-14 lg:py-18">
-      <Container size="default" className="space-y-12 sm:space-y-16">
-        
-        {/* Breadcrumb Navigation */}
-        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs font-medium text-slate-500">
-          <Link to="/" className="hover:text-brand-blue transition-colors">Home</Link>
-          <span aria-hidden="true">/</span>
-          <span className="text-brand-navy font-semibold" aria-current="page">Services</span>
-        </nav>
-
-        {/* 1. Page Header & Introduction */}
+    <div className="w-full bg-navy-800 min-h-screen">
+      <PageHero breadcrumb="Services">
         <header className="space-y-4 max-w-4xl">
           <SectionHeading
+            tone="dark"
             as="h1"
             badge={
-              <Badge variant="blue" icon={Layers}>
+              <Badge variant="neutral-dark" icon={Layers}>
                 Engineering Capabilities & Scope
               </Badge>
             }
@@ -147,6 +140,10 @@ export const Services = () => {
             align="left"
           />
         </header>
+      </PageHero>
+
+      <Container size="default" className="space-y-12 sm:space-y-16 py-10 sm:py-14 lg:py-18">
+        
 
         {/* 2. Three Detailed Service Disciplines */}
         <main aria-label="Detailed Services" className="space-y-12 sm:space-y-16">
@@ -158,7 +155,7 @@ export const Services = () => {
               <section
                 key={service.id}
                 id={service.id}
-                className="bg-white rounded-2xl border border-brand-border p-6 sm:p-8 lg:p-10 shadow-subtle scroll-mt-24 space-y-8"
+                className="bg-card rounded-2xl border border-brand-border p-6 sm:p-8 lg:p-10 shadow-subtle scroll-mt-24 space-y-8"
                 aria-labelledby={`service-heading-${service.id}`}
               >
                 <div className={`grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center ${isReversed ? 'lg:flex-row-reverse' : ''}`}>
@@ -169,7 +166,7 @@ export const Services = () => {
                       <Badge variant={service.badgeVariant} icon={Icon}>
                         {service.tag}
                       </Badge>
-                      <span className="text-xs font-mono font-semibold text-slate-400">
+                      <span className="text-xs font-mono font-semibold text-muted">
                         DISCIPLINE 0{index + 1}
                       </span>
                     </div>
@@ -178,7 +175,7 @@ export const Services = () => {
                       {service.title}
                     </h2>
 
-                    <p className="text-sm sm:text-base text-brand-slate leading-relaxed">
+                    <p className="text-base text-brand-slate leading-[1.65]">
                       {service.summary}
                     </p>
 
@@ -190,7 +187,7 @@ export const Services = () => {
                       <ul className="space-y-2 text-xs sm:text-sm text-brand-slate">
                         {service.activities.map((act, aIdx) => (
                           <li key={aIdx} className="flex items-start gap-2.5">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" aria-hidden="true" />
+                            <CheckCircle2 className="w-4 h-4 text-emerald-300 shrink-0 mt-0.5" aria-hidden="true" />
                             <span className="leading-relaxed">{act}</span>
                           </li>
                         ))}
@@ -225,17 +222,17 @@ export const Services = () => {
 
                   {/* Illustrative Technical Imagery Panel (5 cols) */}
                   <div className={`lg:col-span-5 w-full ${isReversed ? 'lg:order-1' : 'lg:order-2'}`}>
-                    <div className="rounded-2xl bg-brand-bg p-2.5 border border-brand-border shadow-card space-y-2">
-                      <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-100">
+                    <div className="rounded-2xl bg-navy-800 p-2.5 border border-brand-border shadow-card space-y-2">
+                      <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-white/[0.06]">
                         <img
                           src={service.image}
                           alt={service.alt}
-                          className="w-full h-full object-cover object-center"
+                          className="w-full h-full object-cover object-center rounded-xl border border-white/[0.08]"
                           loading="lazy"
                         />
                         <div className="absolute top-3 left-3">
-                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-brand-navy/85 text-white backdrop-blur-sm border border-white/10 shadow-sm">
-                            <Sparkles className="w-3 h-3 text-brand-accent" aria-hidden="true" />
+                          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-navy-950/85 text-white backdrop-blur-sm border border-white/10 shadow-sm">
+                            <Sparkles className="w-3 h-3 text-white/80" aria-hidden="true" />
                             {service.tag}
                           </span>
                         </div>
@@ -273,15 +270,15 @@ export const Services = () => {
                   key={idx}
                   variant="default"
                   padding="lg"
-                  className="bg-white border border-brand-border space-y-3"
+                  className="bg-card border border-brand-border space-y-3"
                 >
-                  <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-brand-blue">
+                  <div className="w-10 h-10 rounded-xl bg-accent/10 border border-accent/15 flex items-center justify-center text-accent">
                     <Icon className="w-5 h-5" aria-hidden="true" />
                   </div>
                   <h3 className="text-base font-bold font-heading text-brand-navy">
                     {principle.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-brand-slate leading-relaxed">
+                  <p className="text-base text-brand-slate leading-[1.65]">
                     {principle.description}
                   </p>
                 </Card>
@@ -291,7 +288,7 @@ export const Services = () => {
         </section>
 
         {/* 4. Scope Confirmation Notice */}
-        <div className="p-4 rounded-xl bg-white border border-brand-border text-left">
+        <div className="p-4 rounded-xl bg-card border border-brand-border text-left">
           <p className="text-xs text-brand-slate leading-relaxed">
             <span className="font-semibold text-brand-navy">Service Scope Notice:</span> The engineering disciplines and work scopes outlined above represent provisional business domains. Specific load ratings, single-line diagrams, voltage limits, and equipment specifications are determined on a per-project basis according to signed client contracts and municipal authority guidelines.
           </p>
@@ -299,18 +296,18 @@ export const Services = () => {
 
         {/* 5. Bottom Callout Banner */}
         <section 
-          className="rounded-2xl bg-brand-navy text-white p-6 sm:p-8 lg:p-10 shadow-elevated"
+          className="rounded-2xl bg-card border border-white/[0.07] text-white p-6 sm:p-8 lg:p-10 shadow-elevated"
           aria-labelledby="services-cta-heading"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-8 space-y-3">
-              <Badge variant="blue" icon={PhoneCall}>
+              <Badge variant="neutral-dark" icon={PhoneCall}>
                 Project Consultations
               </Badge>
-              <h2 id="services-cta-heading" className="text-xl sm:text-2xl font-bold font-heading text-white">
+              <h2 id="services-cta-heading" className="text-xl sm:text-2xl font-bold font-heading text-heading">
                 Discuss Your Facility's Electrical Requirements
               </h2>
-              <p className="text-sm text-slate-300 leading-relaxed max-w-2xl">
+              <p className="text-base text-body leading-[1.65] max-w-2xl">
                 Whether planning power distribution switchgear, structured cable tray containment, or commercial architectural lighting, our engineering team is ready to review project drawings and specifications.
               </p>
             </div>
@@ -329,10 +326,11 @@ export const Services = () => {
               </Button>
               <Button
                 variant="outline"
+                onDark
                 size="md"
                 as={Link}
                 to="/projects"
-                className="w-full justify-center bg-transparent text-white border-white/20 hover:bg-white/10"
+                className="w-full justify-center"
               >
                 Inspect Project Gallery
               </Button>

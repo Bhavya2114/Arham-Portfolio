@@ -3,10 +3,9 @@ import React from 'react';
 /**
  * Reusable Card primitive for structural surfaces, widgets, and content groupings.
  * Variants:
- *  - default: Pure white background with architectural border and subtle card shadow
- *  - muted: Subtle slate/canvas background for inset content
- *  - interactive: Card with gentle hover state and cursor pointer
- *  - dark: Deep navy container with muted border
+ * Graphite theme: every variant is a card #1B1D21 with a 1px white / 7 % border.
+ *  - default / dark / muted: the card
+ *  - interactive: the card with a gentle hover state and cursor pointer
  */
 export const Card = ({
   children,
@@ -19,10 +18,10 @@ export const Card = ({
   const baseStyles = 'rounded-xl transition-all duration-150';
 
   const variantStyles = {
-    default: 'bg-white border border-brand-border shadow-card text-brand-navy',
-    muted: 'bg-brand-bg border border-brand-border text-brand-navy',
-    interactive: 'bg-white border border-brand-border hover:border-blue-300 hover:shadow-elevated cursor-pointer text-brand-navy',
-    dark: 'bg-brand-navy border border-brand-navy-light text-white shadow-card',
+    default: 'bg-card border border-white/[0.07] text-body',
+    muted: 'bg-card border border-white/[0.07] text-body',
+    interactive: 'bg-card border border-white/[0.07] hover:border-accent/40 cursor-pointer text-body',
+    dark: 'bg-card border border-white/[0.07] text-body',
   };
 
   const paddingStyles = {

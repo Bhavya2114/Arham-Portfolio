@@ -35,15 +35,15 @@ export const BrandLogo = ({
     >
       <div className="flex items-center gap-1.5 font-heading">
         <span
-          className={`font-black uppercase tracking-wider transition-colors ${sizeClasses[size] || sizeClasses.default} ${
-            isLight ? 'text-white' : 'text-brand-navy'
+          className={`font-bold uppercase tracking-wider transition-colors ${sizeClasses[size] || sizeClasses.default} ${
+            isLight ? 'text-white' : 'text-ink'
           }`}
         >
           ARHAM
         </span>
         {/* Subtle, architectural electrical dot indicator */}
         <span
-          className={`rounded-full bg-brand-blue shrink-0 ${dotSizes[size] || dotSizes.default}`}
+          className={`rounded-full bg-accent shrink-0 ${dotSizes[size] || dotSizes.default}`}
           aria-hidden="true"
         />
       </div>
@@ -51,7 +51,7 @@ export const BrandLogo = ({
       {showTagline && (
         <span
           className={`text-[9px] uppercase tracking-[0.2em] font-medium -mt-0.5 ${
-            isLight ? 'text-brand-slate-light' : 'text-brand-slate'
+            isLight ? 'text-muted-dark' : 'text-muted'
           }`}
         >
           Electrical & Lighting

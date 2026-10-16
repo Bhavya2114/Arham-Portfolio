@@ -14,11 +14,11 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 
 const PageFallback = () => (
   <div 
-    className="flex-1 flex items-center justify-center min-h-[50vh] p-8"
+    className="flex-1 flex items-center justify-center min-h-[100svh] p-8"
     role="status"
     aria-label="Loading page content"
   >
-    <div className="w-8 h-8 rounded-full border-2 border-brand-blue border-t-transparent animate-spin" />
+    <div className="w-8 h-8 rounded-full border-2 border-olive border-t-transparent animate-spin" />
   </div>
 );
 

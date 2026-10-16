@@ -1,73 +1,79 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Navigation } from 'lucide-react';
-import allenCampusImage from '../../../Images/allen image.png';
 
 /**
- * Floating glass campus card for the /presence map (one ALLEN campus location at a time).
+ * Floating glass project card for the /presence map (one project at a time). Same design as the
+ * original campus card on main: photo left, text right, bottom-anchored over the map, dots + "n / total"
+ * pager below it.
  *
- * - Shows only supplied data: campus name + supplied address. Campus *locations*, not Arham projects:
- *   Arham's work at these campuses is unconfirmed, so nothing here claims it.
- * - The same local image (Images/allen image.png) is used for every campus for now.
- * - Directions open a map search for the supplied address text — no coordinates are used or invented.
- *   No phone action: the records carry no verified phone numbers.
- * - Swipe right→left for the next campus, left→right for the previous one; ←/→ keys and the dots do the
- *   same. Pointer events are stopped here so a swipe never pans the map underneath.
- * - Changing campus slides the card *content* horizontally (~320 ms ease-out) inside the stationary
+ * - Text: type chip, project name, short location (area + city), "scope · year". No address, no
+ *   Directions and no project page link.
+ * - Projects come from data/showcaseProjects.js (currently the ALLEN placeholder set); the photo is the
+ *   project's first photo.
+ * - Controlled (`currentId` / `onChange`), so the map highlights the shown project's pin (or the city
+ *   pin) and a tapped project pin switches the card.
+ * - Swipe right→left for the next project, left→right for the previous one; ←/→ keys and the dots do
+ *   the same. Pointer events are stopped here so a swipe never pans the map underneath. While dragging,
+ *   the content follows the finger through a ref-driven transform (no React state per move); the
+ *   project index changes only when the swipe settles.
+ * - Changing project slides the card *content* horizontally (~320 ms ease-out) inside the stationary
  *   glass card: next = out to the left / in from the right, previous = the reverse. One transition at a
  *   time; under prefers-reduced-motion the content switches instantly.
- * - `demo` (TEMPORARY, see data/demoCampusCards.js): the cards are Kota's records reused for UI testing
- *   in another city. No visible label; only the carousel's accessible name says so. The real Kota
- *   addresses are kept as-is.
  */
 
 const SWIPE_PX = 40;
 const SLIDE_MS = 320;
-
-const directionsUrl = (loc) =>
-  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${loc.name}, ${loc.suppliedAddress}`)}`;
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 
 const stop = (e) => e.stopPropagation();
 
-/** One campus's content (image + details). `ghost` = the outgoing copy during a slide (inert). */
+/** One project's content (image + details). `ghost` = the outgoing copy during a slide (inert). */
+// Photo: full card height on the left, edge to edge, ~40 % of the card width; its frame (10:11 on
+// phones, square from sm) drives the card height, ~25 % taller than before (the card's rounded corners
+// clip it, so only the outer left corners are rounded).
 const CampusSlide = ({ loc, ghost = false }) => (
-  <div className="flex gap-3">
-    <img
-      src={allenCampusImage}
-      alt={ghost ? '' : `${loc.name} — campus building`}
-      draggable={false}
-      loading="lazy"
-      decoding="async"
-      className="w-20 sm:w-28 aspect-[4/3] shrink-0 self-center rounded-xl object-cover"
-    />
-    <div className="min-w-0 flex-1 flex flex-col gap-1" {...(ghost ? {} : { 'aria-live': 'polite', 'aria-atomic': 'true' })}>
-      <span className="self-start rounded-full border border-teal-100/25 bg-white/10 px-2 py-0.5 text-[10px] font-medium tracking-wide text-teal-50">
-        Campus location
+  <div className="flex">
+    <div className="w-[40%] aspect-[10/11] sm:aspect-square shrink-0" data-project-photo="">
+      <img
+        src={loc.photos?.[0]}
+        alt={ghost ? '' : loc.name}
+        draggable={false}
+        loading="lazy"
+        decoding="async"
+        className="h-full w-full object-cover"
+      />
+    </div>
+    <div className="min-w-0 flex-1 flex flex-col gap-1 p-2.5 sm:p-3" {...(ghost ? {} : { 'aria-live': 'polite', 'aria-atomic': 'true' })}>
+      <span className="self-start rounded-full border border-teal-100/25 bg-white/10 px-2 py-0.5 text-[10px] font-medium tracking-wide text-teal-50" data-project-type="">
+        {loc.type}
       </span>
       <h3 className="text-sm sm:text-[15px] font-semibold leading-snug text-white line-clamp-2">{loc.name}</h3>
-      <p className="text-[11px] sm:text-xs leading-snug text-white/80 line-clamp-3" title={loc.suppliedAddress}>{loc.suppliedAddress}</p>
-      {!ghost && <span className="sr-only">Arham's work at this campus has not been confirmed.</span>}
-      <a
-        href={directionsUrl(loc)}
-        target="_blank"
-        rel="noopener noreferrer"
-        onPointerDown={stop}
-        tabIndex={ghost ? -1 : undefined}
-        className="mt-auto self-start inline-flex items-center gap-1.5 min-h-[36px] rounded-lg bg-brand-navy-dark/90 px-3 text-xs font-medium text-white hover:bg-brand-navy-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
-        aria-label={`Directions to ${loc.name} (opens Google Maps search for the address)`}
-      >
-        <Navigation className="w-3.5 h-3.5" aria-hidden="true" />
-        Directions
-      </a>
+      {loc.location && <p className="text-[11px] sm:text-xs leading-snug text-white/80 line-clamp-3" data-project-location="">{loc.location}</p>}
+      <p className="text-[11px] sm:text-xs leading-snug text-white/80" data-project-scope="">
+        {loc.scope}
+        {/* No-break space + no-wrap: "· 2022" stays with the last word, never alone on a new line. */}
+        {loc.year && <>{loc.scope ? '\u00A0' : ''}<span className="whitespace-nowrap">· {loc.year}</span></>}
+      </p>
     </div>
   </div>
 );
 
-export const CampusCard = ({ city, locations = [], demo = false }) => {
-  const [index, setIndex] = useState(0);
-  const [dragX, setDragX] = useState(0);
+export const CampusCard = ({ city, projects: locations = [], currentId = null, onChange }) => {
+  // Controlled by the page (currentId / onChange) so the map can follow the shown project.
+  const index = Math.max(0, locations.findIndex((p) => p.id === currentId));
+  const setIndex = (i) => onChange?.(locations[i]?.id);
+  // Swipe offset goes straight to the content's transform through this ref (no React state per move);
+  // the index only changes when the swipe settles.
+  const contentRef = useRef(null);
+  const setDragOffset = (px) => {
+    const el = contentRef.current;
+    if (!el) return;
+    // While dragging: follow the finger with no transition. Released: clearing the inline styles lets
+    // the `transition-transform duration-200` class ease it back, exactly like the old state version.
+    el.style.transition = px ? 'none' : '';
+    el.style.transform = px ? `translateX(${px}px)` : '';
+  };
   // Active slide: { from: outgoing index, dir: 'next' | 'prev' } — null when idle.
   const [slide, setSlide] = useState(null);
   const sliding = useRef(false); // synchronous lock so rapid input cannot overlap transitions
@@ -116,9 +122,9 @@ export const CampusCard = ({ city, locations = [], demo = false }) => {
       try { e.currentTarget.setPointerCapture(e.pointerId); } catch { /* pointer already released */ }
     }
     if (d.horizontal) {
-      // Resist dragging past the first / last campus.
+      // Resist dragging past the first / last project.
       const atEdge = (dx > 0 && current === 0) || (dx < 0 && current === count - 1);
-      setDragX(atEdge ? dx / 4 : dx);
+      setDragOffset(atEdge ? dx / 4 : dx);
     }
   };
 
@@ -127,17 +133,17 @@ export const CampusCard = ({ city, locations = [], demo = false }) => {
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
     const dx = e.clientX - d.x;
+    drag.current = null;
+    setDragOffset(0);
     if (d.horizontal) {
       swiped.current = true;
       if (dx <= -SWIPE_PX) go(current + 1);
       else if (dx >= SWIPE_PX) go(current - 1);
     }
-    drag.current = null;
-    setDragX(0);
   };
 
   const handleClickCapture = (e) => {
-    // A swipe must not also activate the Directions link.
+    // A swipe must not also count as a click.
     if (swiped.current) {
       swiped.current = false;
       e.preventDefault();
@@ -154,11 +160,11 @@ export const CampusCard = ({ city, locations = [], demo = false }) => {
   const outgoingAnim = slide ? (slide.dir === 'next' ? 'campus-out-to-left' : 'campus-out-to-right') : '';
 
   return (
-    <div className="space-y-1.5" data-campus-card={city} data-campus-demo={demo ? 'true' : undefined}>
+    <div className="space-y-1.5" data-campus-card={city} data-project-card={city}>
       <div
         role="group"
         aria-roledescription="carousel"
-        aria-label={demo ? `Demonstration campus cards for ${city}: sample Kota campuses, not located in ${city}` : `ALLEN campus locations in ${city}`}
+        aria-label={`Arham projects in ${city}`}
         tabIndex={0}
         onKeyDown={handleKeyDown}
         onPointerDown={handlePointerDown}
@@ -167,14 +173,14 @@ export const CampusCard = ({ city, locations = [], demo = false }) => {
         onPointerCancel={handlePointerEnd}
         onClickCapture={handleClickCapture}
         style={{ touchAction: 'pan-y' }}
-        className="flex gap-3 rounded-2xl border border-teal-200/25 bg-teal-700/35 p-2.5 sm:p-3 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md select-none cursor-grab active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+        className="flex overflow-hidden rounded-2xl border border-teal-200/25 bg-teal-700/35 shadow-[0_12px_40px_rgba(0,0,0,0.45)] backdrop-blur-md select-none cursor-grab active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
       >
         {/* The glass card stays put; only its content slides (clipped here). */}
-        <div className="relative min-w-0 flex-1 overflow-hidden -m-1 p-1" data-campus-viewport>
+        <div className="relative min-w-0 flex-1 overflow-hidden" data-campus-viewport>
           {slide && (
             <div
               aria-hidden="true"
-              className={`absolute inset-1 pointer-events-none campus-slide ${outgoingAnim}`}
+              className={`absolute inset-0 pointer-events-none campus-slide ${outgoingAnim}`}
               data-campus-slide="out"
             >
               <CampusSlide loc={locations[slide.from]} ghost />
@@ -182,8 +188,8 @@ export const CampusCard = ({ city, locations = [], demo = false }) => {
           )}
           <div
             key={current}
-            className={slide ? `campus-slide ${incomingAnim}` : dragX ? '' : 'transition-transform duration-200'}
-            style={dragX ? { transform: `translateX(${dragX}px)` } : undefined}
+            ref={contentRef}
+            className={slide ? `campus-slide ${incomingAnim}` : 'transition-transform duration-200'}
             data-campus-slide={slide ? 'in' : 'idle'}
           >
             <CampusSlide loc={loc} />
@@ -194,13 +200,13 @@ export const CampusCard = ({ city, locations = [], demo = false }) => {
       {/* Minimal pagination — on a small dark pill so it stays legible over bright map areas */}
       <div className="flex justify-center" onPointerDown={stop}>
         <div className="inline-flex items-center gap-2 rounded-full bg-brand-navy-dark/70 px-2 text-[11px] text-white/85 backdrop-blur-sm">
-        <div className="flex items-center" role="group" aria-label="Choose campus">
+        <div className="flex items-center" role="group" aria-label="Choose project">
           {locations.map((l, i) => (
             <button
               key={l.id}
               type="button"
               onClick={() => go(i)}
-              aria-label={`Show campus ${i + 1} of ${count}: ${l.name}`}
+              aria-label={`Show project ${i + 1} of ${count}: ${l.name}`}
               aria-current={i === current ? 'true' : undefined}
               className="group p-1.5 rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
             >

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react';
-import { MousePointerClick, Move } from 'lucide-react';
+import { MousePointerClick } from 'lucide-react';
 import IndiaMapSvg, { MAP_COLORS } from './IndiaMapSvg';
+import MapCredits from './MapCredits';
 import { startOverlayEntrance, OVERLAY_ENTER } from '../../lib/overlayEntrance.js';
 import { isMapBackgroundTap } from '../../lib/mapBackgroundTap.js';
 import { createSettleQueue } from '../../lib/viewSettle.js';
@@ -49,12 +50,12 @@ const MARKER_RADIUS_PX = 5;
 const OVERVIEW_CITY = { dotPx: 1.5, opacity: 0.9 };
 // Soft halo behind each zoomed city pin: white, ~2.2× the dot, no blur.
 const PIN_HALO = { scale: 2.2, opacity: 0.18 };
-// Plain navy radial background behind the map (CSS only, static).
-// Page navy behind the whole /presence map section; the map's radial glow ends exactly in it at the
+// Plain graphite radial background behind the map (CSS only, static).
+// Page background (graphite) behind the whole /presence map section; the map's radial glow ends exactly in it at the
 // wrapper's sides, so there is no visible rectangle.
-export const PAGE_NAVY = '#070A1F';
-const MAP_BACKGROUND = `radial-gradient(ellipse farthest-side at 50% 50%, #0B1030 0%, ${PAGE_NAVY} 100%)`;
-// Soft edge fade over the map wrapper's clipped edges: page navy → transparent on all four sides,
+export const PAGE_NAVY = '#0C0D0F'; // page background (Graphite bg)
+const MAP_BACKGROUND = `radial-gradient(ellipse farthest-side at 50% 50%, #141518 0%, ${PAGE_NAVY} 100%)`;
+// Soft edge fade over the map wrapper's clipped edges: page background → transparent on all four sides,
 // sized by --map-fade (40 px phone, 80 px desktop). Plain linear gradients, no mask.
 const EDGE_FADE = [
   `linear-gradient(to bottom, ${PAGE_NAVY}, transparent) top / 100% var(--map-fade) no-repeat`,
@@ -108,6 +109,7 @@ export const PresenceMap = ({
   referenceLat = null,
   projectMarkers = [],
   selectedProjectId = null,
+  cityBeacon = true, // false while a project pin carries the highlight (beacon) instead of the city
   onSelectProject,
   onSelectCluster,
   footer = null,
@@ -402,7 +404,7 @@ export const PresenceMap = ({
               strokeWidth={2}
               vectorEffect="non-scaling-stroke"
             />
-            {isSelected && !moving && (
+            {isSelected && cityBeacon && !moving && (
               <g className="presence-beacon motion-reduce:hidden" aria-hidden="true">
                 <circle r={r} fill="none" stroke={MAP_COLORS.edge} strokeWidth={2} vectorEffect="non-scaling-stroke" />
               </g>
@@ -562,14 +564,21 @@ export const PresenceMap = ({
             <title>{projectNames[id]}</title>
             <circle r={hit} cy={-s} fill="transparent" />
             <circle r={s + 6 * unit} cy={-s * 1.3} className="fill-none stroke-brand-accent opacity-0 group-focus-visible:opacity-100" strokeWidth={2} vectorEffect="non-scaling-stroke" />
+            {/* Highlighted project (the card's project): the same yellow beacon as a selected city */}
+            {isSelected && !moving && (
+              <g className="presence-beacon motion-reduce:hidden" aria-hidden="true" data-project-beacon="">
+                <circle r={s} cy={-s * 1.6} fill="none" stroke={MAP_COLORS.edge} strokeWidth={2} vectorEffect="non-scaling-stroke" />
+              </g>
+            )}
             {/* Pin: tip sits exactly on the verified site coordinate */}
             <path
               d={`M0 0 C ${-s * 0.35} ${-s * 0.6} ${-s} ${-s * 0.95} ${-s} ${-s * 1.6} A ${s} ${s} 0 1 1 ${s} ${-s * 1.6} C ${s} ${-s * 0.95} ${s * 0.35} ${-s * 0.6} 0 0 Z`}
-              className={isSelected ? 'fill-brand-accent stroke-white' : 'fill-white stroke-brand-navy-dark group-hover:fill-emerald-50'}
+              fill={isSelected ? MAP_COLORS.edge : '#FFFFFF'}
+              stroke={MAP_COLORS.land}
               strokeWidth={1.5}
               vectorEffect="non-scaling-stroke"
             />
-            <circle r={s * 0.38} cy={-s * 1.6} className={isSelected ? 'fill-white' : 'fill-brand-navy'} />
+            <circle r={s * 0.38} cy={-s * 1.6} fill={MAP_COLORS.land} />
           </g>
         );
       })}
@@ -684,8 +693,8 @@ export const PresenceMap = ({
       <div className="relative z-20 mb-2 flex flex-wrap items-center justify-between gap-2">
         {selectedState ? (
           <div className="flex flex-wrap items-center gap-2 min-w-0">
-            <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/40 bg-brand-navy-dark/90 px-3 py-1.5 text-sm font-semibold text-emerald-200 max-w-full">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 shrink-0" aria-hidden="true" />
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-brand-navy-dark/90 px-3 py-1.5 text-sm font-semibold text-white max-w-full">
+              <span className="w-2 h-2 rounded-full bg-accent shrink-0" aria-hidden="true" />
               <span className="truncate">
                 {selectedState.name}
                 {selectedCity && <span className="text-brand-accent"> · {selectedCity}</span>}
@@ -740,8 +749,10 @@ export const PresenceMap = ({
 
         <div className="absolute inset-0 z-10 pointer-events-none" style={{ background: EDGE_FADE }} aria-hidden="true" data-layer="edge-fade" />
 
-        {/* Content frame (the map area without the fade band): the scale bar and the card anchor here. */}
+        {/* Content frame (the map area without the fade band): the scale bar, the card and the map-data
+            credits anchor here. */}
         <div className="absolute z-20 pointer-events-none" style={{ inset: 'var(--map-fade)' }} data-map-frame="">
+          <MapCredits cities={markers.length > 0} districts={geography?.districts?.length > 0} />
           {scaleBar && !overlay && (
             <div className="absolute bottom-2 left-2 z-10 rounded-md bg-brand-navy-dark/80 px-2 py-1 text-[10px] text-slate-300 pointer-events-none" aria-hidden="true">
               <div className="h-1.5 border-x border-b border-slate-300" style={{ width: scaleBar.px }} />
@@ -768,59 +779,6 @@ export const PresenceMap = ({
       </div>
 
       {footer && <div className="relative z-20 mt-3">{footer}</div>}
-
-      {/* Pan hint and data attribution (required by the licences): small, low-contrast text floating
-          on the page background, above the map's fade band. No legend. */}
-      <div className="relative z-20 mt-3 space-y-1.5 text-center">
-        {isZoomed && (
-          <p className="inline-flex items-center gap-1.5 text-[11px] text-slate-500">
-            <Move className="w-3 h-3" aria-hidden="true" />
-            Drag to pan · pinch to zoom
-          </p>
-        )}
-        {markers.length > 0 && (
-          <p className="text-[11px] text-slate-500">
-            City locations ©{' '}
-            <a
-              href="https://www.openstreetmap.org/copyright"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline decoration-slate-600 underline-offset-2 hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent rounded"
-            >
-              OpenStreetMap contributors
-            </a>{' '}
-            (ODbL) and Wikipedia
-            {geography?.districts?.length > 0 && (
-              <>
-                {' · '}District boundaries:{' '}
-                <a
-                  href="https://www.geoboundaries.org/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline decoration-slate-600 underline-offset-2 hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent rounded"
-                >
-                  geoBoundaries
-                </a>{' '}
-                / LGD (ODbL)
-              </>
-            )}
-          </p>
-        )}
-        {markers.length === 0 && geography?.districts?.length > 0 && (
-          <p className="text-[11px] text-slate-500">
-            District boundaries:{' '}
-            <a
-              href="https://www.geoboundaries.org/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline decoration-slate-600 underline-offset-2 hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent rounded"
-            >
-              geoBoundaries
-            </a>{' '}
-            / LGD (ODbL)
-          </p>
-        )}
-      </div>
     </div>
   );
 };

@@ -3,22 +3,26 @@
 @tailwind utilities;
 
 :root {
-  /* Color Palette */
-  --color-brand-navy: #101D2C;
-  --color-brand-navy-dark: #0B141F;
-  --color-brand-navy-light: #1B2C42;
-  --color-brand-blue: #2563EB;
-  --color-brand-blue-hover: #1D4ED8;
-  --color-brand-bg: #F8FAFC;
-  --color-brand-slate: #64748B;
-  --color-brand-slate-light: #94A3B8;
-  --color-brand-accent: #F5B544;
-  --color-brand-border: #E2E8F0;
-  --color-brand-border-subtle: #F1F5F9;
+  /* Color Palette — "Graphite" (same values as tailwind.config.js) */
+  --color-navy-950: #0C0D0F;
+  --color-navy-900: #101114;
+  --color-surface: #1B1D21;
+  --color-footer: #08090A;
+  --color-accent: #D9E35A;
+  --color-accent-ink: #14180A;
+  --color-olive: #3F5A14;
+  --color-cyan: #3FD0E6;
+  --color-navy-800: #141518;
+  --color-card: #1B1D21;
+  --color-heading: #F1F1EF;
+  --color-body: #B4B6BA;
+  --color-muted: #8F9298;
+  --color-muted-dark: #8F9298;
+  --color-border: rgba(255, 255, 255, 0.07);
 
-  /* Typography */
+  /* Typography (self-hosted via @fontsource, see src/main.jsx) */
   --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-heading: 'Outfit', 'Inter', sans-serif;
+  --font-heading: 'Sora', 'Inter', sans-serif;
 
   /* Radius */
   --radius-sm: 0.375rem;
@@ -42,18 +46,19 @@ body {
   margin: 0;
   padding: 0;
   font-family: var(--font-body);
-  background-color: var(--color-brand-bg);
-  color: var(--color-brand-navy);
+  background-color: var(--color-navy-950);
+  color: var(--color-body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Heading Defaults */
+/* Heading Defaults: Sora, tight tracking and leading */
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   letter-spacing: -0.02em;
-  color: var(--color-brand-navy);
+  line-height: 1.1;
+  color: var(--color-heading);
   margin: 0;
 }
 
@@ -63,14 +68,16 @@ p {
 
 /* Selection Color */
 ::selection {
-  background-color: var(--color-brand-blue);
-  color: #FFFFFF;
+  background-color: var(--color-accent);
+  color: var(--color-accent-ink);
 }
 
-/* Accessible Keyboard Focus Visibility */
+/* Accessible Keyboard Focus Visibility: accent yellow outside a thin dark ring, so the focus
+   indicator has ≥ 3:1 contrast on both light (dark ring) and dark (yellow) backgrounds. */
 :focus-visible {
-  outline: 2px solid var(--color-brand-blue);
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+  box-shadow: 0 0 0 2px var(--color-accent-ink);
 }
 
 /* Accessible Reduced Motion */
