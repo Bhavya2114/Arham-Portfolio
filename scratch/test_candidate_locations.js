@@ -156,7 +156,7 @@ if (process.env.BUILD_DIR) {
 }
 
 console.log('\n4e. Bottom-Anchored Card & Minimal Map Shift:');
-const overlayClassSrc = (mapSrcC.match(/const overlayClass = [\s\S]*?;\n/) || [''])[0];
+const overlayClassSrc = (mapSrcC.match(/const overlayClass = [\s\S]*?;\r?\n/) || [''])[0];
 assert(overlayClassSrc.includes("'inset-x-2 bottom-2'") && overlayClassSrc.includes('bottom-3') && !/top-\d/.test(overlayClassSrc), 'Card is always anchored to the bottom of the map container (never the top)');
 assert(mapSrcC.includes('className={`absolute z-20 ${overlayClass}') && !/fixed/.test(overlayClassSrc), 'Anchored inside the map container (absolute), not the page / viewport');
 assert(mapSrcC.includes('card: { top: w.top + card.offsetTop, left, right: left + card.offsetWidth },'), "Uses the card's actual rendered size and position (layout box)");
