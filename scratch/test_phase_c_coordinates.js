@@ -155,7 +155,7 @@ assert(!pageSrc.includes('States we cover'), 'No permanent "States we cover" gri
 // Project discovery phase: details open only after a project pin (or same-site cluster) is chosen.
 assert((pageSrc.match(/\{detailsOpen && \(/g) || []).length === 2, 'Desktop panel and mobile sheet render only while project details are open');
 assert(pageSrc.includes('hidden lg:block') && pageSrc.includes('<BottomSheet'), 'Desktop side panel + mobile bottom sheet');
-assert((pageSrc.match(/dispatch\(\{ type: 'selectCity'/g) || []).length === 1, 'City markers drive the selected-city state through the one reducer');
+assert((pageSrc.match(/dispatch\(\{ type: 'selectCity'/g) || []).length === 2 && /onSelectCity=\{\(city\) => dispatch\(\{ type: 'selectCity'/.test(pageSrc) && /if \(project\.city !== nav\.city\) dispatch\(\{ type: 'selectCity'/.test(pageSrc), 'City markers (and a tapped project pin in another city) drive the selected-city state through the one reducer');
 const sheetSrc = read('../src/components/presence/BottomSheet.jsx');
 assert(sheetSrc.includes('lg:hidden') && sheetSrc.includes("['peek', 'half', 'full']"), 'Bottom sheet is mobile-only with three snap points');
 assert(sheetSrc.includes('Expand details') && sheetSrc.includes('Close details'), 'Sheet has expand/collapse and close buttons');

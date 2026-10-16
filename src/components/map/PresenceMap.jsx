@@ -108,6 +108,7 @@ export const PresenceMap = ({
   referenceLat = null,
   projectMarkers = [],
   selectedProjectId = null,
+  cityBeacon = true, // false while a project pin carries the highlight (beacon) instead of the city
   onSelectProject,
   onSelectCluster,
   footer = null,
@@ -402,7 +403,7 @@ export const PresenceMap = ({
               strokeWidth={2}
               vectorEffect="non-scaling-stroke"
             />
-            {isSelected && !moving && (
+            {isSelected && cityBeacon && !moving && (
               <g className="presence-beacon motion-reduce:hidden" aria-hidden="true">
                 <circle r={r} fill="none" stroke={MAP_COLORS.edge} strokeWidth={2} vectorEffect="non-scaling-stroke" />
               </g>
@@ -562,14 +563,21 @@ export const PresenceMap = ({
             <title>{projectNames[id]}</title>
             <circle r={hit} cy={-s} fill="transparent" />
             <circle r={s + 6 * unit} cy={-s * 1.3} className="fill-none stroke-brand-accent opacity-0 group-focus-visible:opacity-100" strokeWidth={2} vectorEffect="non-scaling-stroke" />
+            {/* Highlighted project (the card's project): the same yellow beacon as a selected city */}
+            {isSelected && !moving && (
+              <g className="presence-beacon motion-reduce:hidden" aria-hidden="true" data-project-beacon="">
+                <circle r={s} cy={-s * 1.6} fill="none" stroke={MAP_COLORS.edge} strokeWidth={2} vectorEffect="non-scaling-stroke" />
+              </g>
+            )}
             {/* Pin: tip sits exactly on the verified site coordinate */}
             <path
               d={`M0 0 C ${-s * 0.35} ${-s * 0.6} ${-s} ${-s * 0.95} ${-s} ${-s * 1.6} A ${s} ${s} 0 1 1 ${s} ${-s * 1.6} C ${s} ${-s * 0.95} ${s * 0.35} ${-s * 0.6} 0 0 Z`}
-              className={isSelected ? 'fill-brand-accent stroke-white' : 'fill-white stroke-brand-navy-dark group-hover:fill-emerald-50'}
+              fill={isSelected ? MAP_COLORS.edge : '#FFFFFF'}
+              stroke={MAP_COLORS.land}
               strokeWidth={1.5}
               vectorEffect="non-scaling-stroke"
             />
-            <circle r={s * 0.38} cy={-s * 1.6} className={isSelected ? 'fill-white' : 'fill-brand-navy'} />
+            <circle r={s * 0.38} cy={-s * 1.6} fill={MAP_COLORS.land} />
           </g>
         );
       })}
@@ -603,7 +611,7 @@ export const PresenceMap = ({
   }, [hasOverlay, selectedCity, markers, svgSize.w]);
   const overlayClass = overlaySide === 'full'
     ? 'inset-x-2 bottom-2'
-    : `bottom-3 w-[min(24rem,calc(100%-1.5rem))] ${overlaySide === 'right' ? 'right-3' : 'left-3'}`;
+    : `bottom-3 w-[min(28rem,calc(100%-1.5rem))] ${overlaySide === 'right' ? 'right-3' : 'left-3'}`;
 
   // Pan (map units) needed so the marker sits MARKER_CLEARANCE_PX above the card, measured against the
   // view the map has settled on (viewRef), not an animation frame or a not-yet-rendered viewBox.

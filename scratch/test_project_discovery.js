@@ -135,7 +135,7 @@ console.log('\n6. City Selection Without Zoom (restored behaviour):');
 // The map's target view depends only on the selected state, so a city click cannot change the zoom.
 assert(mapSrc.includes('const getTargetView = useCallback(() => getStateFitView(selectedCode), [selectedCode, getStateFitView]);'), 'Map target view depends only on the selected state (city click cannot change zoom)');
 assert(!mapSrc.includes('data-city-area') && !pageSrc.includes('focusPoint'), 'No city boundary or city-level map view');
-assert(pageSrc.includes('const detailsOpen = Boolean((selectedCity && !campusCardOnly) ||'), 'Selecting a city opens the project panel / sheet (campus-only cities use the floating card instead)');
+assert(pageSrc.includes('const detailsOpen = Boolean((selectedCity && !projectCardOnly) ||'), 'Selecting a city opens the project panel / sheet (cities without published gallery projects use the floating project card instead)');
 assert(pageSrc.includes('<CityProjectList city={selectedCity} projects={cityProjects}'), "City panel lists that city's verified projects");
 assert(pageSrc.includes('getPublishedProjectsByStateAndCity(selectedState.code, selectedCity)'), 'City list uses verified (published) records only');
 assert(pageSrc.includes('aria-label="Previous project"') && pageSrc.includes('aria-label="Next project"') && pageSrc.includes('All projects in {selectedProject.city}'), 'Projects can be stepped through one by one and back to the list');
