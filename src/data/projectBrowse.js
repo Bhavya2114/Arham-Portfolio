@@ -59,16 +59,21 @@ export const typicalScope = (projects) => {
 /** A row's scope chips are shown only when its work differs from its group's typical work. */
 export const scopeDiffers = (project, group) => scopeKey(project.scope) !== scopeKey(group?.typicalScope);
 
+/** A client's short brand word: its first word, e.g. "ALLEN Career Institute" → "ALLEN". */
+export const clientBrand = (client) => (client ? client.trim().split(/\s+/)[0] : null);
+
 /**
- * Name in a client + city list: just the campus part, e.g. "ALLEN Ahmedabad – Sadhya SBR" → "Sadhya SBR",
- * "ALLEN Sankalp" → "Sankalp". The project detail keeps the full name.
+ * Name in a client + city list: the client's brand word + the campus name, without the "<City> – "
+ * prefix, e.g. "ALLEN Ahmedabad – Sadhya SBR" → "ALLEN Sadhya SBR"; "ALLEN Sankalp" stays as it is;
+ * a satellite town keeps its place ("ALLEN Thane – Manpada Campus"). Projects without a client just
+ * lose the city prefix. The project detail keeps the full name.
  */
 export const listName = (p) => {
-  let name = p.name;
-  const clientWord = p.client ? p.client.split(' ')[0] : null;
-  if (clientWord && name.startsWith(`${clientWord} `)) name = name.slice(clientWord.length + 1);
-  if (p.city && name.startsWith(`${p.city} – `)) name = name.slice(p.city.length + 3);
-  return name;
+  const brand = clientBrand(p.client);
+  let rest = p.name;
+  if (brand && rest.startsWith(`${brand} `)) rest = rest.slice(brand.length + 1);
+  if (p.city && rest.startsWith(`${p.city} – `)) rest = rest.slice(p.city.length + 3);
+  return brand ? `${brand} ${rest}` : rest;
 };
 
 /** Client groups for a set of projects, biggest first: { id, name, isClient, category, count, noun, line, projects }. */

@@ -1,7 +1,7 @@
 /**
  * Our Work panel / sheet (branch our-work-panel): viewport-tall desktop area, pinned header + scrolling
  * list, 85dvh phone sheet with the page locked behind it, single-group cities opening their list
- * directly, short campus names, compact rows without the shared stand-in photo, scope chips only when
+ * directly, short names (client brand word + campus, no city prefix), compact rows without the shared stand-in photo, scope chips only when
  * a row differs. (The live layout is also checked in a real browser at 1440×900 and 390×844.)
  */
 
@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { getProjectRows, hasOwnPhoto, PLACEHOLDER_PHOTOS, projectPhotos } from '../src/data/showcaseProjects.js';
-import { getBrowsableProjects, projectsInCity, getGroups, listName, typicalScope, scopeDiffers } from '../src/data/projectBrowse.js';
+import { getBrowsableProjects, projectsInCity, getGroups, listName, clientBrand, typicalScope, scopeDiffers } from '../src/data/projectBrowse.js';
 import { presenceNavReducer, INITIAL_PRESENCE_NAV, sheetLevel } from '../src/lib/presenceNavigation.js';
 import { historyDepth } from '../src/lib/useSheetHistory.js';
 
@@ -60,11 +60,14 @@ assert(!n.autoGroup && historyDepth(n) === 2 && sheetLevel(presenceNavReducer(n,
 assert(getGroups(projectsInCity(all, 'IN-RJ', 'Kota')).length === 1 && /const singleGroupOf = \(stateCode, city\) => \{[\s\S]*?cityGroups\.length === 1 \? cityGroups\[0\]\.id : null;/.test(page), 'The page opens the group directly when the city has exactly one');
 assert(/backLabel="Map"/.test(browser) && /<StatTiles projects=\{group\.projects\} compact \/>/.test(browser) && /autoGroup=\{nav\.autoGroup\}/.test(page), 'Direct-opened list: "‹ Map" back link and the city\'s stat tiles in its header');
 
-console.log('\n4. Short campus names in client + city lists (full name in the detail)');
+console.log('\n4. Short names in client + city lists: brand word + campus, no "<City> – " (full name in the detail)');
 const byId = (id) => all.find((p) => p.id === id);
-assert(listName(byId('allen-ahmedabad-sadhya-sbr')) === 'Sadhya SBR' && listName(byId('allen-ahmedabad-maninagar')) === 'Maninagar Campus' && listName(byId('allen-ahmedabad-gandhinagar')) === 'Gandhinagar Campus', 'Sadhya SBR, Maninagar Campus, Gandhinagar Campus');
-assert(listName(byId('allen-kota-sankalp')) === 'Sankalp' && listName(byId('allen-mumbai-manpada')) === 'Thane – Manpada Campus' && listName(byId('allen-panaji-centre')) === 'Panaji Centre', 'Kota: "Sankalp"; a satellite town keeps its place ("Thane – Manpada Campus")');
-assert(all.every((p) => !listName(p).startsWith('ALLEN ') && !listName(p).startsWith(`${p.city} – `)), 'No list name keeps "ALLEN " or "<City> – "');
+assert(clientBrand('ALLEN Career Institute') === 'ALLEN' && clientBrand(null) === null, 'Brand word = the client\'s first word ("ALLEN")');
+assert(listName(byId('allen-ahmedabad-sadhya-sbr')) === 'ALLEN Sadhya SBR' && listName(byId('allen-ahmedabad-maninagar')) === 'ALLEN Maninagar Campus' && listName(byId('allen-ahmedabad-gandhinagar')) === 'ALLEN Gandhinagar Campus', 'ALLEN Sadhya SBR, ALLEN Maninagar Campus, ALLEN Gandhinagar Campus');
+assert(listName(byId('allen-kota-sankalp')) === 'ALLEN Sankalp' && listName(byId('allen-mumbai-manpada')) === 'ALLEN Thane – Manpada Campus' && listName(byId('allen-panaji-centre')) === 'ALLEN Panaji Centre', 'Kota: "ALLEN Sankalp"; a satellite town keeps its place ("ALLEN Thane – Manpada Campus")');
+assert(all.every((p) => listName(p).startsWith('ALLEN ') && !listName(p).includes(`ALLEN ${p.city} – `)), 'Every list name keeps "ALLEN " and never "ALLEN <City> – "');
+assert(listName({ name: 'ACME Pune – Plant 2', client: 'ACME Industries', city: 'Pune' }) === 'ACME Plant 2' && listName({ name: 'Pune – Office block', client: null, city: 'Pune' }) === 'Office block', 'Generalised: any client\'s brand word + campus; no-client rows just lose the city prefix');
+assert(!/allen[-_ ]?logo|logo\.(png|svg|webp)/i.test(browser) && /GraduationCap/.test(browser), 'No ALLEN logo; the cap icon stays');
 assert(/<ProjectRow key=\{p\.id\} project=\{p\} onOpen=\{onOpenProject\} group=\{group\} short \/>/.test(browser) && /\{heading\(project\.name\)\}/.test(browser) && /<span className="sr-only">\{project\.name\}<\/span>/.test(browser), 'Lists use the short name (screen readers hear the full one); the detail heading is the full name');
 
 console.log('\n5. Compact rows: no thumbnail for the shared stand-in photo');
