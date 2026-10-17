@@ -153,7 +153,7 @@ assert(/const highlightedProjectId = project && hasSiteCoordinates\(project\) \?
 console.log('\n5. Sheet / panel');
 const sheet = read('../src/components/presence/ProjectSheet.jsx');
 assert(/role="dialog"/.test(sheet) && /aria-labelledby=\{labelledBy\}/.test(sheet) && /aria-modal="false"/.test(sheet), 'Sheet is a dialog region labelled by its heading (the map stays usable)');
-assert(/transform 250ms/.test(sheet) && !/transition-\[height\]|transition: 'height/.test(sheet) && /style=\{\{ height: fullH,/.test(sheet), 'Open / expand / drag move it with transform only (~250 ms); its height never animates');
+assert(/transform 250ms/.test(sheet) && !/transition-\[height\]|transition: 'height/.test(sheet) && /fitContent \? \{ height: 'auto', maxHeight: fullH \} : \{ height: fullH \}/.test(sheet), 'Open / expand / drag move it with transform only (~250 ms); its height never animates');
 const moveFn = sheet.slice(sheet.indexOf('const onPointerMove'), sheet.indexOf('const onPointerEnd'));
 assert(/place\(d\.y, false\)/.test(moveFn) && !/set[A-Z]\w*\(/.test(moveFn), 'Dragging writes the transform through a ref (no React render per frame)');
 assert(/const HALF = 0\.5;/.test(sheet) && /setSnap\(level === 'city' \? 'half' : 'full'\)/.test(page), 'Half height for a city, full for a list / project (tapping a group expands it)');
@@ -163,7 +163,7 @@ assert(/headingRef\.current\?\.focus\(\{ preventScroll: true \}\)/.test(browser)
 assert(/cityPinFor\(city\)\?\.focus\(\{ preventScroll: true \}\)/.test(page), 'Closing returns focus to the city pin');
 assert(/if \(e\.key === 'Escape'\) dispatch\(\{ type: 'back' \}\);/.test(page), 'Escape steps back one level');
 assert(/html\[data-map-card="open"\] \.mobile-action-bar/.test(read('../src/styles/index.css')) && /if \(selectedCity\) root\.setAttribute\('data-map-card', 'open'\);/.test(page), 'Phone Call / WhatsApp / Enquire bar hides while the sheet is open');
-assert(/backLabel=\{city\}/.test(browser) && /backLabel=\{`\$\{owner\} · \$\{project\.city\}`\}/.test(browser), 'Back links: "‹ City" and "‹ Client · City"');
+assert(/backLabel=\{city\}/.test(browser) && /backLabel=\{autoGroup \? project\.city : `\$\{owner\} · \$\{project\.city\}`\}/.test(browser), 'Back links: "‹ City" and "‹ City" / "‹ Client · City" from a project');
 assert(/role="tablist"/.test(browser) && /role="tab"/.test(browser) && /aria-selected=\{tab === t\.id\}/.test(browser), 'Group list tabs All / Completed / Ongoing');
 assert(/loading="lazy"/.test(browser) && /h-\[76px\] w-\[76px\]/.test(browser), 'Rows: 76 px lazy thumbnails in a plain list');
 assert(!/\.map\([^)]*=>\s*<ul/.test(browser) && !/<button[^>]*>[\s\S]{0,400}<ul/.test(browser.slice(browser.indexOf('const ProjectRow'), browser.indexOf('export const ProjectBrowser'))), 'No list markup inside row buttons');

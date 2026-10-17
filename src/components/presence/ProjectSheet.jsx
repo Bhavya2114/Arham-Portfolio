@@ -3,7 +3,8 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 /**
  * Phone bottom sheet for Our Work (below `lg`; the desktop shows the same content in a side panel).
  *
- * Two snap points: 'half' (about half the screen; the map stays visible above) and 'full'.
+ * Two snap points: 'half' (about half the screen; the map stays visible above) and 'full', where the sheet
+ * is only as tall as its content (up to ~85 % of the screen; longer content scrolls inside).
  * Motion is transform-only: the sheet has a fixed height (full) and slides with translateY, so opening,
  * expanding and dragging never change layout. Dragging (the handle strip only, `touch-action: none`)
  * writes the transform straight to the element through a ref: no React render per frame. Full height
@@ -32,6 +33,9 @@ export const ProjectSheet = ({ snap = 'half', onSnapChange, onClose, labelledBy,
   const fullH = Math.max(320, Math.min(vh - TOP_GAP, Math.round(vh * MAX_SHARE)));
   const halfH = Math.round(vh * HALF);
   const offsetFor = (s) => (s === 'full' ? 0 : fullH - halfH);
+  // At 'full' the sheet is as tall as its content, up to fullH (short lists → a shorter sheet, no empty
+  // space). 'half' (a multi-client city summary) keeps the fixed-height sheet that slides to half.
+  const fitContent = snap === 'full';
   const sheetRef = useRef(null);
   const drag = useRef(null);
   const opened = useRef(false);
@@ -73,6 +77,15 @@ export const ProjectSheet = ({ snap = 'half', onSnapChange, onClose, labelledBy,
     if (!d || d.id !== e.pointerId) return;
     drag.current = null;
     if (!d.moved) return;
+    if (fitContent) {
+      // Content-height sheet: dragged down far enough closes it, otherwise it springs back.
+      const h = sheetRef.current?.offsetHeight || fullH;
+      if (d.y > Math.min(h * 0.35, 160)) {
+        place(fullH, true);
+        setTimeout(() => onClose?.(), 200);
+      } else place(0, true);
+      return;
+    }
     if (d.y > offsetFor('half') + CLOSE_DRAG_PX) {
       place(fullH, true);
       setTimeout(() => onClose?.(), 200);
@@ -90,7 +103,7 @@ export const ProjectSheet = ({ snap = 'half', onSnapChange, onClose, labelledBy,
       aria-modal="false"
       aria-labelledby={labelledBy}
       className="lg:hidden fixed inset-x-0 bottom-0 z-40 flex flex-col rounded-t-2xl panel-surface panel-surface--sheet will-change-transform"
-      style={{ height: fullH, transform: `translate3d(0, ${fullH}px, 0)` }}
+      style={{ ...(fitContent ? { height: 'auto', maxHeight: fullH } : { height: fullH }), transform: `translate3d(0, ${fullH}px, 0)` }}
       data-sheet-snap={snap}
     >
       {/* Drag handle strip (also a button: tap to expand / collapse) */}
@@ -113,7 +126,7 @@ export const ProjectSheet = ({ snap = 'half', onSnapChange, onClose, labelledBy,
         </button>
       </div>
       <div
-        className="flex-1 min-h-0 flex flex-col overflow-hidden px-4"
+        className="flex-auto min-h-0 flex flex-col overflow-hidden px-4"
         style={{ paddingBottom: `calc(${snap === 'full' ? 0 : fullH - halfH}px + 1.5rem + env(safe-area-inset-bottom))` }}
         data-sheet-body=""
       >

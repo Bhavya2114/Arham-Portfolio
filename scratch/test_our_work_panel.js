@@ -28,21 +28,21 @@ const css = read('../src/styles/index.css');
 
 console.log('\n1. Panel / sheet height never exceeds the viewport');
 assert(/lg:h-\[calc\(100dvh-5rem\)\]/.test(page) && /data-map-area=""/.test(page), 'Desktop: the map + panel area is exactly 100dvh minus the header (h-20 = 5rem)');
-assert(/<aside[\s\S]*?className="relative z-30 w-\[400px\] shrink-0 h-full min-h-0 flex flex-col overflow-hidden/.test(page) && !/lg:sticky lg:top-24 max-h/.test(page), 'Desktop panel fills that area (h-full) and never grows past it; it does not scroll itself');
+assert(/<aside[\s\S]*?className="relative z-30 w-\[400px\] shrink-0 self-start max-h-full min-h-0 flex flex-col overflow-hidden/.test(page) && !/lg:sticky lg:top-24 max-h/.test(page), 'Desktop panel: as tall as its content, never taller than that area (max-h-full); it does not scroll itself');
 assert(/const MAX_SHARE = 0\.85;/.test(sheet) && /Math\.min\(vh - TOP_GAP, Math\.round\(vh \* MAX_SHARE\)\)/.test(sheet), 'Phone sheet: full height at most 85 % of the screen');
 for (const [label, vh] of [['desktop 1440×900', 900], ['phone 390×844', 844]]) {
   const fullH = Math.max(320, Math.min(vh - 72, Math.round(vh * 0.85)));
   assert(label.startsWith('desktop') ? 900 - 80 <= vh : fullH <= vh && fullH <= Math.round(vh * 0.85), `${label}: ${label.startsWith('desktop') ? `area ${vh - 80}px` : `sheet ${fullH}px`} ≤ viewport ${vh}px`);
 }
 assert(/@media \(max-width: 1023px\) \{\s*html\[data-map-card="open"\] \{ overflow: hidden; overscroll-behavior: none; \}/.test(css), 'Phone: the page behind the open sheet is locked');
-assert(/className="flex-1 min-h-0 flex flex-col overflow-hidden px-4"/.test(sheet), 'Sheet body does not scroll (only the list inside does)');
+assert(/className="flex-auto min-h-0 flex flex-col overflow-hidden px-4"/.test(sheet), 'Sheet body does not scroll (only the list inside does)');
 
 console.log('\n2. Pinned header + scrolling body, thin scrollbar, bottom fade');
 assert(/const Layout = \(\{ header, scrollKey, children \}\) => \(/.test(browser) && /data-panel-header=""/.test(browser) && /data-panel-scroll=""/.test(browser), 'Every level: pinned header + scrolling body');
 assert((browser.match(/<Layout/g) || []).length === 4, 'Used by all four levels (city, group, project, cluster)');
 assert(/role="tablist"[\s\S]*?<\/>\s*\);\s*return \(\s*<Layout scrollKey=\{`\$\{focusKey\}\|\$\{tab\}`\} header=\{header\}>/.test(browser), 'Group list: back link, title and status tabs are in the pinned header');
-assert(/header=\{<TopBar backLabel=\{`\$\{owner\} · \$\{project\.city\}`\}/.test(browser), 'Project detail: back link + close pinned');
-assert(/panel-scroll h-full overflow-y-auto overscroll-contain/.test(browser) && /\.panel-scroll::-webkit-scrollbar \{ width: 6px; \}/.test(css) && /scrollbar-color: rgba\(255, 255, 255, 0\.18\) transparent;/.test(css) && /::-webkit-scrollbar-button \{ display: none;/.test(css) && /border-radius: 9999px/.test(css), 'Thin themed scrollbar: 6 px, rounded, no arrows; thin + rgba(255,255,255,.18) where only the standard properties work');
+assert(/<TopBar backLabel=\{autoGroup \? project\.city : `\$\{owner\} · \$\{project\.city\}`\}/.test(browser), 'Project detail: back link + close pinned');
+assert(/panel-scroll min-h-0 overflow-y-auto overscroll-contain/.test(browser) && /\.panel-scroll::-webkit-scrollbar \{ width: 6px; \}/.test(css) && /scrollbar-color: rgba\(255, 255, 255, 0\.18\) transparent;/.test(css) && /::-webkit-scrollbar-button \{ display: none;/.test(css) && /border-radius: 9999px/.test(css), 'Thin themed scrollbar: 6 px, rounded, no arrows; thin + rgba(255,255,255,.18) where only the standard properties work');
 assert(/data-scroll-fade=\{more \? 'on' : 'off'\}/.test(browser) && /el\.scrollTop \+ el\.clientHeight < el\.scrollHeight - 4/.test(browser) && /if \(next !== moreRef\.current\)/.test(browser), 'Bottom fade while more is below, hidden at the end (state changes only when it flips)');
 assert(/useEffect\(\(\) => \{\s*if \(!isDesktop \|\| \(!nav\.stateCode && !selectedCity\)\) return;[\s\S]*?if \(Math\.abs\(delta\) <= 2\) return;[\s\S]*?prefers-reduced-motion: reduce\)'\)\.matches \? 'auto' : 'smooth'/.test(page), 'Desktop: opening a state / city scrolls the area under the header (skipped if aligned; reduced motion = instant)');
 
@@ -58,7 +58,7 @@ assert(sheetLevel(closed) === null && closed.stateCode === 'IN-RJ', 'Back from t
 n = run([{ type: 'selectState', stateCode: 'IN-RJ' }, { type: 'selectCity', stateCode: 'IN-RJ', city: 'Kota' }, { type: 'openGroup', groupId: 'g' }]);
 assert(!n.autoGroup && historyDepth(n) === 2 && sheetLevel(presenceNavReducer(n, { type: 'back' })) === 'city', 'A city with several groups keeps the summary step (list → back → summary)');
 assert(getGroups(projectsInCity(all, 'IN-RJ', 'Kota')).length === 1 && /const singleGroupOf = \(stateCode, city\) => \{[\s\S]*?cityGroups\.length === 1 \? cityGroups\[0\]\.id : null;/.test(page), 'The page opens the group directly when the city has exactly one');
-assert(/backLabel="Map"/.test(browser) && !/<StatTiles projects=\{group\.projects\}/.test(browser) && /\{group\.name\} · \{group\.count\} \{group\.noun\}\{ongoingSuffix\(group\.projects\)\}/.test(browser) && /autoGroup=\{nav\.autoGroup\}/.test(page), 'Direct-opened list: "‹ Map" back link; the subtitle "<client> · N campuses" is the only count (no tiles, no status line)');
+assert(!/backLabel="Map"/.test(browser) && !/<StatTiles projects=\{group\.projects\}/.test(browser) && /\{group\.name\} · \{group\.count\} \{group\.noun\}\{ongoingSuffix\(group\.projects\)\}/.test(browser) && /autoGroup=\{nav\.autoGroup\}/.test(page), 'Direct-opened list: no back link (✕ only); the subtitle "<client> · N campuses" is the only count (no tiles, no status line)');
 
 console.log('\n4. Short names in client + city lists: brand word + campus, no "<City> – " (full name in the detail)');
 const byId = (id) => all.find((p) => p.id === id);
@@ -93,7 +93,33 @@ assert(/const ROW_LIST = 'divide-y divide-white\/\[0\.07\]';/.test(browser) && !
 assert(/String\(index \+ 1\)\.padStart\(2, '0'\)/.test(browser) && /text-accent\/80/.test(browser) && /<ChevronRight className="h-5 w-5 shrink-0 text-muted" aria-hidden="true" \/>/.test(browser), 'Zero-padded number in the accent (80 %), muted chevron on the right');
 assert(/hover:bg-\[rgba\(217,227,90,0\.07\)\] hover:shadow-\[inset_3px_0_0_#D9E35A\]/.test(browser) && /focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/.test(browser) && /active:shadow-\[inset_3px_0_0_#D9E35A\]/.test(browser) && /rounded-\[10px\]/.test(browser), 'Hover / focus / pressed: lime tint, 10px corners, 3px lime bar; keyboard focus also an accent ring');
 assert(/\.panel-surface \.text-muted \{ color: #A8ABB1; \}/.test(css), 'Muted text inside the see-through panel lightened just enough for AA over the map');
-assert(/data-scroll-fade/.test(browser) && /from-\[#141518\]/.test(browser) && /panel-scroll h-full overflow-y-auto/.test(browser), 'Bottom fade (matched to the panel) and thin scrollbar kept');
+assert(/data-scroll-fade/.test(browser) && /from-\[#141518\]/.test(browser) && /panel-scroll min-h-0 overflow-y-auto/.test(browser), 'Bottom fade (matched to the panel) and thin scrollbar kept');
+
+console.log('\n8. Panel fit: no "‹ Map", one-project cities open the project, height fits the content');
+const fitRun = (actions) => actions.reduce(presenceNavReducer, INITIAL_PRESENCE_NAV);
+const cityOf = (city) => projectsInCity(all, 'IN-RJ', city);
+assert(cityOf('Udaipur').length === 1 && cityOf('Jodhpur').length === 3 && cityOf('Kota').length === 15, 'Test cities: Udaipur 1 project, Jodhpur 3, Kota 15');
+// 1 project: tapping the city opens that project; one level; one back closes.
+let one = fitRun([{ type: 'selectState', stateCode: 'IN-RJ' }, { type: 'selectCity', stateCode: 'IN-RJ', city: 'Udaipur', groupId: 'client:ALLEN Career Institute', projectId: cityOf('Udaipur')[0].id }]);
+assert(sheetLevel(one) === 'project' && one.autoProject && historyDepth(one) === 1 && historyDepth(one, true) === 2, '1-project city: project detail directly; depth 1 (2 with the photo viewer)');
+assert(sheetLevel(presenceNavReducer(one, { type: 'back' })) === null && presenceNavReducer(one, { type: 'back' }).stateCode === 'IN-RJ', '1-project city: one back press closes to the map');
+// 3 projects: list directly (one level); a project adds one; back steps project → list → map.
+let three = fitRun([{ type: 'selectState', stateCode: 'IN-RJ' }, { type: 'selectCity', stateCode: 'IN-RJ', city: 'Jodhpur', groupId: 'client:ALLEN Career Institute' }]);
+assert(sheetLevel(three) === 'group' && historyDepth(three) === 1, '3-project city: list directly; depth 1');
+three = presenceNavReducer(three, { type: 'selectProject', projectId: cityOf('Jodhpur')[0].id });
+assert(sheetLevel(three) === 'project' && !three.autoProject && historyDepth(three) === 2, '3-project city: a project from the list is one more level (depth 2)');
+assert(sheetLevel(presenceNavReducer(three, { type: 'back' })) === 'group' && sheetLevel(presenceNavReducer(presenceNavReducer(three, { type: 'back' }), { type: 'back' })) === null, '3-project city: back → list → map');
+// 15 projects: same as 3, just a longer (scrolling) list.
+const fifteen = fitRun([{ type: 'selectState', stateCode: 'IN-RJ' }, { type: 'selectCity', stateCode: 'IN-RJ', city: 'Kota', groupId: 'client:ALLEN Career Institute' }]);
+assert(sheetLevel(fifteen) === 'group' && historyDepth(fifteen) === 1 && historyDepth(presenceNavReducer(fifteen, { type: 'selectProject', projectId: cityOf('Kota')[3].id })) === 2, '15-project city: list depth 1, project depth 2');
+assert(/projectId: only\.length === 1 \? only\[0\]\.id : null/.test(page) && /autoProject=\{nav\.autoProject\}/.test(page), 'The page opens the only project when a city has exactly one');
+assert(/autoProject \? \(/.test(browser) && /data-project-context=""/.test(browser) && /\{project\.city\} <span className="font-normal text-muted">· \{owner\}<\/span>/.test(browser), 'Directly-opened project: "City · Client" context in the header, ✕ only (no back link)');
+assert(/<CloseButton onClose=\{onClose\} label="Close list and return to the map" \/>/.test(browser) && !/backLabel="Map"/.test(browser), 'Lists opened directly have no "‹ Map" link; ✕ closes');
+assert(/backLabel=\{autoGroup \? project\.city : `\$\{owner\} · \$\{project\.city\}`\}/.test(browser), 'A project opened from a list keeps its back link ("‹ Kota")');
+// Height fits the content, up to the max.
+assert(/const Layout = \(\{ header, scrollKey, children \}\) => \(\s*<div className="flex min-h-0 flex-col">/.test(browser) && /<div className="relative flex min-h-0 flex-col">/.test(browser), 'Panel content is as tall as its content (no flex-1 / h-full filling)');
+assert(/const fitContent = snap === 'full';/.test(sheet) && /fitContent \? \{ height: 'auto', maxHeight: fullH \} : \{ height: fullH \}/.test(sheet), 'Phone sheet: content height up to the 85 % max when expanded');
+assert(/if \(fitContent\) \{[\s\S]*?if \(d\.y > Math\.min\(h \* 0\.35, 160\)\) \{/.test(sheet), 'Content-height sheet: drag down closes, otherwise springs back');
 
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);

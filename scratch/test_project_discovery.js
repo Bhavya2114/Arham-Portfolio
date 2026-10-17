@@ -137,7 +137,7 @@ assert(mapSrc.includes('const getTargetView = useCallback(() => getStateFitView(
 assert(!mapSrc.includes('data-city-area') && !pageSrc.includes('focusPoint'), 'No city boundary or city-level map view');
 assert(pageSrc.includes('const level = sheetLevel(nav);') && /\{!isDesktop && level && \(/.test(pageSrc), 'Selecting a city opens its summary in the sheet / panel');
 assert(pageSrc.includes('projectsInCity(filtered, selectedState.code, selectedCity)') && pageSrc.includes('getGroups(cityProjects)'), "City summary lists that city's own projects, grouped by client");
-assert(detailsSrc.includes('backLabel={city}') && detailsSrc.includes('backLabel={`${owner} · ${project.city}`}'), 'Project → its group list → the city, with labelled back links');
+assert(detailsSrc.includes('backLabel={city}') && detailsSrc.includes('backLabel={autoGroup ? project.city : `${owner} · ${project.city}`}'), 'Project → its group list → the city, with labelled back links');
 const markersMemo = (pageSrc.match(/const projectMarkers = useMemo\(([\s\S]*?)\);/) || [])[1] || '';
 assert(!/candidateProjectLocations/.test(detailsSrc + mapSrc) && /stateProjects\.filter\(hasSiteCoordinates\)/.test(markersMemo) && !/campus|candidate/i.test(markersMemo), 'Candidate campus records never become project pins (pins built only from project rows with coordinates)');
 assert(pageSrc.includes('selectedState ? projectsInState(filtered, selectedState.code) : []'), 'State view shows project pins for all its cities (current filter)');

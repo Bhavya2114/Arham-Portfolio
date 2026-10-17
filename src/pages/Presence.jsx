@@ -163,7 +163,11 @@ export const Presence = () => {
     const cityGroups = getGroups(projectsInCity(filtered, stateCode, city));
     return cityGroups.length === 1 ? cityGroups[0].id : null;
   };
-  const selectCity = (city) => dispatch({ type: 'selectCity', stateCode: nav.stateCode, city, groupId: singleGroupOf(nav.stateCode, city) });
+  // …and a city with exactly one project opens that project's detail directly.
+  const selectCity = (city) => {
+    const only = projectsInCity(filtered, nav.stateCode, city);
+    dispatch({ type: 'selectCity', stateCode: nav.stateCode, city, groupId: singleGroupOf(nav.stateCode, city), projectId: only.length === 1 ? only[0].id : null });
+  };
 
   const openProject = (projectId) => {
     const p = allProjects.find((x) => x.id === projectId);
@@ -268,6 +272,7 @@ export const Presence = () => {
       groups={groups}
       group={group}
       autoGroup={nav.autoGroup}
+      autoProject={nav.autoProject}
       project={project}
       clusterProjects={clusterProjects}
       filterLabel={filterLabel}
@@ -330,7 +335,7 @@ export const Presence = () => {
               <aside
                 role="region"
                 aria-labelledby="our-work-panel-heading"
-                className="relative z-30 w-[400px] shrink-0 h-full min-h-0 flex flex-col overflow-hidden rounded-2xl panel-surface p-5"
+                className="relative z-30 w-[400px] shrink-0 self-start max-h-full min-h-0 flex flex-col overflow-hidden rounded-2xl panel-surface p-5"
               >
                 {browser('our-work-panel')}
               </aside>
