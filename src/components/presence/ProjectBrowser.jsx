@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 're
 import { ChevronLeft, ChevronRight, X, GraduationCap, Building2, Home, Factory, Briefcase, Check, MessageCircle, MapPin } from 'lucide-react';
 import PhotoGallery from './PhotoGallery';
 import { projectPhotos, mapsSearchUrl, hasOwnPhoto } from '../../data/showcaseProjects';
-import { cityLine, filterByStatus, statusTabs, statTiles, uniformStatusLine, ongoingSuffix, statusLabel, similarProjectText, listName, scopeDiffers } from '../../data/projectBrowse';
+import { cityLine, filterByStatus, statusTabs, statTiles, uniformStatusLine, ongoingSuffix, statusLabel, similarProjectText, listName, scopeDiffers, workSummary } from '../../data/projectBrowse';
 import { COMPANY, whatsappHref } from '../../data/company';
 
 /**
@@ -12,7 +12,7 @@ import { COMPANY, whatsappHref } from '../../data/company';
  *   city    — city name, one line, Projects / Completed / Ongoing tiles, client groups
  *   group   — "‹ City" (or "‹ Map" when the city's only group opened directly), group name + count as the
  *             only count (" · N ongoing" added when some rows are ongoing), status tabs (mixed only), rows
- *   project — "‹ Client · City", photos, full name, place · Map link, one row of status + work chips, WhatsApp
+ *   project — "‹ Client · City", photos, full name, place · Map link, status chip, one sentence on the work, WhatsApp
  *   cluster — projects that share one map pin
  * Rows in a client + city list show just the campus part of the name, a thumbnail only for the
  * project's own photos (not the shared stand-in), and work chips only when they differ from the group's.
@@ -222,8 +222,9 @@ export const ProjectBrowser = ({
   // Tabs with 0 projects are hidden (they return once a row has that status).
   const groupTabs = useMemo(() => (group ? statusTabs(group.projects) : []), [group]);
 
-  const heading = (text, extra = null) => (
-    <h2 id={headingId} ref={headingRef} tabIndex={-1} className="text-2xl font-bold font-heading text-heading tracking-tight outline-none focus:outline-none focus-visible:outline-none focus-visible:shadow-none">
+  // `size`: the project detail uses a smaller name on phones so the sheet fits with WhatsApp in view.
+  const heading = (text, extra = null, size = 'text-2xl') => (
+    <h2 id={headingId} ref={headingRef} tabIndex={-1} className={`${size} font-bold font-heading text-heading tracking-tight outline-none focus:outline-none focus-visible:outline-none focus-visible:shadow-none`}>
       {text}
       {extra}
     </h2>
@@ -232,6 +233,7 @@ export const ProjectBrowser = ({
   if (level === 'project' && project) {
     const owner = project.client || project.category;
     const photos = projectPhotos(project);
+    const summary = workSummary(project);
     return (
       <Layout
         scrollKey={focusKey}
@@ -255,8 +257,8 @@ export const ProjectBrowser = ({
             button sit at the bottom with no scrolling (it still scrolls if the screen is too short). */}
         <div className="space-y-3 lg:flex lg:flex-1 lg:flex-col lg:space-y-4" data-project-detail="">
           <PhotoGallery photos={photos} alt={project.name} badge={owner} viewer={photoViewer} onViewerChange={onPhotoViewer} fill />
-          <div className="space-y-2">
-            {heading(project.name)}
+          <div className="space-y-1.5 lg:space-y-2">
+            {heading(project.name, null, 'text-xl lg:text-2xl')}
             {/* One line: place · a small Map link (the address itself stays in the data for this URL + schema). */}
             <p className="flex flex-wrap items-center gap-x-2 text-base text-body" data-project-place="">
               <span>{[project.area, project.city].filter(Boolean).join(', ')}</span>
@@ -276,13 +278,11 @@ export const ProjectBrowser = ({
                 </>
               )}
             </p>
-            {/* One row of chips: status first, then the work done. */}
-            <ul className="flex flex-wrap items-center gap-1.5" aria-label="Status and work done">
-              <li><StatusTag project={project} long /></li>
-              {(project.scope || []).map((s) => (
-                <li key={s} className={CHIP}>{s}</li>
-              ))}
-            </ul>
+            {/* Status as the only chip, then one sentence about the work. */}
+            <div className="flex">
+              <StatusTag project={project} long />
+            </div>
+            {summary && <p className="text-body [font-size:15px] leading-snug" data-project-summary="">{summary}</p>}
           </div>
           <a
             href={whatsappHref(similarProjectText(project, COMPANY.name))}

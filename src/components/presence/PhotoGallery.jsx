@@ -117,7 +117,7 @@ export const PhotoGallery = ({ photos, alt, badge, viewer: viewerProp, onViewerC
   const closeViewer = () => setViewer(null);
 
   return (
-    // `fill` (desktop detail): the photo grows to fill the free height (at least 260 px), cropped to cover.
+    // `fill` (project detail): 2:1 on phones; on desktop the photo grows to fill the free height (at least 260 px), cropped to cover.
     <div className={`space-y-2${fill ? ' lg:flex lg:flex-1 lg:min-h-[260px] lg:flex-col' : ''}`}>
       <div className={`relative overflow-hidden rounded-xl border border-white/[0.08] bg-black/30${fill ? ' lg:min-h-0 lg:flex-1' : ''}`}>
         <div ref={trackRef} className={`flex overflow-x-auto snap-x snap-mandatory overscroll-x-contain [scrollbar-width:none]${fill ? ' lg:absolute lg:inset-0' : ''}`} aria-label="Project photos">
@@ -137,7 +137,7 @@ export const PhotoGallery = ({ photos, alt, badge, viewer: viewerProp, onViewerC
                 decoding="async"
                 width="800"
                 height="450"
-                className={`block w-full object-cover ${fill ? 'aspect-video lg:aspect-auto lg:h-full' : 'aspect-video lg:aspect-[2/1]'}`}
+                className={`block w-full object-cover ${fill ? 'aspect-[2/1] lg:aspect-auto lg:h-full' : 'aspect-video lg:aspect-[2/1]'}`}
               />
             </button>
           ))}
