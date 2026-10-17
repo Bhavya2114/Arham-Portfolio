@@ -95,7 +95,7 @@ const StatTiles = ({ projects }) => {
  * The scrolling body: thin themed scrollbar (`.panel-scroll`), contained overscroll, and a soft fade at the
  * bottom edge while more content is below (hidden at the end). The fade's state changes only when it flips.
  */
-const ScrollBody = ({ resetKey, children }) => {
+const ScrollBody = ({ resetKey, fill = false, children }) => {
   const ref = useRef(null);
   const [more, setMore] = useState(false);
   const moreRef = useRef(false);
@@ -121,9 +121,9 @@ const ScrollBody = ({ resetKey, children }) => {
     };
   }, [resetKey]);
   return (
-    <div className="relative flex min-h-0 flex-col">
-      <div ref={ref} className="panel-scroll min-h-0 overflow-y-auto overscroll-contain pr-1 -mr-1" data-panel-scroll="">
-        <div className="pb-2">{children}</div>
+    <div className={`relative flex min-h-0 flex-col${fill ? ' lg:flex-1' : ''}`}>
+      <div ref={ref} className={`panel-scroll min-h-0 overflow-y-auto overscroll-contain pr-1 -mr-1${fill ? ' lg:flex lg:flex-1 lg:flex-col' : ''}`} data-panel-scroll="">
+        <div className={`pb-2${fill ? ' lg:flex lg:flex-1 lg:flex-col' : ''}`}>{children}</div>
       </div>
       <div
         aria-hidden="true"
@@ -136,12 +136,13 @@ const ScrollBody = ({ resetKey, children }) => {
 
 /**
  * Pinned header + scrolling body. The layout is as tall as its content (no empty space below the last row)
- * and shrinks to the panel / sheet's max height, where the body scrolls.
+ * and shrinks to the panel / sheet's max height, where the body scrolls. `fill` (the project detail on
+ * desktop): the layout fills the full-height panel and the body passes that height on to its content.
  */
-const Layout = ({ header, scrollKey, children }) => (
-  <div className="flex min-h-0 flex-col">
+const Layout = ({ header, scrollKey, fill = false, children }) => (
+  <div className={`flex min-h-0 flex-col${fill ? ' lg:flex-1' : ''}`}>
     <div className="shrink-0 space-y-3 pb-3" data-panel-header="">{header}</div>
-    <ScrollBody resetKey={scrollKey}>{children}</ScrollBody>
+    <ScrollBody resetKey={scrollKey} fill={fill}>{children}</ScrollBody>
   </div>
 );
 
@@ -234,6 +235,7 @@ export const ProjectBrowser = ({
     return (
       <Layout
         scrollKey={focusKey}
+        fill
         header={
           autoProject ? (
             // The city's only project, opened directly: the city + client as context, no back link, only ✕.
@@ -249,8 +251,10 @@ export const ProjectBrowser = ({
           )
         }
       >
-        <div className="space-y-3 lg:space-y-4">
-          <PhotoGallery photos={photos} alt={project.name} badge={owner} viewer={photoViewer} onViewerChange={onPhotoViewer} />
+        {/* Desktop: the panel is full height; the photo takes the free space so the text and the WhatsApp
+            button sit at the bottom with no scrolling (it still scrolls if the screen is too short). */}
+        <div className="space-y-3 lg:flex lg:flex-1 lg:flex-col lg:space-y-4" data-project-detail="">
+          <PhotoGallery photos={photos} alt={project.name} badge={owner} viewer={photoViewer} onViewerChange={onPhotoViewer} fill />
           <div className="space-y-2">
             {heading(project.name)}
             {/* One line: place · a small Map link (the address itself stays in the data for this URL + schema). */}
