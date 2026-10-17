@@ -136,18 +136,18 @@ console.log('\n9. Compact project detail: short photo, place · Map, one chip ro
 const gallery = read('../src/components/presence/PhotoGallery.jsx');
 const bik = projectsInCity(all, 'IN-RJ', 'Bikaner');
 assert(bik.length >= 1 && bik.every((p) => p.address && mapsSearchUrl(p).startsWith('https://www.google.com/maps/search/?api=1&query=')), 'Bikaner rows keep their address (it builds the Maps URL)');
-assert(/fill \? 'aspect-\[2\/1\] lg:aspect-auto lg:h-full' : 'aspect-video lg:aspect-\[2\/1\]'/.test(gallery) && !/aspect-\[10\/7\]/.test(gallery), 'Detail photo: 2:1 on phones (fits the 65 % sheet with the summary line); on desktop it fills the free height (see 10.)');
+assert(/fill \? 'aspect-video lg:aspect-auto lg:h-full' : 'aspect-video lg:aspect-\[2\/1\]'/.test(gallery) && !/aspect-\[10\/7\]/.test(gallery), 'Detail photo: 16:9 on phones (back from 2:1: the status moved onto the area line); on desktop it fills the free height (see 10.)');
 assert(/\{badge && \(/.test(gallery) && /\{photos\.length > 1 && \(\s*<span data-photo-counter=""/.test(gallery), 'Client badge kept on the photo; "1 / N" counter only with 2+ photos (swipe + thumbnails too)');
 const detail = browser.slice(browser.indexOf("if (level === 'project' && project)"), browser.indexOf("if (level === 'cluster')"));
 assert(/data-project-place=""/.test(detail) && /\[project\.area, project\.city\]\.filter\(Boolean\)\.join\(', '\)/.test(detail), 'Under the name: "Area, City" on one line');
 assert(/href=\{mapsSearchUrl\(project\)\}/.test(detail) && /target="_blank"/.test(detail) && /aria-label=\{`Open \$\{project\.name\} in Google Maps`\}/.test(detail) && /<MapPin[^>]*\/>\s*Map\s*<\/a>/.test(detail), 'Small "📍 Map" link: same Maps URL, new tab, aria-label "Open <name> in Google Maps"');
-assert(/<div className="flex">\s*<StatusTag project=\{project\} long \/>\s*<\/div>/.test(detail) && !/project\.scope/.test(detail) && !/aria-label="Status and work done"/.test(detail), 'Status ("✓ Completed 2022" / "Ongoing") is the only chip; no scope chips');
+assert((detail.match(/<StatusTag /g) || []).length === 1 && !/<div className="flex">\s*<StatusTag/.test(detail) && !/project\.scope/.test(detail) && !/aria-label="Status and work done"/.test(detail), 'Status ("✓ Completed 2022" / "Ongoing") is the only chip (on the area line, no row of its own); no scope chips');
 assert(!/Open in Google Maps<|\{project\.address\}|\{project\.category\}|Work done<|ExternalLink/.test(detail), 'Removed: address text, "Open in Google Maps", category chip, "Work done" heading');
 
 console.log('\n10. Desktop detail: full-height panel, the photo fills the free space');
 assert(/className=\{`relative z-30 w-\[400px\] shrink-0 \$\{level === 'project' \? 'h-full' : 'self-start max-h-full'\}/.test(page), 'Project detail: the desktop panel uses the full (viewport-fit) height, same as a long list');
 assert(/<Layout\s+scrollKey=\{focusKey\}\s+fill\s+header=\{\s+autoProject/.test(browser) && /const ScrollBody = \(\{ resetKey, fill = false, children \}\)/.test(browser) && /\$\{fill \? ' lg:flex lg:flex-1 lg:flex-col' : ''\}`\} data-panel-scroll=""/.test(browser), 'Detail layout + scroll body pass the full height down (desktop only; still scrolls if it cannot fit)');
-assert(/<PhotoGallery photos=\{photos\} alt=\{project\.name\} badge=\{owner\} viewer=\{photoViewer\} onViewerChange=\{onPhotoViewer\} fill \/>/.test(browser) && /fill \? ' lg:flex lg:flex-1 lg:min-h-\[260px\] lg:flex-col' : ''/.test(gallery) && /fill \? ' lg:min-h-0 lg:flex-1' : ''/.test(gallery) && /fill \? ' lg:absolute lg:inset-0' : ''/.test(gallery) && /object-cover/.test(gallery), 'Photo grows into the free space (flex 1, at least 260 px, object-fit cover) → text + WhatsApp sit at the bottom');
+assert(/<PhotoGallery photos=\{photos\} alt=\{project\.name\} badge=\{owner\} viewer=\{photoViewer\} onViewerChange=\{onPhotoViewer\} fill \/>/.test(browser) && /fill \? ' lg:flex lg:flex-1 lg:min-h-\[180px\] lg:flex-col' : ''/.test(gallery) && /fill \? ' lg:min-h-0 lg:flex-1' : ''/.test(gallery) && /fill \? ' lg:absolute lg:inset-0' : ''/.test(gallery) && /object-cover/.test(gallery), 'Photo grows into the free space (flex 1, at least 180 px, object-fit cover) → text + WhatsApp sit at the bottom; the photo absorbs any shortage');
 assert(/\{badge && \(/.test(gallery) && /data-project-place=""/.test(browser) && /<StatusTag project=\{project\} long \/>/.test(browser), 'Client badge, area · Map and the status chip kept from detail-compact');
 assert(!/lg:/.test(read('../src/components/presence/ProjectSheet.jsx').match(/className="lg:hidden[^"]*"/)[0].replace('lg:hidden', '')), 'Phone sheet unchanged (all fill classes are lg: only; the sheet is lg:hidden)');
 
@@ -162,6 +162,13 @@ assert(all.every((p) => workSummary(p) === W), `All ${all.length} current rows r
 assert(/const summary = workSummary\(project\);/.test(detail) && /\{summary && <p className="text-body \[font-size:15px\] leading-snug" data-project-summary="">\{summary\}<\/p>\}/.test(detail), 'Detail: the sentence under the status chip, body text colour, 15 px');
 assert(/\* {3}summary {4}optional one sentence about the work/.test(read('../src/data/showcaseProjects.js')), 'Row format documents the optional `summary` field');
 assert(/<div className="space-y-1\.5 lg:space-y-2">\s*\{heading\(project\.name, null, 'text-xl lg:text-2xl'\)\}/.test(detail), 'Phone detail: name 20 px, 6 px gaps (desktop unchanged: 24 px, 8 px)');
+
+console.log('\n12. Detail fit 2: status on the area line, photo absorbs the shortage');
+const placeP = detail.slice(detail.indexOf('data-project-place=""'), detail.indexOf('</p>', detail.indexOf('data-project-place=""')));
+assert(/<p className="flex flex-wrap items-center gap-x-1\.5 gap-y-1 text-body \[font-size:14px\]" data-project-place="">/.test(detail), 'Area line: 14 px, 6 px gaps, wraps only when it must');
+assert(/aria-label=\{`Open \$\{project\.name\} in Google Maps`\}[\s\S]*?Map\s*<\/a>[\s\S]*?<span className="inline-flex items-center gap-x-1\.5 whitespace-nowrap" data-project-status="">\s*<span className="text-muted" aria-hidden="true">·<\/span>\s*<StatusTag project=\{project\} long \/>\s*<\/span>\s*$/.test(placeP), '"Area, City · 📍 Map · ✓ Completed 2022": the status is last on that line; "· status" wraps as one piece');
+assert(/data-project-place=""[\s\S]*?<\/p>\s*\{summary && <p[^>]*data-project-summary=""/.test(detail) && /data-project-summary=""[\s\S]*?WhatsApp/.test(detail), 'Then the summary sentence, then the WhatsApp button');
+assert(/lg:min-h-\[180px\]/.test(gallery) && !/lg:min-h-\[260px\]/.test(gallery), 'Desktop photo min height 180 px (it shrinks first, so the detail does not scroll)');
 
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);
