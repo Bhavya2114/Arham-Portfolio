@@ -6,11 +6,13 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
  * Two snap points: 'half' (about half the screen; the map stays visible above) and 'full'.
  * Motion is transform-only: the sheet has a fixed height (full) and slides with translateY, so opening,
  * expanding and dragging never change layout. Dragging (the handle strip only, `touch-action: none`)
- * writes the transform straight to the element through a ref: no React render per frame. The body
- * scrolls on its own; at 'half' it gets bottom padding equal to the off-screen part so its end stays
- * reachable. Reduced motion: the global rule in styles/index.css removes the transition.
+ * writes the transform straight to the element through a ref: no React render per frame. Full height
+ * is at most ~85 % of the screen. The body does not scroll: the content's own pinned header stays put
+ * and only its list scrolls; at 'half' the body gets bottom padding equal to the off-screen part so the
+ * list's end stays reachable. The page behind is locked while the sheet is open (styles/index.css). Reduced motion: the global rule in styles/index.css removes the transition.
  */
 const TOP_GAP = 72; // keeps the sticky site header visible when expanded
+const MAX_SHARE = 0.85; // full height is at most ~85 % of the screen
 const HALF = 0.5;
 const CLOSE_DRAG_PX = 90; // dragged this far below 'half' → close
 const EASE = 'transform 250ms cubic-bezier(0.16, 1, 0.3, 1)';
@@ -27,7 +29,7 @@ const useViewportHeight = () => {
 
 export const ProjectSheet = ({ snap = 'half', onSnapChange, onClose, labelledBy, children }) => {
   const vh = useViewportHeight();
-  const fullH = Math.max(320, vh - TOP_GAP);
+  const fullH = Math.max(320, Math.min(vh - TOP_GAP, Math.round(vh * MAX_SHARE)));
   const halfH = Math.round(vh * HALF);
   const offsetFor = (s) => (s === 'full' ? 0 : fullH - halfH);
   const sheetRef = useRef(null);
@@ -111,7 +113,7 @@ export const ProjectSheet = ({ snap = 'half', onSnapChange, onClose, labelledBy,
         </button>
       </div>
       <div
-        className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-4"
+        className="flex-1 min-h-0 flex flex-col overflow-hidden px-4"
         style={{ paddingBottom: `calc(${snap === 'full' ? 0 : fullH - halfH}px + 1.5rem + env(safe-area-inset-bottom))` }}
         data-sheet-body=""
       >

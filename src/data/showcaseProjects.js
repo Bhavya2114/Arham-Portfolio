@@ -172,8 +172,14 @@ const PLACEHOLDER_PROJECTS = Object.freeze([]);
 /** The rows the page uses. */
 export const getProjectRows = () => (USE_PLACEHOLDER_PROJECTS ? [...SHOWCASE_PROJECTS, ...PLACEHOLDER_PROJECTS] : [...SHOWCASE_PROJECTS]);
 
+/** Shared stand-in photos (not of the project itself): rows whose only photos are these get no thumbnail. */
+export const PLACEHOLDER_PHOTOS = Object.freeze([ALLEN_PHOTO]);
+
 /** A project's photos (at most MAX_PHOTOS). */
 export const projectPhotos = (p) => (Array.isArray(p?.photos) ? p.photos.filter(Boolean).slice(0, MAX_PHOTOS) : []);
+
+/** True when the project has at least one photo of its own (not only a shared stand-in). */
+export const hasOwnPhoto = (p) => projectPhotos(p).some((src) => !PLACEHOLDER_PHOTOS.includes(src));
 
 export const hasSiteCoordinates = (p) => Number.isFinite(p?.lat) && Number.isFinite(p?.lng);
 

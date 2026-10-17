@@ -46,6 +46,36 @@ export const scopeSummary = (projects) => {
   return top.join(' & ');
 };
 
+const scopeKey = (scope) => [...(scope || [])].sort().join('|');
+
+/** The work most of these projects share (the most common exact scope), e.g. ['Full wiring', 'Lighting']. */
+export const typicalScope = (projects) => {
+  const tally = new Map();
+  projects.forEach((p) => tally.set(scopeKey(p.scope), (tally.get(scopeKey(p.scope)) || 0) + 1));
+  const [key] = [...tally.entries()].sort((a, b) => b[1] - a[1])[0] || [''];
+  return key ? key.split('|') : [];
+};
+
+/** A row's scope chips are shown only when its work differs from its group's typical work. */
+export const scopeDiffers = (project, group) => scopeKey(project.scope) !== scopeKey(group?.typicalScope);
+
+/** A client's short brand word: its first word, e.g. "ALLEN Career Institute" → "ALLEN". */
+export const clientBrand = (client) => (client ? client.trim().split(/\s+/)[0] : null);
+
+/**
+ * Name in a client + city list: the client's brand word + the campus name, without the "<City> – "
+ * prefix, e.g. "ALLEN Ahmedabad – Sadhya SBR" → "ALLEN Sadhya SBR"; "ALLEN Sankalp" stays as it is;
+ * a satellite town keeps its place ("ALLEN Thane – Manpada Campus"). Projects without a client just
+ * lose the city prefix. The project detail keeps the full name.
+ */
+export const listName = (p) => {
+  const brand = clientBrand(p.client);
+  let rest = p.name;
+  if (brand && rest.startsWith(`${brand} `)) rest = rest.slice(brand.length + 1);
+  if (p.city && rest.startsWith(`${p.city} – `)) rest = rest.slice(p.city.length + 3);
+  return brand ? `${brand} ${rest}` : rest;
+};
+
 /** Client groups for a set of projects, biggest first: { id, name, isClient, category, count, noun, line, projects }. */
 export const getGroups = (projects) => {
   const byId = new Map();
@@ -59,7 +89,7 @@ export const getGroups = (projects) => {
       const count = g.projects.length;
       const noun = nounFor(g.category, count);
       const scope = scopeSummary(g.projects);
-      return { ...g, count, noun, line: `${count} ${noun}${scope ? ` · ${scope}` : ''}` };
+      return { ...g, count, noun, typicalScope: typicalScope(g.projects), line: `${count} ${noun}${scope ? ` · ${scope}` : ''}` };
     })
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 };

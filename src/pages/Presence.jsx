@@ -158,9 +158,18 @@ export const Presence = () => {
   // Map ↔ list: an open project lights its own pin (if it has coordinates), otherwise its city pin.
   const highlightedProjectId = project && hasSiteCoordinates(project) ? project.id : null;
 
+  // A city with exactly one client group opens that group's list directly (no city summary step).
+  const singleGroupOf = (stateCode, city) => {
+    const cityGroups = getGroups(projectsInCity(filtered, stateCode, city));
+    return cityGroups.length === 1 ? cityGroups[0].id : null;
+  };
+  const selectCity = (city) => dispatch({ type: 'selectCity', stateCode: nav.stateCode, city, groupId: singleGroupOf(nav.stateCode, city) });
+
   const openProject = (projectId) => {
     const p = allProjects.find((x) => x.id === projectId);
-    if (p) dispatch({ type: 'selectProject', projectId, city: p.city, groupId: groupIdOf(p) });
+    if (!p) return;
+    const autoGroup = p.city === nav.city ? nav.autoGroup : singleGroupOf(p.stateCode, p.city) === groupIdOf(p);
+    dispatch({ type: 'selectProject', projectId, city: p.city, groupId: groupIdOf(p), autoGroup });
   };
   const back = () => dispatch({ type: 'back' });
   const closeSheet = () => dispatch({ type: 'closeSheet' });
@@ -210,6 +219,19 @@ export const Presence = () => {
     }
   }, [selectedCity]);
 
+  // Desktop: opening a state or a city scrolls the page so the map + panel area sits right under the site
+  // header (that area is one viewport tall, so exploring needs no page scrolling). Skipped when already aligned.
+  const mapAreaRef = useRef(null);
+  useEffect(() => {
+    if (!isDesktop || (!nav.stateCode && !selectedCity)) return;
+    const area = mapAreaRef.current;
+    if (!area) return;
+    const headerBottom = document.querySelector('header')?.getBoundingClientRect().bottom || 80;
+    const delta = area.getBoundingClientRect().top - headerBottom;
+    if (Math.abs(delta) <= 2) return;
+    window.scrollBy({ top: delta, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+  }, [isDesktop, nav.stateCode, selectedCity]);
+
   // Phone: on a new city, scroll the PAGE (never the map) so its pin sits above the half-height sheet.
   useLayoutEffect(() => {
     if (!selectedCity || isDesktop) return undefined;
@@ -245,6 +267,7 @@ export const Presence = () => {
       cityProjects={cityProjects}
       groups={groups}
       group={group}
+      autoGroup={nav.autoGroup}
       project={project}
       clusterProjects={clusterProjects}
       filterLabel={filterLabel}
@@ -275,7 +298,8 @@ export const Presence = () => {
 
           <div className="sr-only" aria-live="polite" aria-atomic="true">{announcement}</div>
 
-          <div className="flex flex-col lg:flex-row gap-6 items-start">
+          {/* Desktop: the map + panel area is exactly one viewport tall below the site header (h-20). */}
+          <div ref={mapAreaRef} className="flex flex-col lg:flex-row gap-6 items-start lg:items-stretch lg:h-[calc(100dvh-5rem)] lg:py-3 scroll-mt-20" data-map-area="">
             {/* Map — the primary interface */}
             <div className="w-full min-w-0 flex-1">
               <PresenceMap
@@ -289,7 +313,7 @@ export const Presence = () => {
                 markers={cityMarkers}
                 overviewCities={overviewCities}
                 selectedCity={selectedCity}
-                onSelectCity={(city) => dispatch({ type: 'selectCity', stateCode: nav.stateCode, city })}
+                onSelectCity={selectCity}
                 geography={geography}
                 referenceLat={cityMarkers[0]?.lat ?? null}
                 projectMarkers={projectMarkers}
@@ -306,7 +330,7 @@ export const Presence = () => {
               <aside
                 role="region"
                 aria-labelledby="our-work-panel-heading"
-                className="relative z-30 w-[400px] shrink-0 lg:sticky lg:top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain rounded-2xl border border-white/[0.08] bg-surface p-5"
+                className="relative z-30 w-[400px] shrink-0 h-full min-h-0 flex flex-col overflow-hidden rounded-2xl border border-white/[0.08] bg-surface p-5"
               >
                 {browser('our-work-panel')}
               </aside>

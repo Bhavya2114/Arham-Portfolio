@@ -97,6 +97,26 @@ p {
 html[data-map-card="open"] .mobile-action-bar,
 html[data-map-card="open"] .mobile-bar-spacer { display: none; }
 
+/* Our Work phone sheet open: the page behind never scrolls (only the sheet's list does). Programmatic
+   scrolling (bringing the city pin into view) still works. Desktop keeps normal page scrolling. */
+@media (max-width: 1023px) {
+  html[data-map-card="open"] { overflow: hidden; overscroll-behavior: none; }
+}
+
+/* Thin themed scrollbar inside the Our Work panel / sheet list: 6 px, rounded, no arrows. Chrome ignores the
+   ::-webkit-scrollbar rules once scrollbar-width / scrollbar-color are set (and then draws arrows), so the
+   standard properties apply only where ::-webkit-scrollbar is not supported (Firefox). */
+@supports not selector(::-webkit-scrollbar) {
+  .panel-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+  }
+}
+.panel-scroll::-webkit-scrollbar { width: 6px; }
+.panel-scroll::-webkit-scrollbar-track { background: transparent; }
+.panel-scroll::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.18); border-radius: 9999px; }
+.panel-scroll::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+
 /* Architectural Subtle Background Grid */
 .bg-grid-subtle {
   background-size: 32px 32px;
