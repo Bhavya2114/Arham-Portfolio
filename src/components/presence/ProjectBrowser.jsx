@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, X, GraduationCap, Building2, Home, Factory, Briefcase, Check, MessageCircle, MapPin, ExternalLink } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, GraduationCap, Building2, Home, Factory, Briefcase, Check, MessageCircle, MapPin } from 'lucide-react';
 import PhotoGallery from './PhotoGallery';
 import { projectPhotos, mapsSearchUrl, hasOwnPhoto } from '../../data/showcaseProjects';
 import { cityLine, filterByStatus, statusTabs, statTiles, uniformStatusLine, ongoingSuffix, statusLabel, similarProjectText, listName, scopeDiffers } from '../../data/projectBrowse';
@@ -12,7 +12,7 @@ import { COMPANY, whatsappHref } from '../../data/company';
  *   city    — city name, one line, Projects / Completed / Ongoing tiles, client groups
  *   group   — "‹ City" (or "‹ Map" when the city's only group opened directly), group name + count as the
  *             only count (" · N ongoing" added when some rows are ongoing), status tabs (mixed only), rows
- *   project — "‹ Client · City", photos, full name, place, address + Google Maps, status, work done, WhatsApp
+ *   project — "‹ Client · City", photos, full name, place · Map link, one row of status + work chips, WhatsApp
  *   cluster — projects that share one map pin
  * Rows in a client + city list show just the campus part of the name, a thumbnail only for the
  * project's own photos (not the shared stand-in), and work chips only when they differ from the group's.
@@ -32,18 +32,16 @@ export const StatusTag = ({ project, long = false }) =>
     </span>
   );
 
-// `inline`: inside a row button (phrasing content only, so spans instead of a list).
-const ScopeChips = ({ scope, size = 'sm', inline = false }) => {
-  const List = inline ? 'span' : 'ul';
-  const Item = inline ? 'span' : 'li';
-  return (
-    <List className="flex flex-wrap gap-1.5" {...(inline ? {} : { 'aria-label': 'Work done' })}>
-      {(scope || []).map((s) => (
-        <Item key={s} className={`rounded-full border border-white/[0.14] bg-white/[0.06] text-body ${size === 'sm' ? 'px-2 py-0.5 text-xs' : 'px-3 py-1 text-sm'}`}>{s}</Item>
-      ))}
-    </List>
-  );
-};
+const CHIP = 'rounded-full border border-white/[0.14] bg-white/[0.06] px-2 py-0.5 text-xs text-body';
+
+// Inside a row button (phrasing content only, so spans instead of a list).
+const ScopeChips = ({ scope }) => (
+  <span className="flex flex-wrap gap-1.5">
+    {(scope || []).map((s) => (
+      <span key={s} className={CHIP}>{s}</span>
+    ))}
+  </span>
+);
 
 const GroupIcon = ({ category, small = false }) => {
   const Icon = CATEGORY_ICONS[category] || Briefcase;
@@ -180,7 +178,7 @@ const ProjectRow = ({ project, index, onOpen, group = null, short = false }) => 
             <span className="min-w-0 truncate">{project.area}</span>
             <span className="shrink-0"><StatusTag project={project} /></span>
           </span>
-          {(!group || scopeDiffers(project, group)) && <ScopeChips scope={project.scope} inline />}
+          {(!group || scopeDiffers(project, group)) && <ScopeChips scope={project.scope} />}
         </span>
         <ChevronRight className="h-5 w-5 shrink-0 text-muted" aria-hidden="true" />
       </button>
@@ -255,33 +253,32 @@ export const ProjectBrowser = ({
           <PhotoGallery photos={photos} alt={project.name} badge={owner} viewer={photoViewer} onViewerChange={onPhotoViewer} />
           <div className="space-y-2">
             {heading(project.name)}
-            <p className="text-base text-body">{[project.area, project.city].filter(Boolean).join(', ')}</p>
-            {project.address && (
-              <div className="space-y-1">
-                <p className="flex items-start gap-1.5 text-sm text-muted">
-                  <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                  <span>{project.address}</span>
-                </p>
-                <a
-                  href={mapsSearchUrl(project)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`inline-flex min-h-[44px] items-center gap-1.5 rounded text-sm font-semibold text-heading underline decoration-accent decoration-2 underline-offset-4 hover:text-accent ${BTN_FOCUS}`}
-                >
-                  Open in Google Maps
-                  <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-                  <span className="sr-only"> (opens in a new tab)</span>
-                </a>
-              </div>
-            )}
-            <div className="flex flex-wrap items-center gap-2">
-              <StatusTag project={project} long />
-              <span className="rounded-full border border-white/[0.14] bg-white/[0.06] px-2 py-0.5 text-xs font-semibold text-body">{project.category}</span>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-muted">Work done</h3>
-            <ScopeChips scope={project.scope} size="md" />
+            {/* One line: place · a small Map link (the address itself stays in the data for this URL + schema). */}
+            <p className="flex flex-wrap items-center gap-x-2 text-base text-body" data-project-place="">
+              <span>{[project.area, project.city].filter(Boolean).join(', ')}</span>
+              {project.address && (
+                <>
+                  <span className="text-muted" aria-hidden="true">·</span>
+                  <a
+                    href={mapsSearchUrl(project)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`Open ${project.name} in Google Maps`}
+                    className={`-my-1.5 inline-flex min-h-[32px] items-center gap-1 rounded px-1 text-sm font-semibold text-heading underline decoration-accent decoration-2 underline-offset-4 hover:text-accent ${BTN_FOCUS}`}
+                  >
+                    <MapPin className="h-3.5 w-3.5 text-accent" aria-hidden="true" />
+                    Map
+                  </a>
+                </>
+              )}
+            </p>
+            {/* One row of chips: status first, then the work done. */}
+            <ul className="flex flex-wrap items-center gap-1.5" aria-label="Status and work done">
+              <li><StatusTag project={project} long /></li>
+              {(project.scope || []).map((s) => (
+                <li key={s} className={CHIP}>{s}</li>
+              ))}
+            </ul>
           </div>
           <a
             href={whatsappHref(similarProjectText(project, COMPANY.name))}
