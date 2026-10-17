@@ -89,7 +89,7 @@ export const ProjectSheet = ({ snap = 'half', onSnapChange, onClose, labelledBy,
       role="dialog"
       aria-modal="false"
       aria-labelledby={labelledBy}
-      className="lg:hidden fixed inset-x-0 bottom-0 z-40 flex flex-col rounded-t-2xl border-t border-white/[0.08] bg-surface shadow-[0_-12px_40px_rgba(0,0,0,0.45)] will-change-transform"
+      className="lg:hidden fixed inset-x-0 bottom-0 z-40 flex flex-col rounded-t-2xl panel-surface panel-surface--sheet will-change-transform"
       style={{ height: fullH, transform: `translate3d(0, ${fullH}px, 0)` }}
       data-sheet-snap={snap}
     >
