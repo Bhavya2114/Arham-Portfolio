@@ -27,6 +27,7 @@ import { projectLatLon } from '../lib/mapProjection.js';
 import { loadStateGeography } from '../data/geo/stateGeography.js';
 import { presenceNavReducer, INITIAL_PRESENCE_NAV, sheetLevel } from '../lib/presenceNavigation.js';
 import usePageMetadata from '../lib/usePageMetadata';
+import { useSheetHistory, historyDepth } from '../lib/useSheetHistory.js';
 import { COMPANY, pageTitle, whatsappHref, WHATSAPP_HELLO } from '../data/company';
 import { ArrowRight, Phone, MessageCircle } from 'lucide-react';
 
@@ -44,6 +45,8 @@ import { ArrowRight, Phone, MessageCircle } from 'lucide-react';
  * - Selecting a state fits the map to it; selecting a city never zooms. Moving inside the sheet never
  *   moves the map. Back / Escape step back one level; closing returns focus to the city pin.
  * - An opened project highlights its own pin (yellow beacon) when it has coordinates, else its city pin.
+ * - Every sheet level (city → group → project → photo viewer) is a browser-history entry on the same URL
+ *   (lib/useSheetHistory.js): the phone's back button steps back one level and finally closes the sheet.
  */
 const useIsDesktop = () => {
   const query = '(min-width: 1024px)';
@@ -162,6 +165,21 @@ export const Presence = () => {
   const back = () => dispatch({ type: 'back' });
   const closeSheet = () => dispatch({ type: 'closeSheet' });
 
+  // Full-screen photo viewer: owned here because it is a history level too (closed with its project).
+  const [photoViewer, setPhotoViewer] = useState(null);
+  useEffect(() => setPhotoViewer(null), [nav.projectId]);
+  const viewerOpen = level === 'project' && photoViewer !== null;
+
+  // Phone back button / gesture: one level per history entry (viewer → project → list → summary → closed).
+  useSheetHistory(historyDepth(nav, viewerOpen), (levels) => {
+    let left = levels;
+    if (viewerOpen && left > 0) {
+      setPhotoViewer(null);
+      left -= 1;
+    }
+    for (; left > 0; left -= 1) dispatch({ type: 'back' });
+  });
+
   // Sheet height: half for a city summary, full for a list or a project (tapping a group expands it).
   const [snap, setSnap] = useState('half');
   useEffect(() => {
@@ -235,6 +253,8 @@ export const Presence = () => {
       onOpenProject={openProject}
       onBack={back}
       onClose={closeSheet}
+      photoViewer={photoViewer}
+      onPhotoViewer={setPhotoViewer}
     />
   );
 

@@ -15,6 +15,7 @@ import {
 } from '../src/data/projectBrowse.js';
 import { presenceNavReducer, INITIAL_PRESENCE_NAV, sheetLevel } from '../src/lib/presenceNavigation.js';
 import { getPresenceState } from '../src/data/presenceCoverage.js';
+import { historyDepth } from '../src/lib/useSheetHistory.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const read = (rel) => fs.readFileSync(path.resolve(here, rel), 'utf-8');
@@ -139,7 +140,27 @@ const gallery = read('../src/components/presence/PhotoGallery.jsx');
 assert(/snap-x snap-mandatory/.test(gallery) && /\{index \+ 1\} \/ \{photos\.length\}/.test(gallery) && /aria-modal="true"/.test(gallery) && /stopImmediatePropagation/.test(gallery), 'Photos: swipe (scroll-snap), "1 / 6" counter, full-screen viewer whose Escape closes only itself');
 assert(/setIndex\(\(prev\) => \(prev === i \? prev/.test(gallery), 'Photo index stored only when it changes');
 
-console.log('\n6. One way of browsing');
+console.log('\n6. Phone back button: one history entry per sheet level');
+const nav0 = { ...INITIAL_PRESENCE_NAV, stateCode: 'IN-RJ' };
+assert(historyDepth(nav0) === 0 && historyDepth({ ...nav0, city: 'Kota' }) === 1 && historyDepth({ ...nav0, city: 'Kota', groupId: 'g' }) === 2
+  && historyDepth({ ...nav0, city: 'Kota', groupId: 'g', projectId: 'p' }) === 3 && historyDepth({ ...nav0, city: 'Kota', groupId: 'g', projectId: 'p' }, true) === 4,
+  'Levels: summary 1, list 2, project 3, photo viewer 4 (state view 0)');
+assert(historyDepth({ ...nav0, clusterIds: ['a', 'b'] }) === 1, 'A pin cluster chooser is one level');
+// Every reducer `back` removes exactly one level, so N history entries = N back presses.
+let walk = run([{ type: 'selectState', stateCode: 'IN-RJ' }, { type: 'selectCity', stateCode: 'IN-RJ', city: 'Kota' }, { type: 'openGroup', groupId: 'g' }, { type: 'selectProject', projectId: 'p' }]);
+const depths = [historyDepth(walk)];
+while (historyDepth(walk) > 0) { walk = presenceNavReducer(walk, { type: 'back' }); depths.push(historyDepth(walk)); }
+assert(depths.join(',') === '3,2,1,0' && walk.stateCode === 'IN-RJ', `Each back removes one level (${depths.join(' → ')}); the last one closes the sheet, the state stays`);
+const hook = read('../src/lib/useSheetHistory.js');
+assert(/navigate\(here, \{ state: \{ ourWorkLevel: level \} \}\)/.test(hook) && /const here = `\$\{location\.pathname\}\$\{location\.search\}`;/.test(hook), 'Opening a level pushes an entry for the SAME URL (no route change, no reload)');
+assert(/navigate\(depth - at\);/.test(hook), 'Closing levels in the page goes back by as many entries');
+assert(/if \(navigationType !== 'POP'\) return;/.test(hook) && /stepBackRef\.current\(open - level\);/.test(hook), 'Browser back steps the page back by the levels popped');
+assert(/window\.history\.scrollRestoration = 'manual';/.test(hook) && /navigate\(here, \{ replace: true, state: null \}\)/.test(hook), 'No scroll jumps on back; a reload starts closed on a plain entry');
+assert(/useSheetHistory\(historyDepth\(nav, viewerOpen\),/.test(page) && /setPhotoViewer\(null\);\s*left -= 1;/.test(page) && /for \(; left > 0; left -= 1\) dispatch\(\{ type: 'back' \}\);/.test(page), 'Page: viewer closes first, then one reducer back per level');
+assert(/viewer=\{photoViewer\} onViewerChange=\{onPhotoViewer\}/.test(browser) && /const controlled = viewerProp !== undefined;/.test(gallery), 'The photo viewer is a page-owned level (closable by the back button)');
+assert(!/animateTo|setView|viewBox/.test(hook), 'History never touches the map');
+
+console.log('\n7. One way of browsing');
 assert(['CampusCard', 'BottomSheet', 'ProjectDetails', 'ProjectGrid', 'BeforeAfterSlider', 'CityStatus'].every((f) => !exists(`../src/components/presence/${f}.jsx`)), 'Old floating card, old sheet, published-project panel and the card list under the map removed');
 assert(!/overlay=\{|ProjectGrid|CampusCard/.test(page), 'The page uses only the map + sheet / panel');
 

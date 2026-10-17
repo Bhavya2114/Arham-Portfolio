@@ -109,6 +109,8 @@ export const ProjectBrowser = ({
   onOpenProject,
   onBack,
   onClose,
+  photoViewer, // index of the open full-screen photo (owned by the page: it is a history level)
+  onPhotoViewer,
 }) => {
   const headingId = `${idPrefix}-heading`;
   const headingRef = useRef(null);
@@ -140,7 +142,7 @@ export const ProjectBrowser = ({
     return (
       <div className="space-y-4 pb-2">
         <TopBar backLabel={`${owner} · ${project.city}`} onBack={onBack} onClose={onClose} closeLabel="Close project and return to the map" />
-        <PhotoGallery photos={photos} alt={project.name} badge={owner} />
+        <PhotoGallery photos={photos} alt={project.name} badge={owner} viewer={photoViewer} onViewerChange={onPhotoViewer} />
         <div className="space-y-2">
           {heading(project.name)}
           <p className="text-base text-body">{[project.area, project.city].filter(Boolean).join(', ')}</p>

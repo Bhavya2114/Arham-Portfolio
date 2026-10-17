@@ -88,17 +88,33 @@ const Lightbox = ({ photos, start, alt, onClose }) => {
   );
 };
 
-export const PhotoGallery = ({ photos, alt, badge }) => {
+/**
+ * `viewer` / `onViewerChange` (optional): the page can own the viewer state (Our Work does, so the
+ * viewer is a browser-history level and the phone's back button closes it). Without them the gallery
+ * keeps the state itself.
+ */
+export const PhotoGallery = ({ photos, alt, badge, viewer: viewerProp, onViewerChange }) => {
   const trackRef = useRef(null);
   const index = useSnapIndex(trackRef, photos.length);
-  const [viewer, setViewer] = useState(null); // index the full-screen viewer opened at
+  const [localViewer, setLocalViewer] = useState(null); // index the full-screen viewer opened at
+  const controlled = viewerProp !== undefined;
+  const viewer = controlled ? viewerProp : localViewer;
+  const setViewer = controlled ? onViewerChange : setLocalViewer;
   const openerRef = useRef(null);
 
+  // However the viewer closes (its close button, Escape, the phone's back button), focus returns to
+  // the photo it was opened from.
+  const wasOpen = useRef(false);
+  useEffect(() => {
+    if (viewer !== null) wasOpen.current = true;
+    else if (wasOpen.current) {
+      wasOpen.current = false;
+      requestAnimationFrame(() => openerRef.current?.focus({ preventScroll: true }));
+    }
+  }, [viewer]);
+
   if (photos.length === 0) return null;
-  const closeViewer = () => {
-    setViewer(null);
-    requestAnimationFrame(() => openerRef.current?.focus({ preventScroll: true }));
-  };
+  const closeViewer = () => setViewer(null);
 
   return (
     <div className="space-y-2">
