@@ -4,13 +4,13 @@
  * summary pill, a city's stats and client groups, a group's status tabs.
  */
 import { getPresenceState } from './presenceCoverage.js';
-import { getProjectRows, SCOPE_LABELS } from './showcaseProjects.js';
+import { getProjectRows, SCOPE_LABELS, isValidAddress } from './showcaseProjects.js';
 
 export const FILTER_ALL = 'all';
 
-/** Only rows on the map: a coverage city of their state, and the required fields. */
+/** Only rows on the map: a coverage city of their state, the required fields, and a valid address if any. */
 export const isListable = (p) =>
-  Boolean(p && p.id && p.name && p.category && p.city && p.stateCode && getPresenceState(p.stateCode)?.cities.includes(p.city));
+  Boolean(p && p.id && p.name && p.category && p.city && p.stateCode && getPresenceState(p.stateCode)?.cities.includes(p.city) && isValidAddress(p.address));
 
 export const getBrowsableProjects = (rows = getProjectRows()) => rows.filter(isListable);
 

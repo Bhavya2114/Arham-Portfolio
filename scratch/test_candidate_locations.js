@@ -110,8 +110,10 @@ const publicFiles = ['../src/components/map/PresenceMap.jsx', '../src/sections/P
 assert(publicFiles.every((f) => !/cand-|candidate/i.test(read(f))), 'Map, homepage, gallery, routes, selectors and projects.js contain no candidate references');
 if (process.env.BUILD_DIR) {
   const assets = path.resolve(process.env.BUILD_DIR, 'assets');
-  const carriers = fs.readdirSync(assets).filter((f) => /\.js$/.test(f) && /cand-kota|cand-jaipur|CP-6, Indra Vihar|Samachar Jagat|324005/.test(fs.readFileSync(path.join(assets, f), 'utf-8')));
-  assert(carriers.length === 0, `Candidate records (ids, supplied addresses) are not shipped in any bundle (${carriers.join(', ') || 'none'}); only the placeholder campus names are`);
+  // The real ALLEN project rows (showcaseProjects.js) now publish the campus addresses on purpose, so the
+  // candidate records are identified by their own ids and candidate-only fields, not by address text.
+  const carriers = fs.readdirSync(assets).filter((f) => /\.js$/.test(f) && /cand-kota|cand-jaipur|suppliedAddress|locationVerification|arhamWorkConfirmed/.test(fs.readFileSync(path.join(assets, f), 'utf-8')));
+  assert(carriers.length === 0, `Candidate records (ids, review fields) are not shipped in any bundle (${carriers.join(', ') || 'none'})`);
 }
 
 console.log('\n4a. Kota / Jaipur Campus Records (internal data, no longer shown on /presence):');

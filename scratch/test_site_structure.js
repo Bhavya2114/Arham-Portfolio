@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url';
 import { NAV_ITEMS } from '../src/data/navigation.js';
 import { COMPANY, pageTitle } from '../src/data/company.js';
 import { SERVICES, PROCESS_STEPS } from '../src/data/services.js';
-import { getProjectRows, DEMO_PROJECTS, USE_PLACEHOLDER_PROJECTS } from '../src/data/showcaseProjects.js';
+import { getProjectRows, SHOWCASE_PROJECTS, USE_PLACEHOLDER_PROJECTS } from '../src/data/showcaseProjects.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const read = (rel) => fs.readFileSync(path.resolve(here, rel), 'utf-8');
@@ -81,7 +81,7 @@ assert(/id="about"/.test(about) && aboutSentences.length >= 3 && aboutSentences.
 
 console.log('\n5. Our Work: the map is the way in to every project');
 assert(/<PresenceMap[\s\S]*?<ProjectSheet/.test(presence) && !/ProjectGrid/.test(presence) && !exists('../src/components/presence/ProjectGrid.jsx'), 'Map, then projects through the city sheet / panel (one way of browsing; the card list under the map is gone)');
-assert(USE_PLACEHOLDER_PROJECTS && getProjectRows().length === DEMO_PROJECTS.length && DEMO_PROJECTS.every((p) => p.demo === true), `Demo rows (${DEMO_PROJECTS.length}, all demo: true) until real projects are added`);
+assert(!USE_PLACEHOLDER_PROJECTS && getProjectRows().length === SHOWCASE_PROJECTS.length && getProjectRows().every((p) => !p.demo), `Only real project rows (${SHOWCASE_PROJECTS.length}), no demo rows`);
 assert(/root\.setAttribute\('data-map-card', 'open'\)/.test(presence) && /root\.removeAttribute\('data-map-card'\)/.test(presence), 'Page flags an open city card on <html> (for the phone bar)');
 
 console.log('\n6. Enquiry form');

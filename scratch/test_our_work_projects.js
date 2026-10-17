@@ -8,7 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { performance } from 'perf_hooks';
-import { DEMO_PROJECTS, SHOWCASE_PROJECTS, SCOPE_LABELS, USE_PLACEHOLDER_PROJECTS, MAX_PHOTOS, getProjectRows, projectPhotos } from '../src/data/showcaseProjects.js';
+import { SHOWCASE_PROJECTS, SCOPE_LABELS, USE_PLACEHOLDER_PROJECTS, MAX_PHOTOS, getProjectRows, projectPhotos } from '../src/data/showcaseProjects.js';
 import {
   FILTER_ALL, isListable, getBrowsableProjects, groupIdOf, getGroups, getFilterOptions, filterProjects, countByCity, cityKey,
   statesWithProjects, projectsInState, projectsInCity, placeSummary, statusStats, filterByStatus, cityLine, statusLabel, similarProjectText, scopeSummary,
@@ -27,21 +27,27 @@ const assert = (cond, msg) => {
 };
 
 console.log('\n1. Data rows (one per project)');
-const rows = getProjectRows();
-assert(USE_PLACEHOLDER_PROJECTS && SHOWCASE_PROJECTS.length === 0 && rows.length === DEMO_PROJECTS.length && rows.length >= 15, `Demo set shown while USE_PLACEHOLDER_PROJECTS is on (${rows.length} rows)`);
-assert(DEMO_PROJECTS.every((p) => p.demo === true), 'Every demo row is marked demo: true');
-assert(new Set(rows.map((p) => p.id)).size === rows.length, 'Unique ids');
-assert(rows.every((p) => p.client === null || p.client === 'ALLEN Career Institute'), 'No invented client names other than ALLEN (others have client: null)');
-assert(rows.every((p) => ['Coaching centre', 'Commercial', 'Residential'].includes(p.category) && p.name && p.area), 'Category, name and area on every row');
-assert(rows.every((p) => getPresenceState(p.stateCode)?.cities.includes(p.city)), 'Every row is in a worked (coverage) city');
-assert(rows.every((p) => Array.isArray(p.scope) && p.scope.length > 0 && p.scope.every((s) => s in SCOPE_LABELS)), 'Scope uses the fixed list of work types');
-assert(rows.every((p) => ['completed', 'ongoing'].includes(p.status) && (p.status === 'ongoing' || Number.isInteger(p.year))), 'Status completed (with year) or ongoing');
-assert(rows.every((p) => projectPhotos(p).length >= 1 && projectPhotos(p).length <= MAX_PHOTOS) && MAX_PHOTOS === 6, '1–6 photos per project');
+const realRows = getProjectRows();
+assert(!USE_PLACEHOLDER_PROJECTS && realRows.length === SHOWCASE_PROJECTS.length && realRows.length > 0 && realRows.every((p) => !p.demo), `Only real rows are shown (${realRows.length}; placeholders off)`);
+assert(new Set(realRows.map((p) => p.id)).size === realRows.length, 'Unique ids');
+assert(realRows.every((p) => p.client === 'ALLEN Career Institute' && p.category === 'Coaching centre' && p.name && p.area), 'Client, category, name and area on every row');
+assert(realRows.every((p) => getPresenceState(p.stateCode)?.cities.includes(p.city)), 'Every row is in a worked (coverage) city');
+assert(realRows.every((p) => Array.isArray(p.scope) && p.scope.length > 0 && p.scope.every((s) => s in SCOPE_LABELS)), 'Scope uses the fixed list of work types');
+assert(realRows.every((p) => ['completed', 'ongoing'].includes(p.status) && (p.status === 'ongoing' || Number.isInteger(p.year))), 'Status completed (with year) or ongoing');
+assert(realRows.every((p) => projectPhotos(p).length >= 1 && projectPhotos(p).length <= MAX_PHOTOS) && MAX_PHOTOS === 6, '1–6 photos per project');
+
+// Selector behaviour is also exercised with other kinds of rows (no-client jobs, ongoing work). These
+// three rows exist only in this test: they are never part of the site's data.
+const TEST_ONLY_ROWS = [
+  { id: 'test-commercial-kota', client: null, category: 'Commercial', name: 'Test commercial building', area: 'Talwandi', city: 'Kota', stateCode: 'IN-RJ', scope: ['Full wiring', 'DB panels'], status: 'completed', year: 2021, photos: ['/t.jpg'], lat: null, lng: null },
+  { id: 'test-commercial-pune', client: null, category: 'Commercial', name: 'Test office', area: 'Baner', city: 'Pune', stateCode: 'IN-MH', scope: ['Cabling'], status: 'ongoing', year: null, photos: ['/t.jpg'], lat: null, lng: null },
+  { id: 'test-residential-kota', client: null, category: 'Residential', name: 'Test home', area: 'Talwandi', city: 'Kota', stateCode: 'IN-RJ', scope: ['Full wiring', 'Lighting'], status: 'ongoing', year: null, photos: ['/t.jpg'], lat: null, lng: null },
+];
+const rows = [...realRows, ...TEST_ONLY_ROWS];
 const kotaAllen = rows.filter((p) => p.client && p.city === 'Kota');
-assert(kotaAllen.length >= 6 && rows.some((p) => p.client && p.city !== 'Kota') && rows.some((p) => p.category === 'Commercial') && rows.some((p) => p.category === 'Residential'), 'ALLEN campuses in Kota and other cities, plus commercial and residential jobs');
 
 console.log('\n2. Selectors (everything derived from the rows)');
-const all = getBrowsableProjects();
+const all = getBrowsableProjects(rows);
 assert(all.length === rows.length && !isListable({ ...rows[0], city: 'Indore' }) && !isListable({ ...rows[0], name: '' }), 'Rows outside coverage cities or missing fields are left out');
 const opts = getFilterOptions(all);
 assert(opts[0].id === FILTER_ALL && opts[0].label === 'All clients' && opts[0].count === all.length, '"All clients" chip first, with the total');
@@ -53,7 +59,7 @@ assert(filterProjects(all, 'category:Commercial').every((p) => !p.client && p.ca
 const counts = countByCity(all);
 assert([...counts.values()].reduce((s, n) => s + n, 0) === all.length && counts.get(cityKey('IN-RJ', 'Kota')) === rows.filter((p) => p.city === 'Kota').length, 'City counts add up and match the rows');
 assert(countByCity(allen).get(cityKey('IN-RJ', 'Kota')) === kotaAllen.length, 'City counts follow the filter');
-assert(statesWithProjects(filterProjects(all, 'category:Residential')).size < statesWithProjects(all).size, 'A filter narrows the states with projects (the others are dimmed)');
+assert(getBrowsableProjects().length === realRows.length && statesWithProjects(filterProjects(all, 'category:Residential')).size < statesWithProjects(all).size, 'A filter narrows the states with projects (the others are dimmed)');
 const india = placeSummary(all, 'India');
 assert(india.text === `India · ${counts.size} cities · ${all.length} projects`, `Summary pill: "${india.text}"`);
 const rj = placeSummary(projectsInState(all, 'IN-RJ'), 'Rajasthan');
