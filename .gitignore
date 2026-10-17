@@ -28,3 +28,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Browser check outputs (scratch/browser): screenshots, Chrome profile, measurements
+shots_*/
+chrome-prof/
+measure_*.json
