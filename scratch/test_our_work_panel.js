@@ -68,7 +68,7 @@ assert(listName(byId('allen-kota-sankalp')) === 'ALLEN Sankalp' && listName(byId
 assert(all.every((p) => listName(p).startsWith('ALLEN ') && !listName(p).includes(`ALLEN ${p.city} – `)), 'Every list name keeps "ALLEN " and never "ALLEN <City> – "');
 assert(listName({ name: 'ACME Pune – Plant 2', client: 'ACME Industries', city: 'Pune' }) === 'ACME Plant 2' && listName({ name: 'Pune – Office block', client: null, city: 'Pune' }) === 'Office block', 'Generalised: any client\'s brand word + campus; no-client rows just lose the city prefix');
 assert(!/allen[-_ ]?logo|logo\.(png|svg|webp)/i.test(browser) && /GraduationCap/.test(browser), 'No ALLEN logo; the cap icon stays');
-assert(/<ProjectRow key=\{p\.id\} project=\{p\} onOpen=\{onOpenProject\} group=\{group\} short \/>/.test(browser) && /\{heading\(project\.name\)\}/.test(browser) && /<span className="sr-only">\{project\.name\}<\/span>/.test(browser), 'Lists use the short name (screen readers hear the full one); the detail heading is the full name');
+assert(/<ProjectRow key=\{p\.id\} index=\{i\} project=\{p\} onOpen=\{onOpenProject\} group=\{group\} short \/>/.test(browser) && /\{heading\(project\.name\)\}/.test(browser) && /<span className="sr-only">\{project\.name\}<\/span>/.test(browser), 'Lists use the short name (screen readers hear the full one); the detail heading is the full name');
 
 console.log('\n5. Compact rows: no thumbnail for the shared stand-in photo');
 assert(all.every((p) => !hasOwnPhoto(p)) && all.every((p) => projectPhotos(p).every((src) => PLACEHOLDER_PHOTOS.includes(src))), 'All ALLEN rows only have the shared photo → no thumbnails');
@@ -82,6 +82,18 @@ assert(kotaGroup.projects.every((p) => !scopeDiffers(p, kotaGroup)), 'Every Kota
 assert(scopeDiffers({ ...kotaGroup.projects[0], scope: ['Full wiring', 'Lighting', 'DB panels'] }, kotaGroup) && !scopeDiffers({ ...kotaGroup.projects[0], scope: ['Lighting', 'Full wiring'] }, kotaGroup), 'Extra work (DB panels) shows chips; the same work in another order does not');
 assert(/\{\(!group \|\| scopeDiffers\(project, group\)\) && <ScopeChips scope=\{project\.scope\} inline \/>\}/.test(browser), 'Rows render chips only when scopeDiffers');
 assert(getProjectRows().length === 98, 'Data unchanged (98 rows)');
+
+console.log('\n7. Panel / sheet styling (no behaviour change)');
+const panelCss = css.slice(css.indexOf('.panel-surface {'), css.indexOf('/* Thin themed scrollbar'));
+assert(/background: linear-gradient\(180deg, rgba\(32, 34, 39, 0\.82\), rgba\(20, 21, 24, 0\.92\)\);/.test(panelCss) && /border: 1px solid rgba\(255, 255, 255, 0\.09\);/.test(panelCss) && /inset 0 1px 0 rgba\(255, 255, 255, 0\.08\)/.test(panelCss), 'Surface: gradient, white/9 border, inset top highlight + drop shadow');
+assert(!/backdrop-filter:|blur\(/.test(panelCss) && !/backdrop-blur/.test(browser + page + sheet), 'No backdrop-filter / blur anywhere on the panel or sheet');
+assert(/\.panel-surface::before \{[\s\S]*?height: 2px;[\s\S]*?background: linear-gradient\(90deg, transparent, #D9E35A, transparent\);[\s\S]*?opacity: 0\.7;/.test(panelCss), 'Thin 2px lime line centred on the top edge, fading out at both ends (opacity .7)');
+assert(/panel-surface p-5/.test(page) && /panel-surface panel-surface--sheet/.test(sheet) && /\.panel-surface--sheet \{\s*background-color: #0C0D0F;/.test(panelCss), 'Desktop panel and phone sheet use it (the sheet on a solid base so nothing behind shows through)');
+assert(/const ROW_LIST = 'divide-y divide-white\/\[0\.07\]';/.test(browser) && !/rounded-xl border border-white\/\[0\.07\] bg-white\/\[0\.03\] \$\{thumb/.test(browser), 'Rows: no individual boxes, 1px white/7 dividers');
+assert(/String\(index \+ 1\)\.padStart\(2, '0'\)/.test(browser) && /text-accent\/80/.test(browser) && /<ChevronRight className="h-5 w-5 shrink-0 text-muted" aria-hidden="true" \/>/.test(browser), 'Zero-padded number in the accent (80 %), muted chevron on the right');
+assert(/hover:bg-\[rgba\(217,227,90,0\.07\)\] hover:shadow-\[inset_3px_0_0_#D9E35A\]/.test(browser) && /focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/.test(browser) && /active:shadow-\[inset_3px_0_0_#D9E35A\]/.test(browser) && /rounded-\[10px\]/.test(browser), 'Hover / focus / pressed: lime tint, 10px corners, 3px lime bar; keyboard focus also an accent ring');
+assert(/\.panel-surface \.text-muted \{ color: #A8ABB1; \}/.test(css), 'Muted text inside the see-through panel lightened just enough for AA over the map');
+assert(/data-scroll-fade/.test(browser) && /from-\[#141518\]/.test(browser) && /panel-scroll h-full overflow-y-auto/.test(browser), 'Bottom fade (matched to the panel) and thin scrollbar kept');
 
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);

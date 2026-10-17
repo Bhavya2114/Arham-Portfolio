@@ -124,7 +124,7 @@ const ScrollBody = ({ resetKey, children }) => {
       <div
         aria-hidden="true"
         data-scroll-fade={more ? 'on' : 'off'}
-        className={`pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-surface to-transparent transition-opacity duration-200 ${more ? 'opacity-100' : 'opacity-0'}`}
+        className={`pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-[#141518] to-transparent transition-opacity duration-200 ${more ? 'opacity-100' : 'opacity-0'}`}
       />
     </div>
   );
@@ -138,7 +138,14 @@ const Layout = ({ header, scrollKey, children }) => (
   </div>
 );
 
-const ProjectRow = ({ project, onOpen, group = null, short = false }) => {
+// List rows: no boxes, 1 px dividers (on the list). Left: zero-padded number in the accent; middle: name,
+// area and status chip; right: a muted chevron. Hover / focus / pressed: a faint lime tint, 10 px corners
+// and a 3 px lime bar on the left (inset shadow); keyboard focus also gets an accent ring.
+const ROW_STATE =
+  'hover:bg-[rgba(217,227,90,0.07)] hover:shadow-[inset_3px_0_0_#D9E35A] focus-visible:bg-[rgba(217,227,90,0.07)] focus-visible:shadow-[inset_3px_0_0_#D9E35A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent active:bg-[rgba(217,227,90,0.07)] active:shadow-[inset_3px_0_0_#D9E35A]';
+const ROW_LIST = 'divide-y divide-white/[0.07]';
+
+const ProjectRow = ({ project, index, onOpen, group = null, short = false }) => {
   // Thumbnail only for the project's own photos (the shared stand-in photo is not shown in lists).
   const thumb = hasOwnPhoto(project) ? projectPhotos(project)[0] : null;
   const name = short ? listName(project) : project.name;
@@ -147,8 +154,12 @@ const ProjectRow = ({ project, onOpen, group = null, short = false }) => {
       <button
         type="button"
         onClick={() => onOpen(project.id)}
-        className={`w-full flex items-start gap-3 rounded-xl border border-white/[0.07] bg-white/[0.03] ${thumb ? 'p-2.5' : 'px-3 py-2.5'} text-left hover:border-accent/40 transition-colors ${BTN_FOCUS}`}
+        className={`w-full flex items-center gap-3 rounded-[10px] px-2 py-2.5 text-left transition-colors ${ROW_STATE}`}
+        data-project-row=""
       >
+        <span className="w-7 shrink-0 font-heading text-sm font-bold tabular-nums text-accent/80" aria-hidden="true">
+          {String(index + 1).padStart(2, '0')}
+        </span>
         {thumb ? (
           <img src={thumb} alt="" loading="lazy" decoding="async" width="76" height="76" className="h-[76px] w-[76px] shrink-0 rounded-xl border border-white/[0.08] object-cover" />
         ) : null}
@@ -162,6 +173,7 @@ const ProjectRow = ({ project, onOpen, group = null, short = false }) => {
           </span>
           {(!group || scopeDiffers(project, group)) && <ScopeChips scope={project.scope} inline />}
         </span>
+        <ChevronRight className="h-5 w-5 shrink-0 text-muted" aria-hidden="true" />
       </button>
     </li>
   );
@@ -270,8 +282,8 @@ export const ProjectBrowser = ({
           </>
         }
       >
-        <ul className="space-y-2">
-          {clusterProjects.map((p) => <ProjectRow key={p.id} project={p} onOpen={onOpenProject} />)}
+        <ul className={ROW_LIST}>
+          {clusterProjects.map((p, i) => <ProjectRow key={p.id} index={i} project={p} onOpen={onOpenProject} />)}
         </ul>
       </Layout>
     );
@@ -332,8 +344,8 @@ export const ProjectBrowser = ({
       <Layout scrollKey={`${focusKey}|${tab}`} header={header}>
         <div id={`${idPrefix}-tabpanel`} {...(groupTabs.length > 0 ? { role: 'tabpanel', 'aria-labelledby': `${idPrefix}-tab-${tab}` } : {})} data-project-list="">
           {rows.length > 0 ? (
-            <ul className="space-y-2">
-              {rows.map((p) => <ProjectRow key={p.id} project={p} onOpen={onOpenProject} group={group} short />)}
+            <ul className={ROW_LIST}>
+              {rows.map((p, i) => <ProjectRow key={p.id} index={i} project={p} onOpen={onOpenProject} group={group} short />)}
             </ul>
           ) : (
             <p className="text-base text-body py-4">No {tab} projects here.</p>
