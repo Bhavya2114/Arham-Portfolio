@@ -153,7 +153,7 @@ assert(/const highlightedProjectId = project && hasSiteCoordinates\(project\) \?
 console.log('\n5. Sheet / panel');
 const sheet = read('../src/components/presence/ProjectSheet.jsx');
 assert(/role="dialog"/.test(sheet) && /aria-labelledby=\{labelledBy\}/.test(sheet) && /aria-modal="false"/.test(sheet), 'Sheet is a dialog region labelled by its heading (the map stays usable)');
-assert(/transform 250ms/.test(sheet) && !/transition-\[height\]|transition: 'height/.test(sheet) && /fitContent \? \{ height: 'auto', maxHeight: fullH \} : \{ height: fullH \}/.test(sheet), 'Open / expand / drag move it with transform only (~250 ms); its height never animates');
+assert(/transform 250ms/.test(sheet) && !/transition-\[height\]|transition: 'height/.test(sheet) && /fitContent \? \{ height: 'auto', maxHeight: expanded \? fullH : capH \} : \{ height: fullH \}/.test(sheet), 'Open / expand / drag move it with transform only (~250 ms); its height never animates');
 const moveFn = sheet.slice(sheet.indexOf('const onPointerMove'), sheet.indexOf('const onPointerEnd'));
 assert(/place\(d\.y, false\)/.test(moveFn) && !/set[A-Z]\w*\(/.test(moveFn), 'Dragging writes the transform through a ref (no React render per frame)');
 assert(/const HALF = 0\.5;/.test(sheet) && /setSnap\(level === 'city' \? 'half' : 'full'\)/.test(page), 'Half height for a city, full for a list / project (tapping a group expands it)');

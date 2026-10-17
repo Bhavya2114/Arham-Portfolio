@@ -249,7 +249,7 @@ export const ProjectBrowser = ({
           )
         }
       >
-        <div className="space-y-4">
+        <div className="space-y-3 lg:space-y-4">
           <PhotoGallery photos={photos} alt={project.name} badge={owner} viewer={photoViewer} onViewerChange={onPhotoViewer} />
           <div className="space-y-2">
             {heading(project.name)}
@@ -284,7 +284,7 @@ export const ProjectBrowser = ({
             href={whatsappHref(similarProjectText(project, COMPANY.name))}
             target="_blank"
             rel="noopener noreferrer"
-            className={`flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-3 text-base font-semibold text-accent-ink hover:bg-accent-hover ${BTN_FOCUS} focus-visible:ring-offset-2 focus-visible:ring-offset-surface`}
+            className={`flex min-h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-accent px-4 py-2.5 text-[15px] leading-snug font-semibold lg:py-3 lg:text-base text-accent-ink hover:bg-accent-hover ${BTN_FOCUS} focus-visible:ring-offset-2 focus-visible:ring-offset-surface`}
           >
             <MessageCircle className="w-5 h-5" aria-hidden="true" />
             Ask about a similar project on WhatsApp
