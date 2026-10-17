@@ -148,7 +148,7 @@ console.log('\n10. Desktop detail: full-height panel, the photo fills the free s
 assert(/className=\{`relative z-30 w-\[400px\] shrink-0 \$\{level === 'project' \? 'h-full' : 'self-start max-h-full'\}/.test(page), 'Project detail: the desktop panel uses the full (viewport-fit) height, same as a long list');
 assert(/<Layout\s+scrollKey=\{focusKey\}\s+fill\s+header=\{\s+autoProject/.test(browser) && /const ScrollBody = \(\{ resetKey, fill = false, children \}\)/.test(browser) && /\$\{fill \? ' lg:flex lg:flex-1 lg:flex-col' : ''\}`\} data-panel-scroll=""/.test(browser), 'Detail layout + scroll body pass the full height down (desktop only; still scrolls if it cannot fit)');
 assert(/<PhotoGallery photos=\{photos\} alt=\{project\.name\} badge=\{owner\} viewer=\{photoViewer\} onViewerChange=\{onPhotoViewer\} fill \/>/.test(browser) && /fill \? ' lg:flex lg:flex-1 lg:min-h-\[180px\] lg:flex-col' : ''/.test(gallery) && /fill \? ' lg:min-h-0 lg:flex-1' : ''/.test(gallery) && /fill \? ' lg:absolute lg:inset-0' : ''/.test(gallery) && /object-cover/.test(gallery), 'Photo grows into the free space (flex 1, at least 180 px, object-fit cover) → text + WhatsApp sit at the bottom; the photo absorbs any shortage');
-assert(/\{badge && \(/.test(gallery) && /data-project-place=""/.test(browser) && /<StatusTag project=\{project\} long \/>/.test(browser), 'Client badge, area · Map and the status chip kept from detail-compact');
+assert(/\{badge && \(/.test(gallery) && /data-project-place=""/.test(browser) && /<StatusTag project=\{project\} \/>/.test(browser), 'Client badge, area · Map and the status chip kept from detail-compact');
 assert(!/lg:/.test(read('../src/components/presence/ProjectSheet.jsx').match(/className="lg:hidden[^"]*"/)[0].replace('lg:hidden', '')), 'Phone sheet unchanged (all fill classes are lg: only; the sheet is lg:hidden)');
 
 console.log('\n11. Detail summary: status chip + one sentence about the work');
@@ -166,9 +166,16 @@ assert(/<div className="space-y-1\.5 lg:space-y-2">\s*\{heading\(project\.name, 
 console.log('\n12. Detail fit 2: status on the area line, photo absorbs the shortage');
 const placeP = detail.slice(detail.indexOf('data-project-place=""'), detail.indexOf('</p>', detail.indexOf('data-project-place=""')));
 assert(/<p className="flex flex-wrap items-center gap-x-1\.5 gap-y-1 text-body \[font-size:14px\]" data-project-place="">/.test(detail), 'Area line: 14 px, 6 px gaps, wraps only when it must');
-assert(/aria-label=\{`Open \$\{project\.name\} in Google Maps`\}[\s\S]*?Map\s*<\/a>[\s\S]*?<span className="inline-flex items-center gap-x-1\.5 whitespace-nowrap" data-project-status="">\s*<span className="text-muted" aria-hidden="true">·<\/span>\s*<StatusTag project=\{project\} long \/>\s*<\/span>\s*$/.test(placeP), '"Area, City · 📍 Map · ✓ Completed 2022": the status is last on that line; "· status" wraps as one piece');
+assert(/aria-label=\{`Open \$\{project\.name\} in Google Maps`\}[\s\S]*?Map\s*<\/a>[\s\S]*?<span className="inline-flex items-center gap-x-1\.5 whitespace-nowrap" data-project-status="">\s*<span className="text-muted" aria-hidden="true">·<\/span>\s*<StatusTag project=\{project\} \/>\s*<\/span>\s*$/.test(placeP), '"Area, City · 📍 Map · [calendar] 2022": the status is last on that line; "· status" wraps as one piece');
 assert(/data-project-place=""[\s\S]*?<\/p>\s*\{summary && <p[^>]*data-project-summary=""/.test(detail) && /data-project-summary=""[\s\S]*?WhatsApp/.test(detail), 'Then the summary sentence, then the WhatsApp button');
 assert(/lg:min-h-\[180px\]/.test(gallery) && !/lg:min-h-\[260px\]/.test(gallery), 'Desktop photo min height 180 px (it shrinks first, so the detail does not scroll)');
+
+console.log('\n13. Status chip icons');
+const tag = browser.slice(browser.indexOf('export const StatusTag'), browser.indexOf('const CHIP'));
+assert(/import \{[^}]*CalendarCheck, CalendarClock[^}]*\} from 'lucide-react'/.test(browser) && /const Icon = ongoing \? CalendarClock : CalendarCheck;/.test(tag), 'Completed → CalendarCheck, ongoing → CalendarClock (lucide)');
+assert(/<Icon className="h-3\.5 w-3\.5 shrink-0" aria-hidden="true" \/>/.test(tag) && !/text-(emerald|accent|white)/.test((tag.match(/<Icon[^>]*>/) || [''])[0]), 'Icon 14 px, aria-hidden, no colour of its own (it takes the chip text colour)');
+assert(/role="img"\s*aria-label=\{statusAriaLabel\(project\)\}/.test(tag) && /\{statusLabel\(project\)\}/.test(tag) && !/long/.test(tag), 'Chip aria-label "Completed in 2022" / "Ongoing"; visible text is the year (no "Completed") in rows and the detail alike');
+assert((browser.match(/<StatusTag project=\{project\} \/>/g) || []).length === 2 && !/✓|<Check\b/.test(browser), 'Both chips (list rows + detail area line) use it; no ✓ left');
 
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);
