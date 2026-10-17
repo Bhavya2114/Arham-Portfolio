@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom';
 import { Map as MapIcon, MessageCircle } from 'lucide-react';
 import Container from '../components/ui/Container';
 import Button from '../components/ui/Button';
-import { COMPANY, whatsappHref, WHATSAPP_HELLO } from '../data/company';
+import { COMPANY, whatsappHref, WHATSAPP_HELLO, heroStats } from '../data/company';
 
 /**
  * Homepage hero: a short plain-English headline and one line; "See our work on the map" (→ /our-work)
- * and "WhatsApp us". The photo shows on wide screens only, so on a phone the map teaser comes next.
+ * and "WhatsApp us"; a stats row ("Since 2019 · 30+ team", plus projects / cities once set in
+ * data/company.js). The photo shows on wide screens only, so on a phone the map teaser comes next.
  */
 export const Hero = () => {
   return (
@@ -43,6 +44,19 @@ export const Hero = () => {
                 WhatsApp us
               </Button>
             </div>
+
+            <dl className="pt-2 flex flex-wrap gap-x-6 gap-y-2" aria-label="About us in numbers">
+              {heroStats().map((stat) => (
+                <div key={stat.key} className="flex items-baseline gap-1.5">
+                  <dt className="sr-only">{stat.label}</dt>
+                  <dd className="text-base text-body">
+                    {stat.before && <span>{stat.before} </span>}
+                    <span className="font-heading text-2xl font-bold text-heading">{stat.value}</span>
+                    {stat.after && <span> {stat.after}</span>}
+                  </dd>
+                </div>
+              ))}
+            </dl>
           </div>
 
           <div className="hidden lg:block lg:col-span-5">

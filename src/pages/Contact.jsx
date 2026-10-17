@@ -4,7 +4,7 @@ import Container from '../components/ui/Container';
 import PageHero from '../components/ui/PageHero';
 import EnquiryForm from '../components/contact/EnquiryForm';
 import usePageMetadata from '../lib/usePageMetadata';
-import { COMPANY, pageTitle, whatsappHref, WHATSAPP_HELLO } from '../data/company';
+import { COMPANY, pageTitle, whatsappHref, WHATSAPP_HELLO, fullAddress } from '../data/company';
 
 /**
  * Contact: Call / WhatsApp / Email first, then the enquiry form (sent on WhatsApp or by email), then
@@ -71,17 +71,20 @@ export const Contact = () => {
             <li className="flex items-start gap-3">
               <MapPin className="w-5 h-5 mt-0.5 shrink-0 text-accent" aria-hidden="true" />
               <a
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(COMPANY.address)}`}
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fullAddress())}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-heading underline decoration-accent decoration-2 underline-offset-4 hover:text-accent rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
-                {COMPANY.address}
+                {fullAddress()}
               </a>
             </li>
             <li className="flex items-start gap-3">
               <Clock className="w-5 h-5 mt-0.5 shrink-0 text-accent" aria-hidden="true" />
-              {COMPANY.hours}
+              <span>
+                {COMPANY.hoursShort}
+                <span className="sr-only"> ({COMPANY.days}, {COMPANY.hours})</span>
+              </span>
             </li>
           </ul>
         </section>

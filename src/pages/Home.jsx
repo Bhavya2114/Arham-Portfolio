@@ -1,15 +1,20 @@
 import React from 'react';
 import Hero from '../sections/Hero';
 import PresenceTeaser from '../sections/PresenceTeaser';
+import ClientsSection from '../sections/ClientsSection';
 import ServicesList from '../sections/ServicesList';
 import AboutArham from '../sections/AboutArham';
+import WhyArham from '../sections/WhyArham';
+import HowWeWork from '../sections/HowWeWork';
+import TrustStrips from '../sections/TrustStrips';
 import Container from '../components/ui/Container';
 import EnquiryForm from '../components/contact/EnquiryForm';
 import usePageMetadata from '../lib/usePageMetadata';
 import { COMPANY, pageTitle } from '../data/company';
 
 /**
- * Homepage, top to bottom: hero → India map teaser → what we do → about → enquiry form.
+ * Homepage, top to bottom: hero (+ stats) → India map teaser → who we work with → what we do → about →
+ * why choose Arham → how we work → brands / registrations → enquiry form.
  * Sections alternate the two Graphite shades (bg / bg2 = navy-950 / navy-800).
  */
 export const Home = () => {
@@ -26,19 +31,31 @@ export const Home = () => {
       {/* 2. Our work across India: static teaser for /our-work (the interactive map lives only there) */}
       <PresenceTeaser />
 
-      {/* 3. What we do */}
+      {/* 3. Who we work with */}
+      <ClientsSection />
+
+      {/* 4. What we do (top 4 services) */}
       <ServicesList />
 
-      {/* 4. About Arham */}
+      {/* 5. About Arham */}
       <AboutArham />
 
-      {/* 5. Enquiry */}
+      {/* 6. Why choose Arham */}
+      <WhyArham />
+
+      {/* 7. How we work */}
+      <HowWeWork />
+
+      {/* 8. Brands we use · Registered & compliant */}
+      <TrustStrips />
+
+      {/* 9. Enquiry */}
       <section
         id="contact"
-        className="w-full py-12 sm:py-16 border-t border-white/[0.08] bg-navy-950 text-body scroll-mt-20"
+        className="w-full py-10 sm:py-14 border-t border-white/[0.08] bg-navy-950 text-body scroll-mt-20"
         aria-labelledby="home-contact-heading"
       >
-        <Container size="default" className="space-y-6">
+        <Container size="default" className="space-y-5">
           <div className="max-w-2xl space-y-2">
             <h2 id="home-contact-heading" className="text-2xl sm:text-3xl font-bold font-heading text-heading tracking-tight">
               Tell us about your project

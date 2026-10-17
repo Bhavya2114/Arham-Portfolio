@@ -1,56 +1,38 @@
 /**
- * The 3 services: one list for the homepage ("What we do": title + one line) and the Services page
- * (summary, what's included, photo).
+ * Site content: the services (one list for the homepage and the Services page), "Why choose Arham"
+ * and "How we work". Plain text only; icons are mapped in components/ui/contentIcons.js.
  */
 export const SERVICES = Object.freeze([
-  {
-    id: 'wiring',
-    title: 'Wiring & cabling',
-    line: 'Complete wiring for new and existing buildings, with cables, trays and conduits laid neatly and safely.',
-    summary: 'Full electrical wiring for your building, from the main supply to every switch and socket, laid neatly and safely.',
-    includes: [
-      'Complete building wiring',
-      'Cable trays, conduits and trunking',
-      'Power and control cables laid and connected',
-      'Labelled, tidy and easy to maintain',
-    ],
-    image: '/images/project-infrastructure.jpg',
-    alt: 'Cable trays carrying neatly laid electrical cables',
-  },
-  {
-    id: 'power',
-    title: 'Power distribution & panels',
-    line: 'Main and sub-distribution panels installed, connected and tested, so power reaches every floor reliably.',
-    summary: 'Panels and distribution boards that bring power safely to every floor and machine in your building.',
-    includes: [
-      'Main and sub-distribution panels',
-      'Busbars, risers and panel connections',
-      'Earthing and safety checks',
-      'Every circuit tested before handover',
-    ],
-    image: '/images/project-distribution.jpg',
-    alt: 'Electrical distribution panels in a switch room',
-  },
-  {
-    id: 'lighting',
-    title: 'Lighting',
-    line: 'Indoor, outdoor and facade lighting that is bright, safe and energy-efficient.',
-    summary: 'Lighting for offices, classrooms, halls, building fronts and outdoor areas: bright, safe and energy-efficient.',
-    includes: [
-      'Indoor LED lighting',
-      'Facade and outdoor lighting',
-      'High-bay lighting for large halls',
-      'Emergency and exit lighting',
-    ],
-    image: '/images/project-lighting.jpg',
-    alt: 'Building lobby lit with linear LED lights',
-  },
+  { id: 'building-wiring', title: 'Complete building wiring', line: 'Full electrical wiring for new and existing buildings, from main supply to every point.' },
+  { id: 'house-wiring', title: 'House and flat wiring', line: 'Safe, neat wiring for homes, flats and renovations.' },
+  { id: 'lighting', title: 'Lighting installation', line: 'Indoor and outdoor light fittings for classrooms, offices, wards and common areas.' },
+  { id: 'panels', title: 'Electrical panels and DB', line: 'Distribution boards, main panels and sub-panels.' },
+  { id: 'cctv', title: 'CCTV installation', line: 'Camera wiring and installation for campuses and buildings.' },
+  { id: 'earthing', title: 'Earthing', line: 'Proper earthing systems for safety.' },
+  { id: 'fire-alarm', title: 'Fire alarm wiring', line: 'Wiring for fire alarm systems.' },
+  { id: 'backup-power', title: 'Generator and inverter connections', line: 'Backup power connections.' },
+  { id: 'amc', title: 'Annual maintenance (AMC)', line: 'Yearly maintenance contracts to keep your electrical system safe and running.' },
 ]);
 
-/** How a job runs, in 4 short steps (Services page). */
+/** The homepage shows the first four, with a link to all services. */
+export const HOME_SERVICES = Object.freeze(SERVICES.slice(0, 4));
+
+/** "Why choose Arham": six short reasons, one line each. */
+export const WHY_ARHAM = Object.freeze([
+  { id: 'requirement', title: 'Built to your requirement', line: 'We do the job the way you ask for it, nothing skipped.' },
+  { id: 'on-time', title: 'On time', line: 'We finish within the timeline you give us.' },
+  { id: 'clean', title: 'Clean, neat work', line: 'Tidy wiring and a clean site at handover.' },
+  { id: 'safety', title: 'Safety first', line: 'Every installation is tested and checked before use.' },
+  { id: 'pricing', title: 'Fair pricing', line: 'Clear quotes with no hidden costs.' },
+  { id: 'team', title: 'A 30+ member team', line: 'Enough people to handle large campuses and many sites at once.' },
+]);
+
+/** "How we work": six numbered steps (homepage and Services page). */
 export const PROCESS_STEPS = Object.freeze([
-  { title: 'Site visit', text: 'We visit the site, look at the drawings and understand what you need.' },
-  { title: 'Plan and quote', text: 'You get a clear plan and quote before any work starts.' },
-  { title: 'Installation', text: 'We install the wiring, panels and lights neatly and safely.' },
-  { title: 'Testing and handover', text: 'Everything is tested and checked before we hand it over to you.' },
+  { title: 'Understand your requirement', text: 'We discuss the project and visit the site.' },
+  { title: 'Clear quotation', text: 'A detailed quote for materials and work.' },
+  { title: 'Work on your timeline', text: 'We complete the job within the time you set.' },
+  { title: 'Testing and safety checks', text: 'Every circuit is tested before handover.' },
+  { title: 'Handover', text: 'Clean and ready to use.' },
+  { title: 'Annual maintenance', text: 'Optional yearly contract.' },
 ]);

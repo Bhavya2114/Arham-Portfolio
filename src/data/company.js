@@ -18,9 +18,51 @@ export const COMPANY = Object.freeze({
   emailHref: 'mailto:arhampower@gmail.com',
 
   city: 'Kota',
-  address: 'Borkheda, Kota, Rajasthan, India',
-  hours: '9 AM – 6 PM',
+  street: '39 Borkheda',
+  state: 'Rajasthan',
+  pin: null, // PIN code: add when available (shown automatically)
+  address: '39 Borkheda, Kota, Rajasthan',
+  hours: '10 AM – 6 PM',
+  days: 'Monday to Friday',
+  hoursShort: 'Mon–Fri 10 AM–6 PM',
+
+  founded: Object.freeze({ month: 'October', year: 2019 }),
+  founder: 'Bharat Jain',
+  teamSize: '30+',
+
+  // Not available yet: leave null. Each one appears on the site automatically once it is set.
+  projectsCount: null, // e.g. '150+' → hero stat "150+ projects"
+  citiesCount: null, // e.g. '25+' → hero stat "25+ cities"
+  founderBio: null, // a short paragraph about the founder
+  testimonials: null, // client feedback: [{ quote, name, organisation }]
+
+  // Shown as text only (no registration numbers yet). No electrical-contractor licence is claimed.
+  registrations: Object.freeze(['GST registered', 'Udyam registered', 'EPF & ESI compliant', 'TAN registered']),
+  // Brands used in our work (names only: never "dealer", "partner" or "authorised").
+  brands: Object.freeze(['Havells', 'Polycab', 'Philips', 'Legrand', 'Finolex']),
+
+  // Who we work with (text names only, no logos yet).
+  clients: Object.freeze([
+    { type: 'Coaching institutes', names: [{ name: 'ALLEN Career Institute', note: 'our major client' }] },
+    { type: 'Schools', names: [{ name: 'Central Academy' }, { name: 'DDPS' }] },
+    { type: 'Hospitals', names: [{ name: 'Kinker Hospital, Kota' }] },
+  ]),
 });
+
+/** Full postal address, with the PIN once it is set. */
+export const fullAddress = () => (COMPANY.pin ? `${COMPANY.address} ${COMPANY.pin}` : COMPANY.address);
+
+/**
+ * Hero stats: "Since 2019" and "30+ team", plus projects / cities only once they are set above.
+ * Each: { value, before, after } → e.g. before "Since" + value "2019", or value "30+" + after "team".
+ */
+export const heroStats = () =>
+  [
+    { key: 'since', label: 'Founded', before: 'Since', value: String(COMPANY.founded.year) },
+    { key: 'team', label: 'Team size', value: COMPANY.teamSize, after: 'team' },
+    COMPANY.projectsCount && { key: 'projects', label: 'Projects', value: COMPANY.projectsCount, after: 'projects' },
+    COMPANY.citiesCount && { key: 'cities', label: 'Cities', value: COMPANY.citiesCount, after: 'cities' },
+  ].filter(Boolean);
 
 /** Page <title>: "Page — Arham Power Solutions" (the home page passes no page name). */
 export const pageTitle = (page) => (page ? `${page} — ${COMPANY.name}` : `${COMPANY.name} — Electrical Wiring, Lighting & Power Distribution`);

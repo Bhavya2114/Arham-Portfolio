@@ -43,7 +43,7 @@ assert(/text-heading/.test(src['components/ui/SectionHeading.jsx']) && /text-bod
 
 console.log('\n3. Sections');
 assert(/className="w-full bg-navy-950 /.test(src['components/ui/PageHero.jsx']) && ['pages/Services.jsx', 'pages/Contact.jsx'].every((f) => /<div className="w-full bg-navy-800 flex-1">/.test(src[f])), 'Page hero navy-950, page content navy-800 (alternating)');
-assert(/<section[^>]*id="about"[^>]*bg-navy-800/.test(src['sections/AboutArham.jsx']) && /bg-navy-950/.test(src['sections/ServicesList.jsx']), 'Homepage sections use the two shades');
+assert(/<section[^>]*id="about"[^>]*bg-navy-950/.test(src['sections/AboutArham.jsx']) && /bg-navy-800/.test(src['sections/ServicesList.jsx']), 'Homepage sections use the two shades');
 
 console.log('\n4. Forms, photos, text size');
 const form = src['components/contact/EnquiryForm.jsx'];

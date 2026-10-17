@@ -69,7 +69,7 @@ assert(COMPANY.logoWord === 'ARHAM' && COMPANY.logoLine === 'POWER SOLUTIONS', '
 assert(COMPANY.phoneDisplay === '+91 63783 91640' && COMPANY.phoneHref === 'tel:+916378391640', 'Phone +91 63783 91640 (tel:+916378391640)');
 assert(COMPANY.whatsappUrl === 'https://wa.me/916378391640' && /^https:\/\/wa\.me\/[0-9]+$/.test(COMPANY.whatsappUrl), 'WhatsApp https://wa.me/916378391640 (digits only)');
 assert(COMPANY.email === 'arhampower@gmail.com' && COMPANY.emailHref === 'mailto:arhampower@gmail.com', 'Email arhampower@gmail.com');
-assert(COMPANY.address === 'Borkheda, Kota, Rajasthan, India' && COMPANY.hours === '9 AM – 6 PM', 'Office address and hours');
+assert(COMPANY.address === '39 Borkheda, Kota, Rajasthan' && COMPANY.pin === null && COMPANY.hours === '10 AM – 6 PM' && COMPANY.days === 'Monday to Friday' && COMPANY.hoursShort === 'Mon–Fri 10 AM–6 PM', 'Office 39 Borkheda, Kota (PIN to come); hours Mon–Fri 10 AM–6 PM');
 
 // 2. No placeholder contact details left anywhere in the site source
 console.log('\n2. Placeholder contact details removed:');
@@ -136,7 +136,7 @@ assert(getStateDetails('IN-MH')?.name === 'Maharashtra', 'getStateDetails(IN-MH)
 console.log('\n8. Page & Component File References:');
 const read = (rel) => fs.readFileSync(path.resolve(__dirname, rel), 'utf-8');
 const contactPage = read('../src/pages/Contact.jsx');
-assert(/COMPANY\.phoneHref/.test(contactPage) && /whatsappHref\(/.test(contactPage) && /COMPANY\.emailHref/.test(contactPage) && /COMPANY\.address/.test(contactPage) && /COMPANY\.hours/.test(contactPage), 'Contact page: call, WhatsApp, email, office and hours from COMPANY');
+assert(/COMPANY\.phoneHref/.test(contactPage) && /whatsappHref\(/.test(contactPage) && /COMPANY\.emailHref/.test(contactPage) && /fullAddress\(\)/.test(contactPage) && /COMPANY\.hoursShort/.test(contactPage), 'Contact page: call, WhatsApp, email, office and hours from COMPANY');
 const footerFile = read('../src/components/layout/Footer.jsx');
 assert(/COMPANY\.phoneHref/.test(footerFile) && /whatsappHref\(/.test(footerFile) && /COMPANY\.emailHref/.test(footerFile) && /© \{currentYear\} \{COMPANY\.name\}/.test(footerFile), 'Footer: phone, WhatsApp, email and © Arham Power Solutions from COMPANY');
 

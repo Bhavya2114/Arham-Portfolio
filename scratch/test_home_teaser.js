@@ -61,9 +61,10 @@ if (process.env.BUILD_DIR) {
 }
 
 console.log('\n4. Homepage order and Graphite rhythm (bg / bg2 = navy-950 / navy-800, no light sections)');
-const SECTION_FILES = { Hero: 'Hero', PresenceTeaser: 'PresenceTeaser', ServicesList: 'ServicesList', AboutArham: 'AboutArham' };
-const sections = [...home.matchAll(/<(Hero|PresenceTeaser|ServicesList|AboutArham)\b[^>]*\/>|<section[\s\S]*?className="([^"]+)"/g)].map((m) => m[1] || 'EnquirySection');
-const sectionClass = (src) => (src.match(/<section[\s\S]*?className="([^"]+)"/) || ['', ''])[1];
+const SECTION_FILES = { Hero: 'Hero', PresenceTeaser: 'PresenceTeaser', ClientsSection: 'ClientsSection', ServicesList: 'ServicesList', AboutArham: 'AboutArham', WhyArham: 'WhyArham', HowWeWork: 'HowWeWork', TrustStrips: 'TrustStrips' };
+const sections = [...home.matchAll(/<(Hero|PresenceTeaser|ClientsSection|ServicesList|AboutArham|WhyArham|HowWeWork|TrustStrips)\b[^>]*\/>|<section[\s\S]*?className="([^"]+)"/g)].map((m) => m[1] || 'EnquirySection');
+// A section file's full-width band (HowWeWork / TrustStrips also have a "bare" variant without one).
+const sectionClass = (src) => (src.match(/<section[^>]*?className="([^"]*\bw-full\b[^"]*)"/) || ['', ''])[1];
 const shadeOf = (cls) => (/\bbg-navy-950\b/.test(cls) ? '950' : /\bbg-navy-800\b/.test(cls) ? '800' : /\bbg-footer\b/.test(cls) ? 'footer' : `other(${cls.match(/\bbg-[\w-]+/)?.[0] || 'none'})`);
 const sectionSrc = Object.fromEntries(Object.entries(SECTION_FILES).map(([k, f]) => [k, read(`../src/sections/${f}.jsx`)]));
 const shades = {
@@ -72,8 +73,8 @@ const shades = {
 };
 const order = sections.map((name) => shades[name]);
 const footerShade = shadeOf((read('../src/components/layout/Footer.jsx').match(/<footer className="([^"]+)"/) || ['', ''])[1]);
-assert(sections.join(',') === 'Hero,PresenceTeaser,ServicesList,AboutArham,EnquirySection', `Order: hero, map teaser (right after the hero), what we do, about, enquiry (${sections.join(', ')})`);
-assert(order.join(',') === '950,800,950,800,950' && footerShade === 'footer',
+assert(sections.join(',') === 'Hero,PresenceTeaser,ClientsSection,ServicesList,AboutArham,WhyArham,HowWeWork,TrustStrips,EnquirySection', `Order: hero, map teaser (right after the hero), who we work with, what we do, about, why Arham, how we work, brands / registrations, enquiry (${sections.join(', ')})`);
+assert(order.join(',') === '950,800,950,800,950,800,950,800,950' && footerShade === 'footer',
   `Sections alternate navy-950 / navy-800 (${sections.map((n, i) => `${n}:${order[i]}`).join(' ')}), then the #08090A footer`);
 assert(!/\bbg-(white|light|slate-50|slate-100)\b(?!\/)/.test(home + Object.values(sectionSrc).join('\n')), 'No white / light backgrounds on the homepage');
 assert(['CompanyIntroduction', 'ServicesOverview', 'ProjectPreview'].every((f) => !fs.existsSync(path.resolve(here, `../src/sections/${f}.jsx`))), 'Repeated service / intro / stock-photo sections removed');

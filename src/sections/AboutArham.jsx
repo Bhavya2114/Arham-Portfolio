@@ -1,26 +1,24 @@
 import React from 'react';
 import Container from '../components/ui/Container';
 import { COMPANY } from '../data/company';
-import { PRESENCE_TEASER_STATS } from '../data/presenceTeaser';
-
-const stat = (label) => PRESENCE_TEASER_STATS.find((s) => s.label === label)?.value;
 
 /**
- * Homepage "About Arham" (the old About page, folded in; /about redirects here). Plain English, short.
+ * Homepage "About Arham" (the old About page, folded in; /about redirects here). Facts from data/company.js.
+ * A founder bio appears below once COMPANY.founderBio is set.
  */
 export const AboutArham = () => (
-  <section id="about" className="w-full py-12 sm:py-16 border-t border-white/[0.08] bg-navy-800 scroll-mt-20" aria-labelledby="about-heading">
+  <section id="about" className="w-full py-10 sm:py-14 border-t border-white/[0.08] bg-navy-950 scroll-mt-20" aria-labelledby="about-heading">
     <Container size="default">
-      <div className="max-w-3xl space-y-4">
+      <div className="max-w-3xl space-y-3">
         <h2 id="about-heading" className="text-2xl sm:text-3xl font-bold font-heading text-heading tracking-tight">
           About {COMPANY.shortName}
         </h2>
         <p className="text-base sm:text-lg text-body leading-[1.65]">
-          {COMPANY.name} is an electrical contractor based in {COMPANY.city}, Rajasthan. We do wiring, lighting and power
-          distribution for buildings across India, and have worked in {stat('Cities')} cities in {stat('States')} states so far.
-          We plan each job with you, install everything neatly and safely, and test it all before handover. You deal with one team
-          from the first visit to the final switch-on.
+          {COMPANY.name} was founded in {COMPANY.founded.month} {COMPANY.founded.year} by {COMPANY.founder} in {COMPANY.city}, {COMPANY.state}. Today
+          our team of {COMPANY.teamSize} people handles complete electrical wiring, lighting and maintenance for coaching institutes, schools
+          and hospitals. We work to each client&apos;s requirements and timeline, with a focus on safe, clean and on-time work.
         </p>
+        {COMPANY.founderBio && <p className="text-base text-body leading-[1.65]">{COMPANY.founderBio}</p>}
       </div>
     </Container>
   </section>

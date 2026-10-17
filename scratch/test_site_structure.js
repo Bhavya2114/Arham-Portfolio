@@ -67,7 +67,7 @@ const order = [...home.matchAll(/<(Hero|PresenceTeaser|ServicesList|AboutArham)\
 assert(order.join(',') === 'Hero,PresenceTeaser,ServicesList,AboutArham,EnquiryForm', `Order: hero, map teaser, services, about, enquiry form (${order.join(', ')})`);
 const hero = read('../src/sections/Hero.jsx');
 assert(/<Button as=\{Link\} to="\/our-work" variant="primary"[\s\S]*?See our work on the map/.test(hero) && /href=\{whatsappHref\(WHATSAPP_HELLO\)\}[\s\S]*?WhatsApp us/.test(hero), 'Hero: "See our work on the map" (→ /our-work) and "WhatsApp us"');
-assert(SERVICES.length === 3 && SERVICES.every((s) => s.title && s.line && s.line.length < 120), '3 services, one short line each');
+assert(SERVICES.length === 9 && SERVICES.every((s) => s.title && s.line && s.line.length < 120), '9 services, one short line each (the homepage shows the first 4)');
 assert(/to="\/services"[\s\S]*?All services/.test(read('../src/sections/ServicesList.jsx')), '"All services" link');
 const about = code(read('../src/sections/AboutArham.jsx'));
 const aboutSentences = (about.match(/<p[^>]*>([\s\S]*?)<\/p>/) || ['', ''])[1].split(/(?<=\.)\s+/).filter((x) => x.trim());
@@ -98,7 +98,7 @@ const visible = [home, presence, contact, services, notFound, hero, about, foote
 const banned = ['Illustrative', 'Provisional', 'Subject to confirmation', 'Scope Disclosure', 'Documentation Notice', 'Verification Standard', 'Authenticated', 'pending executive', 'Standalone Foundation', 'Formulate', 'Corporate', 'being prepared', 'once approved', 'Route Not Found'];
 assert(banned.every((w) => !visible.includes(w)), `No disclaimers / jargon (${banned.filter((w) => visible.includes(w)).join(', ') || 'none found'})`);
 assert(!/to="\/#presence"|href="\/#presence"|to="\/projects"|to="\/presence"/.test(visible), 'No links to /#presence, /projects or /presence (all go to /our-work)');
-assert(PROCESS_STEPS.length === 4 && /How we work/.test(services) && /Our services/.test(services), 'Services: "Our services", 3 services, "How we work" in 4 steps');
+assert(PROCESS_STEPS.length === 6 && /<HowWeWork bare/.test(services) && /Our services/.test(services) && /SERVICES\.map/.test(services), 'Services: "Our services", all 9 services, "How we work" in 6 steps');
 assert(/Page not found/.test(notFound) && /to="\/our-work"/.test(notFound) && /to="\/contact"/.test(notFound), '404: "Page not found" with Home · Our Work · Contact');
 assert(exists('../src/components/map/MapCredits.jsx') && /MapCredits/.test(read('../src/components/map/PresenceMap.jsx')), 'Map data credits kept');
 
