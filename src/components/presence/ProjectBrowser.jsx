@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 're
 import { ChevronLeft, ChevronRight, X, GraduationCap, Building2, Home, Factory, Briefcase, Check, MessageCircle, MapPin, ExternalLink } from 'lucide-react';
 import PhotoGallery from './PhotoGallery';
 import { projectPhotos, mapsSearchUrl, hasOwnPhoto } from '../../data/showcaseProjects';
-import { cityLine, filterByStatus, statusTabs, statTiles, statusLabel, similarProjectText, listName, scopeDiffers } from '../../data/projectBrowse';
+import { cityLine, filterByStatus, statusTabs, statTiles, uniformStatusLine, statusLabel, similarProjectText, listName, scopeDiffers } from '../../data/projectBrowse';
 import { COMPANY, whatsappHref } from '../../data/company';
 
 /**
@@ -70,7 +70,10 @@ const TopBar = ({ backLabel, onBack, onClose, closeLabel }) => (
   </div>
 );
 
+// One status for every project → a single line ("7 projects · all completed"); mixed → tiles (0s hidden).
 const StatTiles = ({ projects, compact = false }) => {
+  const line = uniformStatusLine(projects);
+  if (line) return <p className="text-sm font-semibold text-body" data-status-line="">{line}</p>;
   const tiles = statTiles(projects); // Completed / Ongoing tiles hidden while 0
   return (
     <dl className={`grid ${TILE_COLS[tiles.length]} gap-2`}>
@@ -303,6 +306,8 @@ export const ProjectBrowser = ({
             </div>
           </>
         )}
+        {/* Tabs only when the list mixes statuses (one status for every row → no tabs row at all). */}
+        {groupTabs.length > 0 && (
         <div role="tablist" aria-label="Project status" className="flex gap-2 overflow-x-auto [scrollbar-width:none]">
           {groupTabs.map((t) => (
             <button
@@ -321,11 +326,12 @@ export const ProjectBrowser = ({
             </button>
           ))}
         </div>
+        )}
       </>
     );
     return (
       <Layout scrollKey={`${focusKey}|${tab}`} header={header}>
-        <div id={`${idPrefix}-tabpanel`} role="tabpanel" aria-labelledby={`${idPrefix}-tab-${tab}`}>
+        <div id={`${idPrefix}-tabpanel`} {...(groupTabs.length > 0 ? { role: 'tabpanel', 'aria-labelledby': `${idPrefix}-tab-${tab}` } : {})} data-project-list="">
           {rows.length > 0 ? (
             <ul className="space-y-2">
               {rows.map((p) => <ProjectRow key={p.id} project={p} onOpen={onOpenProject} group={group} short />)}
@@ -339,7 +345,6 @@ export const ProjectBrowser = ({
   }
 
   // City summary
-  const tiles = statTiles(cityProjects); // Completed / Ongoing tiles hidden while 0
   return (
     <Layout
       scrollKey={focusKey}
@@ -366,14 +371,7 @@ export const ProjectBrowser = ({
         </div>
       ) : (
         <div className="space-y-4">
-          <dl className={`grid ${TILE_COLS[tiles.length]} gap-2`}>
-            {tiles.map(({ id, label, value }) => (
-              <div key={id} className="flex flex-col-reverse rounded-xl border border-white/[0.07] bg-white/[0.03] px-3 py-2.5">
-                <dt className="text-xs text-muted">{label}</dt>
-                <dd className="font-heading text-2xl font-bold text-heading tabular-nums">{value}</dd>
-              </div>
-            ))}
-          </dl>
+          <StatTiles projects={cityProjects} />
           <ul className="space-y-2" aria-label={`Clients in ${city}`}>
             {groups.map((g) => (
               <li key={g.id}>

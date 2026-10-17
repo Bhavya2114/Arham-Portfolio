@@ -1,9 +1,10 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
+import { showClientFilter } from '../../data/projectBrowse';
 
 /**
- * Above the Our Work map: the summary pill ("India · 7 cities · 21 projects") and the filter chips
- * ("All clients", then one chip per client / category that has projects). The chips scroll
+ * Above the Our Work map: the summary pill ("India · 27 cities · 98 projects") and, while the data has
+ * 2+ clients / categories, the filter chips ("All clients", then one chip per client / category). The chips scroll
  * horizontally on phones. Choosing a filter updates every count and dims places with no matches.
  */
 export const OurWorkToolbar = ({ summary, options, filter, onFilter }) => (
@@ -12,6 +13,8 @@ export const OurWorkToolbar = ({ summary, options, filter, onFilter }) => (
       <MapPin className="w-4 h-4 text-accent shrink-0" aria-hidden="true" />
       {summary}
     </p>
+    {/* Client chips only while there are 2+ clients / categories to choose between. */}
+    {showClientFilter(options) && (
     <div
       role="group"
       aria-label="Filter projects by client"
@@ -35,6 +38,7 @@ export const OurWorkToolbar = ({ summary, options, filter, onFilter }) => (
         );
       })}
     </div>
+    )}
   </div>
 );
 
