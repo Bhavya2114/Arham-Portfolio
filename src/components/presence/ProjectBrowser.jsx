@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, X, GraduationCap, Building2, Home, Factory, Briefcase, Check, MessageCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, GraduationCap, Building2, Home, Factory, Briefcase, Check, MessageCircle, MapPin, ExternalLink } from 'lucide-react';
 import PhotoGallery from './PhotoGallery';
-import { projectPhotos } from '../../data/showcaseProjects';
+import { projectPhotos, mapsSearchUrl } from '../../data/showcaseProjects';
 import { statusStats, cityLine, filterByStatus, STATUS_TABS, statusLabel, similarProjectText } from '../../data/projectBrowse';
 import { COMPANY, whatsappHref } from '../../data/company';
 
@@ -51,7 +51,7 @@ const GroupIcon = ({ category }) => {
 };
 
 const TopBar = ({ backLabel, onBack, onClose, closeLabel }) => (
-  <div className="flex items-center justify-between gap-2 -mx-1 mb-2">
+  <div className="flex items-center justify-between gap-2 mb-2">
     {onBack ? (
       <button type="button" onClick={onBack} className={`inline-flex min-h-[44px] items-center gap-1 rounded-lg px-1 text-sm font-semibold text-heading hover:text-accent ${BTN_FOCUS}`}>
         <ChevronLeft className="w-5 h-5 text-accent" aria-hidden="true" />
@@ -81,10 +81,10 @@ const ProjectRow = ({ project, onOpen }) => {
           <span className="h-[76px] w-[76px] shrink-0 rounded-lg bg-white/[0.06]" aria-hidden="true" />
         )}
         <span className="min-w-0 flex-1 space-y-1">
-          <span className="block text-base font-semibold text-heading leading-snug">{project.name}</span>
-          <span className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted">
-            {project.area}
-            <StatusTag project={project} />
+          <span className="block truncate text-base font-semibold text-heading leading-snug" title={project.name}>{project.name}</span>
+          <span className="flex min-w-0 items-center gap-2 text-sm text-muted">
+            <span className="min-w-0 truncate">{project.area}</span>
+            <span className="shrink-0"><StatusTag project={project} /></span>
           </span>
           <ScopeChips scope={project.scope} inline />
         </span>
@@ -146,6 +146,24 @@ export const ProjectBrowser = ({
         <div className="space-y-2">
           {heading(project.name)}
           <p className="text-base text-body">{[project.area, project.city].filter(Boolean).join(', ')}</p>
+          {project.address && (
+            <div className="space-y-1">
+              <p className="flex items-start gap-1.5 text-sm text-muted">
+                <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                <span>{project.address}</span>
+              </p>
+              <a
+                href={mapsSearchUrl(project)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`inline-flex min-h-[44px] items-center gap-1.5 rounded text-sm font-semibold text-heading underline decoration-accent decoration-2 underline-offset-4 hover:text-accent ${BTN_FOCUS}`}
+              >
+                Open in Google Maps
+                <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            </div>
+          )}
           <div className="flex flex-wrap items-center gap-2">
             <StatusTag project={project} long />
             <span className="rounded-full border border-white/[0.14] bg-white/[0.06] px-2 py-0.5 text-xs font-semibold text-body">{project.category}</span>
@@ -232,7 +250,7 @@ export const ProjectBrowser = ({
           {heading(city)}
           <p className="text-base text-body">{cityProjects.length > 0 ? cityLine(cityProjects) : `${stateName}`}</p>
         </div>
-        <button type="button" onClick={onClose} aria-label={`Close ${city} and return to the map`} className={`-mr-1 inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-body hover:bg-white/10 ${BTN_FOCUS}`}>
+        <button type="button" onClick={onClose} aria-label={`Close ${city} and return to the map`} className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-body hover:bg-white/10 ${BTN_FOCUS}`}>
           <X className="w-5 h-5" aria-hidden="true" />
         </button>
       </div>
