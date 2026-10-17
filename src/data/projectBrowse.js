@@ -143,16 +143,31 @@ export const statusStats = (projects) => ({
 export const STATUS_TABS = Object.freeze(['all', 'completed', 'ongoing']);
 const STATUS_LABELS = { all: 'All', completed: 'Completed', ongoing: 'Ongoing' };
 
+/** The different statuses among these projects, e.g. ['completed'] or ['completed', 'ongoing']. */
+export const statusesIn = (projects) => STATUS_TABS.slice(1).filter((s) => projects.some((p) => p.status === s));
+
 /**
- * Group-list status tabs: "All", plus Completed / Ongoing only when that status has projects (a tab
- * with 0 is hidden and comes back by itself once a row has that status).
+ * Group-list status tabs, only when the list mixes 2+ statuses: "All", plus each status that has rows.
+ * One status for every row → no tabs at all (they come back by themselves once statuses differ).
  */
 export const statusTabs = (projects) => {
+  if (statusesIn(projects).length < 2) return [];
   const stats = statusStats(projects);
   return STATUS_TABS.map((id) => ({ id, label: STATUS_LABELS[id], count: id === 'all' ? stats.total : stats[id] })).filter((t) => t.id === 'all' || t.count > 0);
 };
 
-/** City-summary stat tiles: "Projects", plus Completed / Ongoing only when not 0. */
+/**
+ * One status for every project → one line instead of tiles: "7 projects · all completed"
+ * ("1 project · completed"); mixed statuses → null (the tiles are shown).
+ */
+export const uniformStatusLine = (projects) => {
+  const statuses = statusesIn(projects);
+  if (projects.length === 0 || statuses.length !== 1) return null;
+  const n = projects.length;
+  return `${n} ${n === 1 ? 'project' : 'projects'} · ${n === 1 ? '' : 'all '}${statuses[0]}`;
+};
+
+/** City stat tiles for mixed statuses: "Projects", plus Completed / Ongoing only when not 0. */
 export const statTiles = (projects) => {
   const stats = statusStats(projects);
   return [
@@ -161,6 +176,9 @@ export const statTiles = (projects) => {
     { id: 'ongoing', label: 'Ongoing', value: stats.ongoing },
   ].filter((t) => t.id === 'total' || t.value > 0);
 };
+
+/** Client filter chips are shown only while the data has 2+ client / category groups. */
+export const showClientFilter = (filterOptions) => filterOptions.length > 2;
 export const filterByStatus = (projects, tab) => (tab === 'completed' || tab === 'ongoing' ? projects.filter((p) => p.status === tab) : projects);
 
 /** One line under a city name: "Electrical work for coaching centres, commercial buildings and homes." */

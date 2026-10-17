@@ -11,7 +11,7 @@ import { performance } from 'perf_hooks';
 import { SHOWCASE_PROJECTS, SCOPE_LABELS, USE_PLACEHOLDER_PROJECTS, MAX_PHOTOS, getProjectRows, projectPhotos } from '../src/data/showcaseProjects.js';
 import {
   FILTER_ALL, isListable, getBrowsableProjects, groupIdOf, getGroups, getFilterOptions, filterProjects, countByCity, cityKey,
-  statesWithProjects, projectsInState, projectsInCity, placeSummary, statusStats, filterByStatus, cityLine, statusLabel, similarProjectText, scopeSummary, statusTabs, statTiles,
+  statesWithProjects, projectsInState, projectsInCity, placeSummary, statusStats, filterByStatus, cityLine, statusLabel, similarProjectText, scopeSummary, statusTabs, statTiles, uniformStatusLine, showClientFilter,
 } from '../src/data/projectBrowse.js';
 import { presenceNavReducer, INITIAL_PRESENCE_NAV, sheetLevel } from '../src/lib/presenceNavigation.js';
 import { getPresenceState } from '../src/data/presenceCoverage.js';
@@ -89,18 +89,28 @@ for (let i = 0; i < 50; i += 1) getGroups(projectsInCity(filterProjects(getBrows
 const perRun = (performance.now() - t0) / 50;
 assert(perRun < 5, `60 rows: filter + city + groups in ${perRun.toFixed(2)} ms`);
 
-console.log('\n2b. Empty statuses are hidden, and come back by themselves');
+console.log('\n2b. Status tabs only for mixed statuses; one status → a single line');
 const realKota = projectsInCity(getBrowsableProjects(), 'IN-RJ', 'Kota');
-assert(statusTabs(realKota).map((t) => `${t.label} ${t.count}`).join(', ') === `All ${realKota.length}, Completed ${realKota.length}`, `No ongoing projects → no "Ongoing" tab (${statusTabs(realKota).map((t) => `${t.label} ${t.count}`).join(', ')})`);
-assert(statTiles(realKota).map((t) => t.label).join(',') === 'Projects,Completed' && !statTiles(realKota).some((t) => t.value === 0), 'No "0 Ongoing" tile in the city summary');
-const withOngoing = [...realKota, TEST_ONLY_ROWS[2]];
-assert(statusTabs(withOngoing).map((t) => t.label).join(',') === 'All,Completed,Ongoing' && statusTabs(withOngoing).find((t) => t.id === 'ongoing').count === 1, 'One ongoing row → the "Ongoing (1)" tab reappears');
-assert(statTiles(withOngoing).map((t) => `${t.label} ${t.value}`).join(', ') === `Projects ${withOngoing.length}, Completed ${realKota.length}, Ongoing 1`, 'One ongoing row → the "Ongoing 1" tile reappears');
+const realAhmedabad = projectsInCity(getBrowsableProjects(), 'IN-GJ', 'Ahmedabad');
+assert(statusTabs(realKota).length === 0 && statusTabs(realAhmedabad).length === 0, 'Every row completed (Kota, Ahmedabad) → no tabs row');
+assert(uniformStatusLine(realAhmedabad) === '7 projects · all completed' && uniformStatusLine(realKota) === '15 projects · all completed', `One status → one line: "${uniformStatusLine(realAhmedabad)}"`);
 const onlyOngoing = [TEST_ONLY_ROWS[1], TEST_ONLY_ROWS[2]];
-assert(statusTabs(onlyOngoing).map((t) => t.id).join(',') === 'all,ongoing' && statTiles(onlyOngoing).map((t) => t.id).join(',') === 'total,ongoing', 'Only ongoing work → no "Completed" tab or tile');
-assert(statusTabs([])[0].id === 'all' && statusTabs([]).length === 1 && statTiles([]).length === 1, '"All" tab and "Projects" tile always shown');
+assert(statusTabs(onlyOngoing).length === 0 && uniformStatusLine(onlyOngoing) === '2 projects · all ongoing' && uniformStatusLine([TEST_ONLY_ROWS[1]]) === '1 project · ongoing', 'All ongoing → no tabs; "2 projects · all ongoing" ("1 project · ongoing")');
+const mixed = [...realKota, TEST_ONLY_ROWS[2]];
+assert(statusTabs(mixed).map((t) => `${t.label} ${t.count}`).join(', ') === `All ${mixed.length}, Completed ${realKota.length}, Ongoing 1`, `Mixed statuses → tabs come back: ${statusTabs(mixed).map((t) => `${t.label} ${t.count}`).join(', ')}`);
+assert(uniformStatusLine(mixed) === null && statTiles(mixed).map((t) => `${t.label} ${t.value}`).join(', ') === `Projects ${mixed.length}, Completed ${realKota.length}, Ongoing 1`, 'Mixed statuses → tiles (Projects, Completed, Ongoing)');
+assert(statTiles([TEST_ONLY_ROWS[0], TEST_ONLY_ROWS[2]]).every((t) => t.value > 0) && statusTabs([]).length === 0 && uniformStatusLine([]) === null, 'Tiles hide 0s; an empty list has no tabs and no line');
 const browserSrc = read('../src/components/presence/ProjectBrowser.jsx');
-assert(/statusTabs\(group\.projects\)/.test(browserSrc) && /const tiles = statTiles\(cityProjects\)/.test(browserSrc) && /TILE_COLS\[tiles\.length\]/.test(browserSrc), 'Sheet / panel use these selectors (tile grid sized to the tiles shown)');
+assert(/statusTabs\(group\.projects\)/.test(browserSrc) && /\{groupTabs\.length > 0 && \(/.test(browserSrc) && /const line = uniformStatusLine\(projects\);\s*if \(line\) return <p/.test(browserSrc) && (browserSrc.match(/<StatTiles projects=/g) || []).length === 2, 'Sheet / panel: tabs row only when there are tabs; one shared StatTiles (line or tiles) for the city summary and the direct list');
+
+console.log('\n2c. Client filter chips only while there are 2+ clients');
+const oneClient = getFilterOptions(getBrowsableProjects());
+assert(oneClient.length === 2 && !showClientFilter(oneClient), `Only ALLEN in the data → chips hidden (${oneClient.map((o) => `${o.label} ${o.count}`).join(' · ')})`);
+const secondClient = { ...TEST_ONLY_ROWS[0], id: 'test-second-client', client: 'Test Hospital Trust', category: 'Hospital' };
+const twoClients = getFilterOptions(getBrowsableProjects([...getProjectRows(), secondClient]));
+assert(twoClients.length === 3 && showClientFilter(twoClients) && twoClients.map((o) => o.label).join(',') === 'All clients,ALLEN Career Institute,Test Hospital Trust', 'A second client (test-only row) → chips appear: All clients · ALLEN · the new client');
+assert(showClientFilter(getFilterOptions(getBrowsableProjects([...getProjectRows(), TEST_ONLY_ROWS[0]]))), 'A no-client category (e.g. Commercial) also brings the chips back');
+assert(/\{showClientFilter\(options\) && \(/.test(read('../src/components/presence/OurWorkToolbar.jsx')) && /<MapPin className="w-4 h-4 text-accent shrink-0"/.test(read('../src/components/presence/OurWorkToolbar.jsx')), 'Toolbar: the summary pill always; chips only via showClientFilter');
 
 console.log('\n3. Navigation: map → city → group → project, back one level at a time');
 const run = (actions, from = INITIAL_PRESENCE_NAV) => actions.reduce(presenceNavReducer, from);
