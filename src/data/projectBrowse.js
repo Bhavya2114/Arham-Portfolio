@@ -177,6 +177,12 @@ export const statTiles = (projects) => {
   ].filter((t) => t.id === 'total' || t.value > 0);
 };
 
+/** List subtitle suffix: " · 3 ongoing" when some rows are ongoing, otherwise nothing. */
+export const ongoingSuffix = (projects) => {
+  const n = projects.filter((p) => p.status === 'ongoing').length;
+  return n > 0 ? ` · ${n} ongoing` : '';
+};
+
 /** Client filter chips are shown only while the data has 2+ client / category groups. */
 export const showClientFilter = (filterOptions) => filterOptions.length > 2;
 export const filterByStatus = (projects, tab) => (tab === 'completed' || tab === 'ongoing' ? projects.filter((p) => p.status === tab) : projects);
