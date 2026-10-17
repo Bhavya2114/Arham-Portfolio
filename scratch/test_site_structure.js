@@ -47,6 +47,12 @@ assert(/window\.location\.hash/.test(read('../src/lib/usePageMetadata.js')) && /
 const sitemap = read('../public/sitemap.xml');
 assert(['/', '/our-work', '/services', '/contact'].every((r) => sitemap.includes(`<loc>${r}</loc>`)) && (sitemap.match(/<loc>/g) || []).length === 4, 'sitemap.xml: the 4 pages');
 
+// Hosting (Vercel): every path that is not a real file serves index.html, so direct visits / refreshes on
+// /our-work, /services, /contact and the old /presence, /projects, /about load the app (which redirects).
+const vercel = JSON.parse(read('../vercel.json'));
+assert(Array.isArray(vercel.rewrites) && vercel.rewrites.length === 1 && vercel.rewrites[0].source === '/(.*)' && vercel.rewrites[0].destination === '/index.html' && !vercel.redirects && !vercel.headers,
+  'vercel.json: SPA fallback rewrite to /index.html (real files such as images, sitemap and robots.txt are still served first)');
+
 console.log('\n2. Navigation');
 assert(NAV_ITEMS.map((i) => `${i.name}:${i.path}`).join(',') === 'Our Work:/our-work,Services:/services,Contact:/contact', 'Nav: Our Work · Services · Contact');
 assert(/whatsappHref\(WHATSAPP_HELLO\)/.test(header) && /aria-label=\{`WhatsApp \$\{COMPANY\.name\}`\}/.test(header) && />\s*Enquire\s*<\/Button>/.test(header) && /variant="primary"/.test(header), 'Header: WhatsApp icon button and the yellow Enquire button');
