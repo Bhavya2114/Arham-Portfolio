@@ -46,6 +46,31 @@ export const scopeSummary = (projects) => {
   return top.join(' & ');
 };
 
+const scopeKey = (scope) => [...(scope || [])].sort().join('|');
+
+/** The work most of these projects share (the most common exact scope), e.g. ['Full wiring', 'Lighting']. */
+export const typicalScope = (projects) => {
+  const tally = new Map();
+  projects.forEach((p) => tally.set(scopeKey(p.scope), (tally.get(scopeKey(p.scope)) || 0) + 1));
+  const [key] = [...tally.entries()].sort((a, b) => b[1] - a[1])[0] || [''];
+  return key ? key.split('|') : [];
+};
+
+/** A row's scope chips are shown only when its work differs from its group's typical work. */
+export const scopeDiffers = (project, group) => scopeKey(project.scope) !== scopeKey(group?.typicalScope);
+
+/**
+ * Name in a client + city list: just the campus part, e.g. "ALLEN Ahmedabad – Sadhya SBR" → "Sadhya SBR",
+ * "ALLEN Sankalp" → "Sankalp". The project detail keeps the full name.
+ */
+export const listName = (p) => {
+  let name = p.name;
+  const clientWord = p.client ? p.client.split(' ')[0] : null;
+  if (clientWord && name.startsWith(`${clientWord} `)) name = name.slice(clientWord.length + 1);
+  if (p.city && name.startsWith(`${p.city} – `)) name = name.slice(p.city.length + 3);
+  return name;
+};
+
 /** Client groups for a set of projects, biggest first: { id, name, isClient, category, count, noun, line, projects }. */
 export const getGroups = (projects) => {
   const byId = new Map();
@@ -59,7 +84,7 @@ export const getGroups = (projects) => {
       const count = g.projects.length;
       const noun = nounFor(g.category, count);
       const scope = scopeSummary(g.projects);
-      return { ...g, count, noun, line: `${count} ${noun}${scope ? ` · ${scope}` : ''}` };
+      return { ...g, count, noun, typicalScope: typicalScope(g.projects), line: `${count} ${noun}${scope ? ` · ${scope}` : ''}` };
     })
     .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
 };
