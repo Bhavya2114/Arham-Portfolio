@@ -12,7 +12,7 @@ import { COMPANY, whatsappHref } from '../../data/company';
  *   city    — city name, one line, Projects / Completed / Ongoing tiles, client groups
  *   group   — "‹ City" (or "‹ Map" when the city's only group opened directly), group name + count as the
  *             only count (" · N ongoing" added when some rows are ongoing), status tabs (mixed only), rows
- *   project — "‹ Client · City", photos, full name, place · Map link, status chip, one sentence on the work, WhatsApp
+ *   project — "‹ Client · City", photos, full name, place · Map · status, one sentence on the work, WhatsApp
  *   cluster — projects that share one map pin
  * Rows in a client + city list show just the campus part of the name, a thumbnail only for the
  * project's own photos (not the shared stand-in), and work chips only when they differ from the group's.
@@ -259,8 +259,9 @@ export const ProjectBrowser = ({
           <PhotoGallery photos={photos} alt={project.name} badge={owner} viewer={photoViewer} onViewerChange={onPhotoViewer} fill />
           <div className="space-y-1.5 lg:space-y-2">
             {heading(project.name, null, 'text-xl lg:text-2xl')}
-            {/* One line: place · a small Map link (the address itself stays in the data for this URL + schema). */}
-            <p className="flex flex-wrap items-center gap-x-2 text-base text-body" data-project-place="">
+            {/* One line: place · a small Map link · status (the address itself stays in the data for the Map
+                URL + schema). The "· status" pair wraps as one piece, on narrow phones only. */}
+            <p className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-body [font-size:14px]" data-project-place="">
               <span>{[project.area, project.city].filter(Boolean).join(', ')}</span>
               {project.address && (
                 <>
@@ -277,11 +278,11 @@ export const ProjectBrowser = ({
                   </a>
                 </>
               )}
+              <span className="inline-flex items-center gap-x-1.5 whitespace-nowrap" data-project-status="">
+                <span className="text-muted" aria-hidden="true">·</span>
+                <StatusTag project={project} long />
+              </span>
             </p>
-            {/* Status as the only chip, then one sentence about the work. */}
-            <div className="flex">
-              <StatusTag project={project} long />
-            </div>
             {summary && <p className="text-body [font-size:15px] leading-snug" data-project-summary="">{summary}</p>}
           </div>
           <a
