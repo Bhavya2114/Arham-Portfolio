@@ -4,7 +4,8 @@ import { useLocation, useNavigate, useNavigationType } from 'react-router-dom';
 /**
  * Our Work sheet levels in the browser history, so the phone's back button / gesture steps back one
  * level at a time (photo viewer → project → group list → city summary → sheet closed; a city with one
- * client group opens its list directly, which is a single level) and never leaves
+ * client group opens its list directly, and a city with one project opens that project, each a single
+ * level) and never leaves
  * /our-work while a level is open.
  *
  * Every level is a history entry for the SAME URL (react-router push with state { ourWorkLevel: n }):
@@ -18,7 +19,7 @@ import { useLocation, useNavigate, useNavigationType } from 'react-router-dom';
  * The browser's own scroll restoration is turned off on this page, so going back never jumps the page.
  */
 export const historyDepth = (nav, viewerOpen = false) =>
-  (nav.city ? 1 : 0) + (nav.groupId && !nav.autoGroup ? 1 : 0) + (nav.projectId || nav.clusterIds ? 1 : 0) + (viewerOpen ? 1 : 0);
+  (nav.city ? 1 : 0) + (nav.groupId && !nav.autoGroup ? 1 : 0) + ((nav.projectId && !nav.autoProject) || nav.clusterIds ? 1 : 0) + (viewerOpen ? 1 : 0);
 
 const entryLevel = (location) => (Number.isInteger(location.state?.ourWorkLevel) ? location.state.ourWorkLevel : 0);
 

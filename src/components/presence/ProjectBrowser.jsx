@@ -71,6 +71,12 @@ const TopBar = ({ backLabel, onBack, onClose, closeLabel }) => (
 );
 
 // One status for every project → a single line ("7 projects · all completed"); mixed → tiles (0s hidden).
+const CloseButton = ({ onClose, label }) => (
+  <button type="button" onClick={onClose} aria-label={label} className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-body hover:bg-white/10 ${BTN_FOCUS}`}>
+    <X className="w-5 h-5" aria-hidden="true" />
+  </button>
+);
+
 const StatTiles = ({ projects }) => {
   const line = uniformStatusLine(projects);
   if (line) return <p className="text-sm font-semibold text-body" data-status-line="">{line}</p>;
@@ -117,8 +123,8 @@ const ScrollBody = ({ resetKey, children }) => {
     };
   }, [resetKey]);
   return (
-    <div className="relative flex-1 min-h-0">
-      <div ref={ref} className="panel-scroll h-full overflow-y-auto overscroll-contain pr-1 -mr-1" data-panel-scroll="">
+    <div className="relative flex min-h-0 flex-col">
+      <div ref={ref} className="panel-scroll min-h-0 overflow-y-auto overscroll-contain pr-1 -mr-1" data-panel-scroll="">
         <div className="pb-2">{children}</div>
       </div>
       <div
@@ -130,9 +136,12 @@ const ScrollBody = ({ resetKey, children }) => {
   );
 };
 
-/** Pinned header + scrolling body. */
+/**
+ * Pinned header + scrolling body. The layout is as tall as its content (no empty space below the last row)
+ * and shrinks to the panel / sheet's max height, where the body scrolls.
+ */
 const Layout = ({ header, scrollKey, children }) => (
-  <div className="flex h-full min-h-0 flex-col">
+  <div className="flex min-h-0 flex-col">
     <div className="shrink-0 space-y-3 pb-3" data-panel-header="">{header}</div>
     <ScrollBody resetKey={scrollKey}>{children}</ScrollBody>
   </div>
@@ -188,6 +197,7 @@ export const ProjectBrowser = ({
   groups,
   group,
   autoGroup = false, // the city's only group, opened directly (no city summary step)
+  autoProject = false, // the city's only project, opened directly (no list step)
   project,
   clusterProjects = [],
   filterLabel = null,
@@ -224,7 +234,23 @@ export const ProjectBrowser = ({
     const owner = project.client || project.category;
     const photos = projectPhotos(project);
     return (
-      <Layout scrollKey={focusKey} header={<TopBar backLabel={`${owner} · ${project.city}`} onBack={onBack} onClose={onClose} closeLabel="Close project and return to the map" />}>
+      <Layout
+        scrollKey={focusKey}
+        header={
+          autoProject ? (
+            // The city's only project, opened directly: the city + client as context, no back link, only ✕.
+            <div className="flex items-center justify-between gap-2">
+              <p className="min-w-0 truncate text-sm font-semibold text-heading" data-project-context="">
+                {project.city} <span className="font-normal text-muted">· {owner}</span>
+              </p>
+              <CloseButton onClose={onClose} label="Close project and return to the map" />
+            </div>
+          ) : (
+            // Back to the list it came from: "‹ Kota" for a city's only group, else "‹ Client · City".
+            <TopBar backLabel={autoGroup ? project.city : `${owner} · ${project.city}`} onBack={onBack} onClose={onClose} closeLabel="Close project and return to the map" />
+          )
+        }
+      >
         <div className="space-y-4">
           <PhotoGallery photos={photos} alt={project.name} badge={owner} viewer={photoViewer} onViewerChange={onPhotoViewer} />
           <div className="space-y-2">
@@ -294,11 +320,13 @@ export const ProjectBrowser = ({
     const header = (
       <>
         {autoGroup ? (
-          // The city's only group opened directly: back closes to the map; the city's stats sit in the header.
+          // The city's only group opened directly: no back link (✕ closes to the map; so does the back button).
           <>
-            <TopBar backLabel="Map" onBack={onBack} onClose={onClose} closeLabel="Close list and return to the map" />
             <div className="space-y-1">
-              {heading(city)}
+              <div className="flex items-start justify-between gap-2">
+                {heading(city)}
+                <CloseButton onClose={onClose} label="Close list and return to the map" />
+              </div>
               <p className="flex items-center gap-2 text-sm text-muted">
                 <GroupIcon category={group.category} small />
                 <span className="min-w-0 truncate">{group.name} · {group.count} {group.noun}{ongoingSuffix(group.projects)}</span>
