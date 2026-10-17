@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 're
 import { ChevronLeft, ChevronRight, X, GraduationCap, Building2, Home, Factory, Briefcase, Check, MessageCircle, MapPin, ExternalLink } from 'lucide-react';
 import PhotoGallery from './PhotoGallery';
 import { projectPhotos, mapsSearchUrl, hasOwnPhoto } from '../../data/showcaseProjects';
-import { cityLine, filterByStatus, statusTabs, statTiles, uniformStatusLine, statusLabel, similarProjectText, listName, scopeDiffers } from '../../data/projectBrowse';
+import { cityLine, filterByStatus, statusTabs, statTiles, uniformStatusLine, ongoingSuffix, statusLabel, similarProjectText, listName, scopeDiffers } from '../../data/projectBrowse';
 import { COMPANY, whatsappHref } from '../../data/company';
 
 /**
@@ -10,8 +10,8 @@ import { COMPANY, whatsappHref } from '../../data/company';
  * desktop side panel). Every level is a pinned header + a scrolling body: only the body scrolls, inside
  * the panel / sheet (thin themed scrollbar, a soft fade at the bottom while more is below).
  *   city    — city name, one line, Projects / Completed / Ongoing tiles, client groups
- *   group   — "‹ City" (or "‹ Map" when the city's only group opened directly, with the city's tiles in
- *             the header), group name + count, status tabs, project rows
+ *   group   — "‹ City" (or "‹ Map" when the city's only group opened directly), group name + count as the
+ *             only count (" · N ongoing" added when some rows are ongoing), status tabs (mixed only), rows
  *   project — "‹ Client · City", photos, full name, place, address + Google Maps, status, work done, WhatsApp
  *   cluster — projects that share one map pin
  * Rows in a client + city list show just the campus part of the name, a thumbnail only for the
@@ -71,16 +71,16 @@ const TopBar = ({ backLabel, onBack, onClose, closeLabel }) => (
 );
 
 // One status for every project → a single line ("7 projects · all completed"); mixed → tiles (0s hidden).
-const StatTiles = ({ projects, compact = false }) => {
+const StatTiles = ({ projects }) => {
   const line = uniformStatusLine(projects);
   if (line) return <p className="text-sm font-semibold text-body" data-status-line="">{line}</p>;
   const tiles = statTiles(projects); // Completed / Ongoing tiles hidden while 0
   return (
     <dl className={`grid ${TILE_COLS[tiles.length]} gap-2`}>
       {tiles.map(({ id, label, value }) => (
-        <div key={id} className={`flex flex-col-reverse rounded-xl border border-white/[0.07] bg-white/[0.03] px-3 ${compact ? 'py-1.5' : 'py-2.5'}`}>
+        <div key={id} className={`flex flex-col-reverse rounded-xl border border-white/[0.07] bg-white/[0.03] px-3 py-2.5`}>
           <dt className="text-xs text-muted">{label}</dt>
-          <dd className={`font-heading ${compact ? 'text-xl' : 'text-2xl'} font-bold text-heading tabular-nums`}>{value}</dd>
+          <dd className={`font-heading text-2xl font-bold text-heading tabular-nums`}>{value}</dd>
         </div>
       ))}
     </dl>
@@ -289,10 +289,9 @@ export const ProjectBrowser = ({
               {heading(city)}
               <p className="flex items-center gap-2 text-sm text-muted">
                 <GroupIcon category={group.category} small />
-                <span className="min-w-0 truncate">{group.name} · {group.count} {group.noun}</span>
+                <span className="min-w-0 truncate">{group.name} · {group.count} {group.noun}{ongoingSuffix(group.projects)}</span>
               </p>
             </div>
-            <StatTiles projects={group.projects} compact />
           </>
         ) : (
           <>
@@ -301,7 +300,7 @@ export const ProjectBrowser = ({
               <GroupIcon category={group.category} />
               <div className="min-w-0">
                 {heading(group.name)}
-                <p className="text-sm text-muted">{group.count} {group.noun} in {city}</p>
+                <p className="text-sm text-muted">{group.count} {group.noun} in {city}{ongoingSuffix(group.projects)}</p>
               </div>
             </div>
           </>

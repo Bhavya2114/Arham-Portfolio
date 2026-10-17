@@ -11,7 +11,7 @@ import { performance } from 'perf_hooks';
 import { SHOWCASE_PROJECTS, SCOPE_LABELS, USE_PLACEHOLDER_PROJECTS, MAX_PHOTOS, getProjectRows, projectPhotos } from '../src/data/showcaseProjects.js';
 import {
   FILTER_ALL, isListable, getBrowsableProjects, groupIdOf, getGroups, getFilterOptions, filterProjects, countByCity, cityKey,
-  statesWithProjects, projectsInState, projectsInCity, placeSummary, statusStats, filterByStatus, cityLine, statusLabel, similarProjectText, scopeSummary, statusTabs, statTiles, uniformStatusLine, showClientFilter,
+  statesWithProjects, projectsInState, projectsInCity, placeSummary, statusStats, filterByStatus, cityLine, statusLabel, similarProjectText, scopeSummary, statusTabs, statTiles, uniformStatusLine, showClientFilter, ongoingSuffix,
 } from '../src/data/projectBrowse.js';
 import { presenceNavReducer, INITIAL_PRESENCE_NAV, sheetLevel } from '../src/lib/presenceNavigation.js';
 import { getPresenceState } from '../src/data/presenceCoverage.js';
@@ -101,7 +101,10 @@ assert(statusTabs(mixed).map((t) => `${t.label} ${t.count}`).join(', ') === `All
 assert(uniformStatusLine(mixed) === null && statTiles(mixed).map((t) => `${t.label} ${t.value}`).join(', ') === `Projects ${mixed.length}, Completed ${realKota.length}, Ongoing 1`, 'Mixed statuses → tiles (Projects, Completed, Ongoing)');
 assert(statTiles([TEST_ONLY_ROWS[0], TEST_ONLY_ROWS[2]]).every((t) => t.value > 0) && statusTabs([]).length === 0 && uniformStatusLine([]) === null, 'Tiles hide 0s; an empty list has no tabs and no line');
 const browserSrc = read('../src/components/presence/ProjectBrowser.jsx');
-assert(/statusTabs\(group\.projects\)/.test(browserSrc) && /\{groupTabs\.length > 0 && \(/.test(browserSrc) && /const line = uniformStatusLine\(projects\);\s*if \(line\) return <p/.test(browserSrc) && (browserSrc.match(/<StatTiles projects=/g) || []).length === 2, 'Sheet / panel: tabs row only when there are tabs; one shared StatTiles (line or tiles) for the city summary and the direct list');
+assert(/statusTabs\(group\.projects\)/.test(browserSrc) && /\{groupTabs\.length > 0 && \(/.test(browserSrc) && /const line = uniformStatusLine\(projects\);\s*if \(line\) return <p/.test(browserSrc) && (browserSrc.match(/<StatTiles projects=/g) || []).length === 1, 'Sheet / panel: tabs row only when there are tabs; StatTiles (line or tiles) only on the city summary of a multi-client city');
+assert(ongoingSuffix(realKota) === '' && ongoingSuffix(mixed) === ' · 1 ongoing' && ongoingSuffix(onlyOngoing) === ' · 2 ongoing', 'List subtitle: nothing extra when all completed; " · N ongoing" when some rows are ongoing');
+assert((browserSrc.match(/\{ongoingSuffix\(group\.projects\)\}/g) || []).length === 2 && !/data-status-line=""[\s\S]{0,80}group\.projects/.test(browserSrc), 'Both list headers (direct and via the summary) use the subtitle as the only count');
+assert(/\{statusLabel\(project, \{ long \}\)\}/.test(browserSrc) && /<Check className="w-3 h-3"/.test(browserSrc), 'Completed rows keep the ✓ year chip')
 
 console.log('\n2c. Client filter chips only while there are 2+ clients');
 const oneClient = getFilterOptions(getBrowsableProjects());

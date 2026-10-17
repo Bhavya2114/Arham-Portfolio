@@ -58,7 +58,7 @@ assert(sheetLevel(closed) === null && closed.stateCode === 'IN-RJ', 'Back from t
 n = run([{ type: 'selectState', stateCode: 'IN-RJ' }, { type: 'selectCity', stateCode: 'IN-RJ', city: 'Kota' }, { type: 'openGroup', groupId: 'g' }]);
 assert(!n.autoGroup && historyDepth(n) === 2 && sheetLevel(presenceNavReducer(n, { type: 'back' })) === 'city', 'A city with several groups keeps the summary step (list → back → summary)');
 assert(getGroups(projectsInCity(all, 'IN-RJ', 'Kota')).length === 1 && /const singleGroupOf = \(stateCode, city\) => \{[\s\S]*?cityGroups\.length === 1 \? cityGroups\[0\]\.id : null;/.test(page), 'The page opens the group directly when the city has exactly one');
-assert(/backLabel="Map"/.test(browser) && /<StatTiles projects=\{group\.projects\} compact \/>/.test(browser) && /autoGroup=\{nav\.autoGroup\}/.test(page), 'Direct-opened list: "‹ Map" back link and the city\'s stat tiles in its header');
+assert(/backLabel="Map"/.test(browser) && !/<StatTiles projects=\{group\.projects\}/.test(browser) && /\{group\.name\} · \{group\.count\} \{group\.noun\}\{ongoingSuffix\(group\.projects\)\}/.test(browser) && /autoGroup=\{nav\.autoGroup\}/.test(page), 'Direct-opened list: "‹ Map" back link; the subtitle "<client> · N campuses" is the only count (no tiles, no status line)');
 
 console.log('\n4. Short names in client + city lists: brand word + campus, no "<City> – " (full name in the detail)');
 const byId = (id) => all.find((p) => p.id === id);
