@@ -48,6 +48,25 @@ export const scopeSummary = (projects) => {
 
 const scopeKey = (scope) => [...(scope || [])].sort().join('|');
 
+// A scope label as a word in a sentence: "Full wiring" → "wiring", "Earthing" → "earthing", "DB panels" stays.
+const sentenceWord = (s) => (s === 'Full wiring' ? 'wiring' : /^[A-Z]{2}/.test(s) ? s : s.charAt(0).toLowerCase() + s.slice(1));
+
+/**
+ * One sentence about the work on a project (the detail view): the row's own `summary` when it has one;
+ * full wiring + lighting → "Complete wiring and lighting for the entire building."; otherwise the scope
+ * labels as a sentence, e.g. "Wiring, DB panels and earthing.". null without any scope.
+ */
+export const workSummary = (p) => {
+  const own = typeof p?.summary === 'string' ? p.summary.trim() : '';
+  if (own) return own;
+  const scope = p?.scope || [];
+  if (scope.length === 0) return null;
+  if (scopeKey(scope) === scopeKey(['Full wiring', 'Lighting'])) return 'Complete wiring and lighting for the entire building.';
+  const words = scope.map(sentenceWord);
+  const list = words.length === 1 ? words[0] : `${words.slice(0, -1).join(', ')} and ${words[words.length - 1]}`;
+  return `${list.charAt(0).toUpperCase()}${list.slice(1)}.`;
+};
+
 /** The work most of these projects share (the most common exact scope), e.g. ['Full wiring', 'Lighting']. */
 export const typicalScope = (projects) => {
   const tally = new Map();

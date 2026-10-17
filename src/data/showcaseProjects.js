@@ -14,8 +14,10 @@
  *              satellite towns are filed under their big city (Thane, Navi Mumbai, Kalyan, Panvel,
  *              Vasai, Mira Road → Mumbai; Liluah → Kolkata; Gandhinagar → Ahmedabad)
  *   stateCode  e.g. 'IN-RJ'
- *   address    optional full postal address: shown on the project with an "Open in Google Maps" link
+ *   address    optional full postal address: not shown as text; it builds the project's "Map" link
  *   scope      what Arham did, from SCOPE_LABELS below, e.g. ['Full wiring', 'Lighting', 'DB panels']
+ *   summary    optional one sentence about the work, shown on the project instead of the sentence made
+ *              from `scope` (workSummary in projectBrowse.js)
  *   status     'completed' | 'ongoing'
  *   year       completion year (or start year while ongoing; optional then)
  *   photos     1–6 photos (public paths, or new URL(..., import.meta.url).href)

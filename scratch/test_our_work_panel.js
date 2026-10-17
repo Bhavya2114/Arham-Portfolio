@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { getProjectRows, hasOwnPhoto, PLACEHOLDER_PHOTOS, projectPhotos, mapsSearchUrl } from '../src/data/showcaseProjects.js';
-import { getBrowsableProjects, projectsInCity, getGroups, listName, clientBrand, typicalScope, scopeDiffers } from '../src/data/projectBrowse.js';
+import { getBrowsableProjects, projectsInCity, getGroups, listName, clientBrand, typicalScope, scopeDiffers, workSummary } from '../src/data/projectBrowse.js';
 import { presenceNavReducer, INITIAL_PRESENCE_NAV, sheetLevel } from '../src/lib/presenceNavigation.js';
 import { historyDepth } from '../src/lib/useSheetHistory.js';
 
@@ -68,7 +68,7 @@ assert(listName(byId('allen-kota-sankalp')) === 'ALLEN Sankalp' && listName(byId
 assert(all.every((p) => listName(p).startsWith('ALLEN ') && !listName(p).includes(`ALLEN ${p.city} – `)), 'Every list name keeps "ALLEN " and never "ALLEN <City> – "');
 assert(listName({ name: 'ACME Pune – Plant 2', client: 'ACME Industries', city: 'Pune' }) === 'ACME Plant 2' && listName({ name: 'Pune – Office block', client: null, city: 'Pune' }) === 'Office block', 'Generalised: any client\'s brand word + campus; no-client rows just lose the city prefix');
 assert(!/allen[-_ ]?logo|logo\.(png|svg|webp)/i.test(browser) && /GraduationCap/.test(browser), 'No ALLEN logo; the cap icon stays');
-assert(/<ProjectRow key=\{p\.id\} index=\{i\} project=\{p\} onOpen=\{onOpenProject\} group=\{group\} short \/>/.test(browser) && /\{heading\(project\.name\)\}/.test(browser) && /<span className="sr-only">\{project\.name\}<\/span>/.test(browser), 'Lists use the short name (screen readers hear the full one); the detail heading is the full name');
+assert(/<ProjectRow key=\{p\.id\} index=\{i\} project=\{p\} onOpen=\{onOpenProject\} group=\{group\} short \/>/.test(browser) && /\{heading\(project\.name, null, 'text-xl lg:text-2xl'\)\}/.test(browser) && /<span className="sr-only">\{project\.name\}<\/span>/.test(browser), 'Lists use the short name (screen readers hear the full one); the detail heading is the full name');
 
 console.log('\n5. Compact rows: no thumbnail for the shared stand-in photo');
 assert(all.every((p) => !hasOwnPhoto(p)) && all.every((p) => projectPhotos(p).every((src) => PLACEHOLDER_PHOTOS.includes(src))), 'All ALLEN rows only have the shared photo → no thumbnails');
@@ -136,20 +136,32 @@ console.log('\n9. Compact project detail: short photo, place · Map, one chip ro
 const gallery = read('../src/components/presence/PhotoGallery.jsx');
 const bik = projectsInCity(all, 'IN-RJ', 'Bikaner');
 assert(bik.length >= 1 && bik.every((p) => p.address && mapsSearchUrl(p).startsWith('https://www.google.com/maps/search/?api=1&query=')), 'Bikaner rows keep their address (it builds the Maps URL)');
-assert(/fill \? 'aspect-video lg:aspect-auto lg:h-full' : 'aspect-video lg:aspect-\[2\/1\]'/.test(gallery) && !/aspect-\[10\/7\]/.test(gallery), 'Photo: 16:9 on phones; on desktop it fills the free height (see 10.)');
+assert(/fill \? 'aspect-\[2\/1\] lg:aspect-auto lg:h-full' : 'aspect-video lg:aspect-\[2\/1\]'/.test(gallery) && !/aspect-\[10\/7\]/.test(gallery), 'Detail photo: 2:1 on phones (fits the 65 % sheet with the summary line); on desktop it fills the free height (see 10.)');
 assert(/\{badge && \(/.test(gallery) && /\{photos\.length > 1 && \(\s*<span data-photo-counter=""/.test(gallery), 'Client badge kept on the photo; "1 / N" counter only with 2+ photos (swipe + thumbnails too)');
 const detail = browser.slice(browser.indexOf("if (level === 'project' && project)"), browser.indexOf("if (level === 'cluster')"));
 assert(/data-project-place=""/.test(detail) && /\[project\.area, project\.city\]\.filter\(Boolean\)\.join\(', '\)/.test(detail), 'Under the name: "Area, City" on one line');
 assert(/href=\{mapsSearchUrl\(project\)\}/.test(detail) && /target="_blank"/.test(detail) && /aria-label=\{`Open \$\{project\.name\} in Google Maps`\}/.test(detail) && /<MapPin[^>]*\/>\s*Map\s*<\/a>/.test(detail), 'Small "📍 Map" link: same Maps URL, new tab, aria-label "Open <name> in Google Maps"');
-assert(/aria-label="Status and work done"/.test(detail) && /<li><StatusTag project=\{project\} long \/><\/li>\s*\{\(project\.scope \|\| \[\]\)\.map/.test(detail), 'One row of chips: "✓ Completed 2022" / "Ongoing" first, then the scope chips');
+assert(/<div className="flex">\s*<StatusTag project=\{project\} long \/>\s*<\/div>/.test(detail) && !/project\.scope/.test(detail) && !/aria-label="Status and work done"/.test(detail), 'Status ("✓ Completed 2022" / "Ongoing") is the only chip; no scope chips');
 assert(!/Open in Google Maps<|\{project\.address\}|\{project\.category\}|Work done<|ExternalLink/.test(detail), 'Removed: address text, "Open in Google Maps", category chip, "Work done" heading');
 
 console.log('\n10. Desktop detail: full-height panel, the photo fills the free space');
 assert(/className=\{`relative z-30 w-\[400px\] shrink-0 \$\{level === 'project' \? 'h-full' : 'self-start max-h-full'\}/.test(page), 'Project detail: the desktop panel uses the full (viewport-fit) height, same as a long list');
 assert(/<Layout\s+scrollKey=\{focusKey\}\s+fill\s+header=\{\s+autoProject/.test(browser) && /const ScrollBody = \(\{ resetKey, fill = false, children \}\)/.test(browser) && /\$\{fill \? ' lg:flex lg:flex-1 lg:flex-col' : ''\}`\} data-panel-scroll=""/.test(browser), 'Detail layout + scroll body pass the full height down (desktop only; still scrolls if it cannot fit)');
 assert(/<PhotoGallery photos=\{photos\} alt=\{project\.name\} badge=\{owner\} viewer=\{photoViewer\} onViewerChange=\{onPhotoViewer\} fill \/>/.test(browser) && /fill \? ' lg:flex lg:flex-1 lg:min-h-\[260px\] lg:flex-col' : ''/.test(gallery) && /fill \? ' lg:min-h-0 lg:flex-1' : ''/.test(gallery) && /fill \? ' lg:absolute lg:inset-0' : ''/.test(gallery) && /object-cover/.test(gallery), 'Photo grows into the free space (flex 1, at least 260 px, object-fit cover) → text + WhatsApp sit at the bottom');
-assert(/\{badge && \(/.test(gallery) && /data-project-place=""/.test(browser) && /aria-label="Status and work done"/.test(browser), 'Client badge, area · Map and chips kept from detail-compact');
+assert(/\{badge && \(/.test(gallery) && /data-project-place=""/.test(browser) && /<StatusTag project=\{project\} long \/>/.test(browser), 'Client badge, area · Map and the status chip kept from detail-compact');
 assert(!/lg:/.test(read('../src/components/presence/ProjectSheet.jsx').match(/className="lg:hidden[^"]*"/)[0].replace('lg:hidden', '')), 'Phone sheet unchanged (all fill classes are lg: only; the sheet is lg:hidden)');
+
+console.log('\n11. Detail summary: status chip + one sentence about the work');
+const W = 'Complete wiring and lighting for the entire building.';
+assert(workSummary({ scope: ['Full wiring', 'Lighting'] }) === W && workSummary({ scope: ['Lighting', 'Full wiring'] }) === W, 'Full wiring + lighting (any order) → "Complete wiring and lighting for the entire building."');
+assert(workSummary({ scope: ['Full wiring', 'DB panels', 'Earthing'] }) === 'Wiring, DB panels and earthing.', 'Other scopes → a sentence: "Wiring, DB panels and earthing."');
+assert(workSummary({ scope: ['Cabling'] }) === 'Cabling.' && workSummary({ scope: ['Lighting', 'Earthing'] }) === 'Lighting and earthing.' && workSummary({ scope: ['DB panels', 'Cabling'] }) === 'DB panels and cabling.', 'One label → "Cabling."; two → "A and b."; acronyms keep their case');
+assert(workSummary({ scope: ['Full wiring', 'Lighting'], summary: '  Rewired all four floors.  ' }) === 'Rewired all four floors.' && workSummary({ scope: ['Cabling'], summary: '   ' }) === 'Cabling.', 'A row\'s own `summary` overrides the generated sentence (blank is ignored)');
+assert(workSummary({ scope: [] }) === null && workSummary({}) === null, 'No scope → no sentence');
+assert(all.every((p) => workSummary(p) === W), `All ${all.length} current rows read "${W}"`);
+assert(/const summary = workSummary\(project\);/.test(detail) && /\{summary && <p className="text-body \[font-size:15px\] leading-snug" data-project-summary="">\{summary\}<\/p>\}/.test(detail), 'Detail: the sentence under the status chip, body text colour, 15 px');
+assert(/\* {3}summary {4}optional one sentence about the work/.test(read('../src/data/showcaseProjects.js')), 'Row format documents the optional `summary` field');
+assert(/<div className="space-y-1\.5 lg:space-y-2">\s*\{heading\(project\.name, null, 'text-xl lg:text-2xl'\)\}/.test(detail), 'Phone detail: name 20 px, 6 px gaps (desktop unchanged: 24 px, 8 px)');
 
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);
