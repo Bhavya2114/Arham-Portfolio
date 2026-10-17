@@ -118,8 +118,19 @@ assert(/<CloseButton onClose=\{onClose\} label="Close list and return to the map
 assert(/backLabel=\{autoGroup \? project\.city : `\$\{owner\} · \$\{project\.city\}`\}/.test(browser), 'A project opened from a list keeps its back link ("‹ Kota")');
 // Height fits the content, up to the max.
 assert(/const Layout = \(\{ header, scrollKey, children \}\) => \(\s*<div className="flex min-h-0 flex-col">/.test(browser) && /<div className="relative flex min-h-0 flex-col">/.test(browser), 'Panel content is as tall as its content (no flex-1 / h-full filling)');
-assert(/const fitContent = snap === 'full';/.test(sheet) && /fitContent \? \{ height: 'auto', maxHeight: fullH \} : \{ height: fullH \}/.test(sheet), 'Phone sheet: content height up to the 85 % max when expanded');
-assert(/if \(fitContent\) \{[\s\S]*?if \(d\.y > Math\.min\(h \* 0\.35, 160\)\) \{/.test(sheet), 'Content-height sheet: drag down closes, otherwise springs back');
+assert(/const fitContent = snap === 'full';/.test(sheet) && /fitContent \? \{ height: 'auto', maxHeight: expanded \? fullH : capH \} : \{ height: fullH \}/.test(sheet), 'Phone sheet: content height, capped at 65 % (85 % once expanded)');
+assert(/if \(fitContent\) \{[\s\S]*?\} else if \(d\.y - d\.grow > Math\.min\(\(h - d\.grow\) \* 0\.35, 160\)\) \{\s*place\(fullH, true\);/.test(sheet), 'Content-height sheet: dragged far down closes');
+
+console.log('\n8b. Phone sheet height: 65 % cap, drag up to 85 %, each city starts at 65 %');
+assert(/const CAP_SHARE = 0\.65;/.test(sheet) && /const MAX_SHARE = 0\.85;/.test(sheet) && /const capH = Math\.min\(fullH, Math\.max\(300, Math\.round\(vh \* CAP_SHARE\)\)\);/.test(sheet), 'Cap at 65 % of the screen (never above the 85 % full height); top third of the map stays visible');
+assert(/const \[expanded, setExpanded\] = useState\(false\);/.test(sheet) && /<ProjectSheet key=\{`\$\{nav\.stateCode\}\|\$\{selectedCity\}`\}/.test(page), 'Expanded is the sheet\'s own state and the sheet is keyed per city → the next city starts at 65 %');
+const moveFn10 = sheet.slice(sheet.indexOf('const onPointerMove'), sheet.indexOf('const onPointerEnd'));
+assert(/if \(!d\.moved && fitContent && !expanded && dy < 0\) \{[\s\S]*?d\.grow = applyMaxHeight\(fullH\) - oldH;\s*d\.base = d\.grow;/.test(moveFn10) && !/set[A-Z]\w*\(/.test(moveFn10), 'Drag up from 65 %: the 85 % cap is applied once at the gesture start (FLIP offset), then only the transform moves');
+const endFn10 = sheet.slice(sheet.indexOf('const onPointerEnd'), sheet.indexOf('return (\n    <section'));
+assert(/if \(d\.grow > 0 && d\.y < d\.grow \/ 2\) \{\s*place\(0, true\);\s*setExpanded\(true\);/.test(endFn10) && /\} else if \(d\.grow > 0 \|\| \(expanded && d\.y > COLLAPSE_DRAG_PX\)\) \{\s*collapseFrom\(d\.y\);/.test(endFn10), 'Release: past halfway up → 85 %; dragged down a little → back to 65 %; far → closes');
+assert(/const collapseFrom = \(y\) => \{[\s\S]*?place\(y - shrink, false\);[\s\S]*?place\(0, true\);/.test(sheet) && /const expandFrom = \(y\) => \{[\s\S]*?place\(y \+ grow, false\);[\s\S]*?place\(0, true\);/.test(sheet), 'Expand / collapse keep the top edge in place and animate the transform only');
+assert(/else if \(expanded\) collapseFrom\(0\);\s*else expandFrom\(0\);/.test(sheet) && /aria-label=\{fitContent && expanded \? 'Collapse panel' : 'Expand panel'\}/.test(sheet) && /aria-expanded=\{fitContent && expanded\}/.test(sheet), 'Handle button (keyboard / tap): expand to 85 % and back');
+assert(/<div className="space-y-3 lg:space-y-4">/.test(browser) && /py-2\.5 text-\[15px\] leading-snug font-semibold lg:py-3 lg:text-base/.test(browser), 'Phone detail a little tighter so it fits the 65 % cap with WhatsApp visible (desktop unchanged)');
 
 console.log('\n9. Compact project detail: short photo, place · Map, one chip row');
 const gallery = read('../src/components/presence/PhotoGallery.jsx');
