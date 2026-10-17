@@ -32,7 +32,8 @@ const homeSrc = read('../src/sections/PresenceTeaser.jsx');
 
 console.log('\n1. No redundant back buttons');
 assert(!/Back to India|Back to \$\{|backLabel|\bonBack\b/.test(mapSrc), 'PresenceMap renders no back button and takes no onBack / backLabel');
-assert(!/Back to India|Back to \$\{|backLabel|onBack=|goBackOneLevel/.test(pageSrc), 'Presence page passes no back handler or label');
+const mapJsx = pageSrc.slice(pageSrc.indexOf('<PresenceMap'), pageSrc.indexOf('/>', pageSrc.indexOf('toolbar={')) + 2);
+assert(mapJsx.length > 100 && !/Back to India|backLabel|onBack=|goBackOneLevel/.test(mapJsx), 'Presence page passes the map no back handler or label (the only back links are inside the project sheet / panel)');
 assert(!/ArrowLeft/.test(mapSrc), 'Map toolbar no longer imports the back arrow');
 
 console.log('\n2. Uncovered state returns to India');
@@ -56,14 +57,14 @@ assert(!getPresenceStateCodes().includes('IN-MP') && reduce({ ...INIT, stateCode
 s = reduce({ ...INIT, stateCode: 'IN-RJ', city: 'Kota' }, { type: 'back' });
 assert(s.stateCode === 'IN-RJ' && s.city === null && reduce(s, { type: 'back' }).stateCode === null, 'Escape (back) goes city → state → India');
 assert(reduce({ ...INIT, stateCode: 'IN-RJ', city: 'Kota' }, { type: 'selectState', stateCode: 'IN-RJ' }).city === null, 'Clicking the selected state closes the city');
-assert(/if \(e\.key !== 'Escape'\) return;[\s\S]*?dispatch\(\{ type: 'back' \}\)/.test(pageSrc), 'Escape still steps back one level');
+assert(/if \(e\.key === 'Escape'\) dispatch\(\{ type: 'back' \}\);/.test(pageSrc), 'Escape still steps back one level');
 
 console.log('\n4. Kept controls');
 assert(/\{selectedState\.name\}\s*\{selectedCity && <span className="text-brand-accent"> · \{selectedCity\}<\/span>\}/.test(mapSrc), 'State · city selection pill kept');
 assert(!/aria-label="Zoom in"|Map zoom controls/.test(mapSrc) && !/\b(zoomBy|fitView|ZOOM_STEP|controlsAtTop|controlButton)\b/.test(mapSrc) && !/\b(Plus|Minus|Maximize2)\b/.test(mapSrc), 'Zoom +/−/fit buttons removed, with their now-unused code and icon imports');
 assert(!/Drag to pan|pinch to zoom|use the controls/.test(mapSrc), 'No pan / zoom hint text under the map');
 assert(/clamp\(g\.view\.k \* \(now\.spread \/ start\.spread\), 1, MAX_ZOOM\)/.test(mapSrc) && /onPointerDown=/.test(mapSrc) && /onSelectCluster/.test(mapSrc) && /animateTo\(getTargetView\(\)\);/.test(mapSrc), 'Pinch-to-zoom, drag, cluster zoom and state fit kept');
-assert(!/LocationExplorer|Explore locations|toolbar=/.test(pageSrc) && !/toolbar/.test(mapSrc), '"Explore locations" button and the unused toolbar slot are removed');
+assert(!/LocationExplorer|Explore locations/.test(pageSrc) && /toolbar=\{<OurWorkToolbar /.test(pageSrc) && /\{toolbar \? \(/.test(mapSrc), '"Explore locations" removed; the toolbar slot holds the summary pill and filter chips');
 
 console.log('\n5. Background tap resets; clicks outside the map do not');
 {

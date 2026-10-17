@@ -116,23 +116,21 @@ if (process.env.BUILD_DIR) {
 
 console.log('\n4a. Kota / Jaipur Campus Records (internal data, no longer shown on /presence):');
 const pageSrcC = read('../src/pages/Presence.jsx');
-const listSrc = read('../src/components/presence/ProjectDetails.jsx');
+// Our Work's browsing UI (the old ProjectDetails panel that listed these records was removed).
+const listSrc = ['../src/components/presence/ProjectBrowser.jsx', '../src/data/projectBrowse.js', '../src/data/showcaseProjects.js'].map(read).join('\n');
 // Mirrors the page: the selected city's group from the existing helper, filtered to the selected state.
+assert(!/cand-|candidate|suppliedAddress|getCandidateLocations/i.test(listSrc + pageSrcC), 'Our Work (page, browser, selectors, project rows) uses no candidate records');
 const panelFor = (stateCode, city) => (getCandidateLocationsByCity()[city] || []).filter((c) => c.stateCode === stateCode);
 assert(!/getCampusCardsForCity|getCandidateLocationsByCity|campusLocations/.test(pageSrcC) && !fs.existsSync(path.resolve(__dirname, '../src/data/demoCampusCards.js')), 'The demo campus records (Kota records reused for every city) are no longer used; the card shows showcase projects');
 assert(panelFor('IN-RJ', 'Kota').length === 8 && panelFor('IN-RJ', 'Jaipur').length === 9, 'Kota panel lists 8 campus locations, Jaipur lists 9');
 assert(panelFor('IN-RJ', 'Kota').map((c) => c.id).join() === C.filter((c) => c.city === 'Kota').map((c) => c.id).join(), 'Kota entries are the existing records (no duplicates or re-creation)');
 assert(panelFor('IN-RJ', 'Kota').concat(panelFor('IN-RJ', 'Jaipur')).filter((c) => !c.coordinates).length === 13, 'The 13 records without coordinates are included');
 assert(PRESENCE_COVERAGE.flatMap((e) => e.cities.map((city) => [e.stateCode, city])).filter(([s, city]) => !['Kota', 'Jaipur'].includes(city)).every(([s, city]) => panelFor(s, city).length === 0), 'All other 25 approved cities have no campus locations (empty state kept)');
-assert(listSrc.includes('{loc.name}') && listSrc.includes('{loc.suppliedAddress}') && !/loc\.(coordinates|notes|status|sources|lat|lon)/.test(listSrc), 'Panel shows only name + supplied address (no coordinates, notes or status)');
-assert(listSrc.includes('ALLEN campus locations (') && listSrc.includes("Arham's work at these campuses has not been confirmed."), 'Labelled as campus location records with unconfirmed Arham work');
-assert(listSrc.includes('No verified Arham projects are listed for {city} yet.'), 'Verified-project count stays separate (none listed)');
-assert(listSrc.includes('projects.length === 0 && campusLocations.length === 0') && listSrc.includes('data-empty-state="city"'), 'Cities without projects or campus records keep the existing empty state');
 assert(!/campusLocations[^;\n]*(onSelect|openProject|projectMarkers|selectProject)/.test(pageSrcC + listSrc), 'Campus locations open no project details and create no map pins');
 
 console.log('\n4c. Floating Card (now the project card, see test_presence_projects.js):');
 const mapSrcC = read('../src/components/map/PresenceMap.jsx');
-assert(/<CampusCard\s*key=\{`\$\{nav\.stateCode\}\|\$\{selectedCity\}`\}/.test(pageSrcC) && /projects=\{cityShowcase\}/.test(pageSrcC), 'The floating card shows the selected city\'s showcase projects, keyed per city');
+assert(/<ProjectSheet key=\{`\$\{nav\.stateCode\}\|\$\{selectedCity\}`\}/.test(pageSrcC) && /cityProjects=\{cityProjects\}/.test(pageSrcC), 'The city sheet / panel shows the selected city\'s own projects, keyed per city');
 assert(mapSrcC.includes('overlay = null,') && mapSrcC.includes('data-map-overlay=') && !mapSrcC.includes('controlsAtTop'), 'Map hosts the card as an overlay (no zoom controls to move out of its way)');
 assert(mapSrcC.includes('const getTargetView = useCallback(() => getStateFitView(selectedCode), [selectedCode, getStateFitView]);'), 'Showing the card never changes the map zoom (fit depends only on the state)');
 if (process.env.BUILD_DIR) {
@@ -190,7 +188,7 @@ assert(Object.values(groups).flat().every((c) => typeof c.name === 'string' && c
 assert(C.every((c) => typeof c.locationVerification === 'string' && c.arhamWorkConfirmed === false), 'Location verification is recorded separately from (unconfirmed) Arham work');
 assert(getPublishedProjectsByStateAndCity('IN-RJ', 'Kota', C).length === 0 && getPublishedProjectsByStateAndCity('IN-RJ', 'Jaipur', C).length === 0, 'Candidates never appear in the public city project lists');
 const presencePage = read('../src/pages/Presence.jsx');
-assert(/const cityProjects = useMemo\(\s*\(\) => \(selectedState && selectedCity \? getPublishedProjectsByStateAndCity\(selectedState\.code, selectedCity\)/.test(presencePage), 'Verified-project list still reads published projects only (candidates kept separate)');
+assert(/const cityProjects = useMemo\(\s*\(\) => \(selectedState && selectedCity \? projectsInCity\(filtered, selectedState\.code, selectedCity\)/.test(presencePage) && /getBrowsableProjects\(\)/.test(presencePage), 'City lists read the project rows (showcaseProjects.js) only (candidates kept separate)');
 
 console.log('\n5. Review Workflow:');
 assert(CANDIDATE_STATUSES.join(',') === 'UNVERIFIED,PENDING_REVIEW,APPROVED,REJECTED', 'Statuses: UNVERIFIED → PENDING_REVIEW → APPROVED | REJECTED');

@@ -1,40 +1,65 @@
-import React, { useReducer, useMemo, useEffect, useState } from 'react';
+import React, { useReducer, useMemo, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Container from '../components/ui/Container';
 import Button from '../components/ui/Button';
 import PresenceMap, { PAGE_NAVY } from '../components/map/PresenceMap';
-import BottomSheet, { PEEK_HEIGHT } from '../components/presence/BottomSheet';
-import CampusCard from '../components/presence/CampusCard';
-import { ProjectDetails, ProjectChooser, CityProjectList } from '../components/presence/ProjectDetails';
+import ProjectSheet from '../components/presence/ProjectSheet';
+import ProjectBrowser from '../components/presence/ProjectBrowser';
+import OurWorkToolbar from '../components/presence/OurWorkToolbar';
 import { getPresenceStateCodes, getPresenceState } from '../data/presenceCoverage.js';
-import {
-  getPublishedProjectsByStateAndCity,
-  getMappedProjectsByStateAndCity,
-} from '../data/projectSelectors.js';
 import { CITY_COORDINATES } from '../data/cityCoordinates.js';
-import { getShowcaseProjectsForCity, getShowcaseProjectsForState, getShowcaseProjectList, hasSiteCoordinates } from '../data/showcaseProjects.js';
-import ProjectGrid from '../components/presence/ProjectGrid';
-import { PRESENCE_TEASER_STATS } from '../data/presenceTeaser';
-import { COMPANY, pageTitle, whatsappHref, WHATSAPP_HELLO } from '../data/company';
+import { hasSiteCoordinates } from '../data/showcaseProjects.js';
+import {
+  FILTER_ALL,
+  getBrowsableProjects,
+  getFilterOptions,
+  filterProjects,
+  countByCity,
+  cityKey,
+  statesWithProjects,
+  projectsInState,
+  projectsInCity,
+  placeSummary,
+  getGroups,
+  groupIdOf,
+} from '../data/projectBrowse.js';
 import { projectLatLon } from '../lib/mapProjection.js';
 import { loadStateGeography } from '../data/geo/stateGeography.js';
-import { presenceNavReducer, INITIAL_PRESENCE_NAV } from '../lib/presenceNavigation.js';
+import { presenceNavReducer, INITIAL_PRESENCE_NAV, sheetLevel } from '../lib/presenceNavigation.js';
 import usePageMetadata from '../lib/usePageMetadata';
-import { MapPin, ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, X, Phone, MessageCircle } from 'lucide-react';
+import { COMPANY, pageTitle, whatsappHref, WHATSAPP_HELLO } from '../data/company';
+import { ArrowRight, Phone, MessageCircle } from 'lucide-react';
 
 /**
- * Our Work page (/our-work; /presence and /projects redirect here): the India map, then the project cards.
+ * Our Work page (/our-work; /presence and /projects redirect here): the India map is the way in to
+ * every project.
  *
- * India → State → City (project list) → Project details.
- * - Coverage (11 states / 27 cities) comes from `presenceCoverage.js`.
- * - Selecting a state zooms the map to it and shows its city markers, district lines and the pins
- *   of every verified project in that state.
- * - Selecting a city does NOT zoom or draw a city-level map: it opens that city's verified projects,
- *   listed one by one, in the side panel (`lg` and above) or the compact bottom sheet below it.
- *   Each project can then be opened and stepped through (previous / next).
- * - Project pins use each published project's own verified `coordinates`; city coordinates are never
- *   substituted. With no published projects a city shows the honest empty state.
+ * India → State → City → Group → Project (lib/presenceNavigation.js):
+ * - Map: city pins carry a yellow project-count badge; a summary pill and client / category filter
+ *   chips sit above the map. A filter dims states and cities with no matching projects and updates
+ *   every count (all derived from data/showcaseProjects.js by data/projectBrowse.js).
+ * - Tapping a city opens its summary (stats + client groups) in a bottom sheet on phones (half height;
+ *   the map stays visible above) or a ~400 px side panel on desktop. Group → project list (tabs All /
+ *   Completed / Ongoing); row → project detail (photos, work done, WhatsApp).
+ * - Selecting a state fits the map to it; selecting a city never zooms. Moving inside the sheet never
+ *   moves the map. Back / Escape step back one level; closing returns focus to the city pin.
+ * - An opened project highlights its own pin (yellow beacon) when it has coordinates, else its city pin.
  */
+const useIsDesktop = () => {
+  const query = '(min-width: 1024px)';
+  const [match, setMatch] = useState(() => typeof window !== 'undefined' && window.matchMedia(query).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(query);
+    const onChange = () => setMatch(mq.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
+  return match;
+};
+
+const cityPinFor = (city) =>
+  [...document.querySelectorAll('svg [role="button"][aria-pressed]')].find((el) => (el.getAttribute('aria-label') || '').startsWith(`${city},`));
+
 export const Presence = () => {
   usePageMetadata(
     pageTitle('Our Work'),
@@ -42,14 +67,32 @@ export const Presence = () => {
   );
 
   const [nav, dispatch] = useReducer(presenceNavReducer, INITIAL_PRESENCE_NAV);
+  const [filter, setFilter] = useState(FILTER_ALL);
+  const isDesktop = useIsDesktop();
 
   const coverageStateCodes = useMemo(() => getPresenceStateCodes(), []);
-  const projectList = useMemo(() => getShowcaseProjectList(), []);
-
   const selectedState = useMemo(() => getPresenceState(nav.stateCode), [nav.stateCode]);
   const selectedCity = nav.city;
+  const level = sheetLevel(nav);
 
-  // Phone action bar (MobileActionBar) hides while a city's project card or panel is open.
+  // ---- Projects, filter and counts (all derived from the project rows) ----
+  const allProjects = useMemo(() => getBrowsableProjects(), []);
+  const filterOptions = useMemo(() => getFilterOptions(allProjects), [allProjects]);
+  const filtered = useMemo(() => filterProjects(allProjects, filter), [allProjects, filter]);
+  const counts = useMemo(() => countByCity(filtered), [filtered]);
+  const filtering = filter !== FILTER_ALL;
+  const filterLabel = filtering ? filterOptions.find((o) => o.id === filter)?.label || null : null;
+  const dimStateCodes = useMemo(() => {
+    if (!filtering) return [];
+    const withProjects = statesWithProjects(filtered);
+    return coverageStateCodes.filter((code) => !withProjects.has(code));
+  }, [filtering, filtered, coverageStateCodes]);
+  const summary = useMemo(
+    () => (selectedState ? placeSummary(projectsInState(filtered, selectedState.code), selectedState.name) : placeSummary(filtered, 'India')).text,
+    [filtered, selectedState]
+  );
+
+  // Phone action bar (MobileActionBar) hides while a city's sheet / panel is open.
   useEffect(() => {
     const root = document.documentElement;
     if (selectedCity) root.setAttribute('data-map-card', 'open');
@@ -72,173 +115,127 @@ export const Presence = () => {
   }, [nav.stateCode]);
   const geography = geo.stateCode === nav.stateCode ? geo.data : null;
 
-  // Every worked city, shown as a small dot at the India overview.
+  // Every worked city, shown as a small dot at the India overview (faded when the filter has none there).
   const overviewCities = useMemo(
     () =>
       CITY_COORDINATES
         .filter((c) => coverageStateCodes.includes(c.stateCode) && getPresenceState(c.stateCode)?.cities.includes(c.city))
-        .map((c) => ({ city: c.city, stateCode: c.stateCode, ...projectLatLon(c.lat, c.lon) })),
-    [coverageStateCodes]
+        .map((c) => ({ city: c.city, stateCode: c.stateCode, ...projectLatLon(c.lat, c.lon), dim: filtering && !counts.get(cityKey(c.stateCode, c.city)) })),
+    [coverageStateCodes, filtering, counts]
   );
 
-  // City markers for the selected state (reference points, not building locations).
+  // City markers for the selected state (reference points, not building locations), with project counts.
   const cityMarkers = useMemo(() => {
     if (!selectedState) return [];
     return CITY_COORDINATES
       .filter((c) => c.stateCode === selectedState.code && selectedState.cities.includes(c.city))
-      .map((c) => ({
-        city: c.city,
-        lat: c.lat,
-        ...projectLatLon(c.lat, c.lon),
-        count: getMappedProjectsByStateAndCity(c.stateCode, c.city).length,
-      }));
-  }, [selectedState]);
+      .map((c) => {
+        const count = counts.get(cityKey(c.stateCode, c.city)) || 0;
+        return { city: c.city, lat: c.lat, ...projectLatLon(c.lat, c.lon), count, dim: filtering && count === 0 };
+      });
+  }, [selectedState, counts, filtering]);
 
-  // Verified (published) projects across the selected state's approved cities.
-  const stateProjects = useMemo(
-    () => (selectedState ? selectedState.cities.flatMap((c) => getPublishedProjectsByStateAndCity(selectedState.code, c)) : []),
-    [selectedState]
-  );
-  const stateMappedProjects = useMemo(
-    () => (selectedState ? selectedState.cities.flatMap((c) => getMappedProjectsByStateAndCity(selectedState.code, c)) : []),
-    [selectedState]
-  );
-  // Showcase projects (data/showcaseProjects.js) in the selected state (records with a city only).
-  const stateShowcase = useMemo(() => (selectedState ? getShowcaseProjectsForState(selectedState.code) : []), [selectedState]);
-  // Pins: published projects with verified coordinates, plus showcase projects that have lat / lng.
+  // Project pins: projects in the selected state that have their own site coordinates.
+  const stateProjects = useMemo(() => (selectedState ? projectsInState(filtered, selectedState.code) : []), [filtered, selectedState]);
   const projectMarkers = useMemo(
-    () => [
-      ...stateMappedProjects.map((p) => ({ id: p.id, name: p.name, city: p.city, ...projectLatLon(p.coordinates.lat, p.coordinates.lon) })),
-      ...stateShowcase.filter(hasSiteCoordinates).map((p) => ({ id: p.id, name: p.name, city: p.city, ...projectLatLon(p.lat, p.lng) })),
-    ],
-    [stateMappedProjects, stateShowcase]
+    () => stateProjects.filter(hasSiteCoordinates).map((p) => ({ id: p.id, name: p.name, city: p.city, ...projectLatLon(p.lat, p.lng) })),
+    [stateProjects]
   );
+
+  // ---- The sheet / panel content for the current level ----
   const cityProjects = useMemo(
-    () => (selectedState && selectedCity ? getPublishedProjectsByStateAndCity(selectedState.code, selectedCity) : []),
-    [selectedState, selectedCity]
+    () => (selectedState && selectedCity ? projectsInCity(filtered, selectedState.code, selectedCity) : []),
+    [filtered, selectedState, selectedCity]
   );
+  const groups = useMemo(() => getGroups(cityProjects), [cityProjects]);
+  const group = groups.find((g) => g.id === nav.groupId) || null;
+  const project = nav.projectId ? allProjects.find((p) => p.id === nav.projectId) || null : null;
+  const clusterProjects = nav.clusterIds ? allProjects.filter((p) => nav.clusterIds.includes(p.id)) : [];
 
-  // Showcase projects (data/showcaseProjects.js) for the floating card: only the selected city's own
-  // records, never another city's. `cardProjectId` is the project shown in the card; it falls back to
-  // the city's first project, so switching city always starts at that city's own projects.
-  const cityShowcase = useMemo(
-    () => (selectedState && selectedCity ? getShowcaseProjectsForCity(selectedState.code, selectedCity) : []),
-    [selectedState, selectedCity]
-  );
-  const [cardProjectId, setCardProjectId] = useState(null);
-  const cardProject = cityShowcase.find((p) => p.id === cardProjectId) || cityShowcase[0] || null;
-
-  const selectedProject = stateProjects.find((p) => p.id === nav.projectId) || null;
-  const clusterProjects = nav.clusterIds ? stateMappedProjects.filter((p) => nav.clusterIds.includes(p.id)) : [];
-  // A city without published gallery projects is browsed with the floating project card over the map
-  // (its showcase projects, or "Projects coming soon") instead of the panel / bottom sheet.
-  const projectCardOnly = Boolean(selectedCity && !selectedProject && clusterProjects.length === 0 && cityProjects.length === 0);
-  // The panel opens for a selected city (project list / empty state), a project, or a same-site cluster.
-  const detailsOpen = Boolean((selectedCity && !projectCardOnly) || selectedProject || clusterProjects.length > 0);
-
-  // Card <-> map: the card's project is highlighted on the map: its own pin when it has lat / lng,
-  // otherwise its city pin. A tapped showcase pin switches the card to that project (and its city).
-  const highlightedProjectId = nav.projectId || (projectCardOnly && cardProject && hasSiteCoordinates(cardProject) ? cardProject.id : null);
-  const showShowcaseProject = (projectId) => {
-    const project = stateShowcase.find((p) => p.id === projectId);
-    if (!project) return false;
-    if (project.city !== nav.city) dispatch({ type: 'selectCity', stateCode: nav.stateCode, city: project.city });
-    setCardProjectId(project.id);
-    return true;
-  };
+  // Map ↔ list: an open project lights its own pin (if it has coordinates), otherwise its city pin.
+  const highlightedProjectId = project && hasSiteCoordinates(project) ? project.id : null;
 
   const openProject = (projectId) => {
-    if (showShowcaseProject(projectId)) return;
-    const project = stateProjects.find((p) => p.id === projectId);
-    if (project) dispatch({ type: 'selectProject', projectId, city: project.city });
+    const p = allProjects.find((x) => x.id === projectId);
+    if (p) dispatch({ type: 'selectProject', projectId, city: p.city, groupId: groupIdOf(p) });
   };
-  const projectIndex = selectedProject ? cityProjects.findIndex((p) => p.id === selectedProject.id) : -1;
+  const back = () => dispatch({ type: 'back' });
+  const closeSheet = () => dispatch({ type: 'closeSheet' });
 
-  // Close the whole panel: back to the state view (the map itself never moved).
-  const closePanel = () => (nav.city ? dispatch({ type: 'selectState', stateCode: nav.stateCode }) : dispatch({ type: 'closeDetails' }));
+  // Sheet height: half for a city summary, full for a list or a project (tapping a group expands it).
+  const [snap, setSnap] = useState('half');
+  useEffect(() => {
+    setSnap(level === 'city' ? 'half' : 'full');
+  }, [level, nav.city]);
 
-  // Back from a project / cluster to the city's project list.
-  const closeDetails = () => {
-    const returnTo = nav.projectId;
-    dispatch({ type: 'closeDetails' });
-    if (returnTo) {
-      requestAnimationFrame(() => {
-        // Return focus to the project's pin, or to the cluster that contains it.
-        const target = [...document.querySelectorAll('svg [data-project-id], svg [data-project-ids]')].find(
-          (el) => el.getAttribute('data-project-id') === returnTo || (el.getAttribute('data-project-ids') || '').split(' ').includes(returnTo)
-        );
-        target?.focus({ preventScroll: true });
-      });
-    }
-  };
-
+  // Escape steps back one level (the photo viewer captures its own Escape first).
   useEffect(() => {
     if (!nav.stateCode) return undefined;
-    const handleKeyDown = (e) => {
-      if (e.key !== 'Escape') return;
-      if (nav.projectId || nav.clusterIds) closeDetails();
-      else dispatch({ type: 'back' });
+    const onKey = (e) => {
+      if (e.key === 'Escape') dispatch({ type: 'back' });
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [nav]);
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [nav.stateCode]);
 
-  const announcement = selectedProject
-    ? `${selectedProject.name} details opened.`
-    : clusterProjects.length > 0
-      ? `${clusterProjects.length} nearby projects. Choose one.`
+  // Closing the sheet returns focus to the city pin it was opened from.
+  const lastCity = useRef(null);
+  useEffect(() => {
+    if (selectedCity) {
+      lastCity.current = selectedCity;
+      return;
+    }
+    if (lastCity.current) {
+      const city = lastCity.current;
+      lastCity.current = null;
+      requestAnimationFrame(() => cityPinFor(city)?.focus({ preventScroll: true }));
+    }
+  }, [selectedCity]);
+
+  // Phone: on a new city, scroll the PAGE (never the map) so its pin sits above the half-height sheet.
+  useLayoutEffect(() => {
+    if (!selectedCity || isDesktop) return undefined;
+    const t = setTimeout(() => {
+      const pin = cityPinFor(selectedCity);
+      if (!pin) return;
+      const r = pin.getBoundingClientRect();
+      const sheetTop = window.innerHeight * 0.5;
+      const headerBottom = document.querySelector('header')?.getBoundingClientRect().bottom || 64;
+      const target = headerBottom + (sheetTop - headerBottom) * 0.55;
+      const delta = r.top + r.height / 2 - target;
+      if (Math.abs(delta) > 24) window.scrollBy({ top: delta, behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+    }, 60);
+    return () => clearTimeout(t);
+  }, [selectedCity, isDesktop]);
+
+  const announcement = project
+    ? `${project.name} opened.`
+    : group
+      ? `${group.name} in ${selectedCity}: ${group.count} ${group.noun}.`
       : selectedCity
-        ? `${selectedCity}, ${selectedState.name}. ${
-            cityProjects.length > 0 ? `${cityProjects.length} verified ${cityProjects.length === 1 ? 'project' : 'projects'} listed.` : 'No projects listed yet.'
-          }${projectCardOnly ? (cityShowcase.length > 0 ? ` ${cityShowcase.length} ${cityShowcase.length === 1 ? 'project' : 'projects'} shown.` : ' Projects coming soon.') : ''}`
+        ? `${selectedCity}, ${selectedState.name}: ${cityProjects.length} ${cityProjects.length === 1 ? 'project' : 'projects'}.`
         : selectedState
-          ? `${selectedState.name} selected. ${
-              selectedState.cities.length > 0
-                ? `${selectedState.cities.length} ${selectedState.cities.length === 1 ? 'city' : 'cities'} shown on the map.`
-                : 'No cities listed yet.'
-            }`
-          : 'All India view.';
+          ? `${selectedState.name} selected. ${summary}.`
+          : `All India view. ${summary}.`;
 
-  const detailsTitle = selectedProject
-    ? selectedProject.name
-    : clusterProjects.length > 0
-      ? `${clusterProjects.length} nearby projects`
-      : selectedCity || '';
-  const detailsSubtitle = selectedProject
-    ? `${selectedProject.city}, ${selectedState?.name}`
-    : clusterProjects.length > 0
-      ? selectedState?.name || ''
-      : selectedState && selectedCity
-        ? `${selectedState.name} · ${cityProjects.length} verified ${cityProjects.length === 1 ? 'project' : 'projects'}`
-        : '';
-  const stepButton =
-    'inline-flex items-center gap-1 min-h-[44px] px-2 text-sm text-slate-300 hover:text-white disabled:opacity-35 disabled:hover:text-slate-300 rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent';
-  const detailsBody = selectedProject ? (
-    <div className="space-y-3">
-      {/* One by one through the city's projects, or back to the list */}
-      <div className="flex flex-wrap items-center justify-between gap-1 border-b border-white/10 pb-2">
-        <button type="button" onClick={closeDetails} className={stepButton}>
-          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          All projects in {selectedProject.city}
-        </button>
-        {projectIndex >= 0 && cityProjects.length > 1 && (
-          <div className="flex items-center" role="group" aria-label="Browse projects">
-            <button type="button" className={stepButton} disabled={projectIndex === 0} onClick={() => openProject(cityProjects[projectIndex - 1].id)} aria-label="Previous project">
-              <ChevronLeft className="w-4 h-4" aria-hidden="true" />
-            </button>
-            <span className="text-xs text-slate-400 tabular-nums">{projectIndex + 1} / {cityProjects.length}</span>
-            <button type="button" className={stepButton} disabled={projectIndex === cityProjects.length - 1} onClick={() => openProject(cityProjects[projectIndex + 1].id)} aria-label="Next project">
-              <ChevronRight className="w-4 h-4" aria-hidden="true" />
-            </button>
-          </div>
-        )}
-      </div>
-      <ProjectDetails key={selectedProject.id} project={selectedProject} stateName={selectedState?.name} showHeading={false} />
-    </div>
-  ) : clusterProjects.length > 0 ? (
-    <ProjectChooser projects={clusterProjects} onSelect={openProject} />
-  ) : (
-    <CityProjectList city={selectedCity} projects={cityProjects} onSelect={openProject} />
+  const browser = (idPrefix) => (
+    <ProjectBrowser
+      level={level}
+      idPrefix={idPrefix}
+      stateName={selectedState?.name}
+      city={selectedCity}
+      cityProjects={cityProjects}
+      groups={groups}
+      group={group}
+      project={project}
+      clusterProjects={clusterProjects}
+      filterLabel={filterLabel}
+      onClearFilter={() => setFilter(FILTER_ALL)}
+      onOpenGroup={(groupId) => dispatch({ type: 'openGroup', groupId })}
+      onOpenProject={openProject}
+      onBack={back}
+      onClose={closeSheet}
+    />
   );
 
   return (
@@ -247,19 +244,13 @@ export const Presence = () => {
           overflow-x clip: the map wrapper's fade band may extend past the page gutter. */}
       <section aria-labelledby="presence-heading" className="relative overflow-x-clip" style={{ background: PAGE_NAVY }}>
         {/* Bottom padding ≥ the map's fade band (40 / 80 px), so the band stays inside this section. */}
-        <Container size="default" className="relative pt-10 sm:pt-14 lg:pt-16 pb-16 sm:pb-24 lg:pb-28 space-y-8 sm:space-y-10">
+        <Container size="default" className="relative pt-8 sm:pt-12 lg:pt-14 pb-16 sm:pb-24 lg:pb-28 space-y-5 sm:space-y-8">
           {/* Page Header */}
-          <header className="max-w-2xl space-y-3">
-            <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-muted-dark">
-              <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
-              Our Work
-            </p>
+          <header className="max-w-2xl space-y-2">
             <h1 id="presence-heading" className="text-3xl sm:text-4xl lg:text-5xl font-extrabold font-heading tracking-tight text-white">
               Our work across India
             </h1>
-            <p className="text-base text-slate-300 leading-[1.65]">
-              {PRESENCE_TEASER_STATS.map((s) => `${s.value} ${s.label.toLowerCase()}`).join(' in ')}, and growing.
-            </p>
+            <p className="text-base text-slate-300 leading-[1.65]">Tap a state, then a city, to see the projects.</p>
           </header>
 
           <div className="sr-only" aria-live="polite" aria-atomic="true">{announcement}</div>
@@ -269,6 +260,7 @@ export const Presence = () => {
             <div className="w-full min-w-0 flex-1">
               <PresenceMap
                 activeStateCodes={coverageStateCodes}
+                dimStateCodes={dimStateCodes}
                 selectedState={selectedState}
                 onSelectState={(stateCode) => dispatch({ type: 'selectState', stateCode })}
                 onReset={() => dispatch({ type: 'reset' })}
@@ -284,67 +276,31 @@ export const Presence = () => {
                 selectedProjectId={highlightedProjectId}
                 cityBeacon={!highlightedProjectId}
                 onSelectProject={openProject}
-                onSelectCluster={(projectIds) => {
-                  // A cluster with showcase projects switches the card to the first of them.
-                  const showcaseId = projectIds.find((id) => stateShowcase.some((p) => p.id === id));
-                  if (showcaseId) showShowcaseProject(showcaseId);
-                  else dispatch({ type: 'showCluster', projectIds });
-                }}
-                overlay={
-                  projectCardOnly && cardProject ? (
-                    <CampusCard
-                      key={`${nav.stateCode}|${selectedCity}`}
-                      city={selectedCity}
-                      projects={cityShowcase}
-                      currentId={cardProject.id}
-                      onChange={setCardProjectId}
-                    />
-                  ) : null
-                }
+                onSelectCluster={(projectIds) => dispatch({ type: 'showCluster', projectIds })}
+                toolbar={<OurWorkToolbar summary={summary} options={filterOptions} filter={filter} onFilter={setFilter} />}
               />
             </div>
 
-            {/* Desktop panel — rendered only while a city, project or cluster is selected */}
-            {detailsOpen && (
+            {/* Desktop: the same content in a side panel next to the map */}
+            {isDesktop && level && (
               <aside
-                className="hidden lg:block relative z-30 w-[22rem] shrink-0 lg:sticky lg:top-24 rounded-2xl border border-white/[0.08] bg-surface p-5"
-                aria-label={`${detailsTitle} details`}
+                role="region"
+                aria-labelledby="our-work-panel-heading"
+                className="relative z-30 w-[400px] shrink-0 lg:sticky lg:top-24 max-h-[calc(100vh-7rem)] overflow-y-auto overscroll-contain rounded-2xl border border-white/[0.08] bg-surface p-5"
               >
-                <div className="flex items-start justify-between gap-2 mb-4">
-                  <div className="min-w-0">
-                    <h2 className="text-lg font-bold font-heading text-white leading-snug">{detailsTitle}</h2>
-                    <p className="text-sm text-slate-400">{detailsSubtitle}</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={closePanel}
-                    aria-label="Close panel"
-                    className="inline-flex items-center justify-center w-11 h-11 shrink-0 -mt-2 -mr-2 rounded-full text-slate-300 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
-                  >
-                    <X className="w-5 h-5" aria-hidden="true" />
-                  </button>
-                </div>
-                {detailsBody}
+                {browser('our-work-panel')}
               </aside>
             )}
           </div>
         </Container>
       </section>
 
-      {/* Project cards (the old /projects gallery, merged here) + enquiry */}
-      <section className="border-t border-white/10 bg-navy-800" aria-labelledby="presence-projects-heading">
-        <Container size="default" className="py-10 sm:py-14 space-y-6">
-          <h2 id="presence-projects-heading" className="text-2xl sm:text-3xl font-bold font-heading text-heading tracking-tight">
-            Projects
-          </h2>
-          {projectList.length > 0 ? (
-            <ProjectGrid projects={projectList} />
-          ) : (
-            <p className="text-base text-body leading-[1.65]">Project photos are on the way. Ask us about work in your city.</p>
-          )}
+      {/* Enquiry */}
+      <section className="border-t border-white/10 bg-navy-800" aria-labelledby="presence-cta-heading">
+        <Container size="default" className="py-10 sm:py-14">
           <div className="rounded-2xl bg-card border border-white/[0.07] p-5 sm:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="space-y-1">
-              <h3 className="text-lg font-bold font-heading text-heading">Have a project in your city?</h3>
+              <h2 id="presence-cta-heading" className="text-lg font-bold font-heading text-heading">Have a project in your city?</h2>
               <p className="text-base text-body">Call or WhatsApp us, or send your details.</p>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -362,21 +318,11 @@ export const Presence = () => {
         </Container>
       </section>
 
-      {/* Mobile sheet (hidden at lg and above) — rendered only while a city, project or cluster is selected */}
-      {detailsOpen && (
-        <>
-          <div className="lg:hidden" style={{ height: PEEK_HEIGHT }} aria-hidden="true" />
-          <BottomSheet
-            open
-            resetKey={nav.projectId || (nav.clusterIds || []).join('|') || nav.city}
-            title={detailsTitle}
-            subtitle={detailsSubtitle}
-            label={`${detailsTitle} details`}
-            onClose={closePanel}
-          >
-            {detailsBody}
-          </BottomSheet>
-        </>
+      {/* Phone: the bottom sheet (half height for a city, full for a list / project) */}
+      {!isDesktop && level && (
+        <ProjectSheet key={`${nav.stateCode}|${selectedCity}`} snap={snap} onSnapChange={setSnap} onClose={closeSheet} labelledBy="our-work-sheet-heading">
+          {browser('our-work-sheet')}
+        </ProjectSheet>
       )}
     </div>
   );

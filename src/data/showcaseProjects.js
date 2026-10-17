@@ -1,120 +1,96 @@
 /**
- * Arham project showcase — the projects shown in the /our-work project card, as project pins on the
- * map, and as the project cards under the map.
+ * Arham Power Solutions — projects shown on Our Work (/our-work). ONE ROW PER PROJECT; everything on
+ * the page (city pin counts, filter chips, client groups, state / India totals) is derived from this
+ * list by the selectors in data/projectBrowse.js, so adding a row updates the whole page.
  *
- * One record per project:
- *   id         stable unique id
- *   name       project name
- *   city       city exactly as listed in presenceCoverage.js (the card only shows a city's own projects)
- *   stateCode  state code, e.g. 'IN-RJ'
- *   location   short location: area + city only, e.g. 'Indra Vihar, Kota' (no full address / pincode)
- *   type       short type shown as the card chip, e.g. 'Coaching centre'
- *   scope      one line on what Arham did, e.g. 'Complete wiring of the whole building'
- *   year       completion year (number)
- *   photos     1–4 photos (import the image files, or new URL(..., import.meta.url).href)
- *   beforePhoto, afterPhoto  optional; when both exist the card shows the before / after slider
- *   lat, lng   optional site coordinates; with them the project gets its own pin on the map,
- *              otherwise the selected city's pin is highlighted instead
- *
- * Records without a city are never shown (nothing is guessed). Separate from data/projects.js, which
- * is the publication-gated source for the map's verified-project pins. While USE_PLACEHOLDER_PROJECTS is on,
- * cities without their own records show PLACEHOLDER_PROJECTS (see below).
+ * Row format:
+ *   id         stable unique id, e.g. 'allen-sankalp-kota'
+ *   client     client name, e.g. 'ALLEN Career Institute'; null for private / no-client jobs
+ *              (those are grouped by category instead)
+ *   category   'Coaching centre' | 'Commercial' | 'Residential' | 'Industrial' | 'Hospital' | 'School' | …
+ *   name       campus / building name
+ *   area       locality, e.g. 'Indra Vihar'
+ *   city       city exactly as listed in presenceCoverage.js (rows with any other city are not shown)
+ *   stateCode  e.g. 'IN-RJ'
+ *   scope      what Arham did, from SCOPE_LABELS below, e.g. ['Full wiring', 'Lighting', 'DB panels']
+ *   status     'completed' | 'ongoing'
+ *   year       completion year (or start year while ongoing; optional then)
+ *   photos     1–6 photos (public paths, or new URL(..., import.meta.url).href)
+ *   lat, lng   optional site coordinates: with them the project gets its own pin on the map,
+ *              otherwise its city's pin is highlighted
+ *   demo       true only for the placeholder rows below
  */
 
-export const MAX_PHOTOS = 4;
+export const MAX_PHOTOS = 6;
 
-/** @type {Array<object>} */
-export const SHOWCASE_PROJECTS = Object.freeze([
-  {
-    id: 'coaching-centre-2022',
-    name: 'TODO: project name', // TODO: confirm the project name
-    city: null, // TODO: confirm the city (must match presenceCoverage.js); hidden until set
-    stateCode: null, // TODO: confirm the state code, e.g. 'IN-RJ'
-    location: null, // TODO: area + city, e.g. 'Indra Vihar, Kota'
-    type: 'Coaching centre',
-    scope: 'Complete wiring of the whole building',
-    year: 2022,
-    photos: [], // TODO: add 1–4 project photos
-    beforePhoto: null,
-    afterPhoto: null,
-    lat: null,
-    lng: null,
-  },
-]);
+/** Work types used in `scope` (shown as chips) and their short forms for summaries ("wiring & lighting"). */
+export const SCOPE_LABELS = Object.freeze({
+  'Full wiring': 'wiring',
+  Lighting: 'lighting',
+  'DB panels': 'panels',
+  Cabling: 'cabling',
+  Earthing: 'earthing',
+  'Facade lighting': 'facade lighting',
+});
+
+/** Real projects. Add rows here. */
+export const SHOWCASE_PROJECTS = Object.freeze([]);
 
 /**
- * PLACEHOLDER content — the ALLEN campus photos, shown for EVERY selected city until real projects
- * are added. Same set for each city; no coordinates, so the selected city's pin is highlighted.
- *
- * To swap in real projects: add them to SHOWCASE_PROJECTS above (with their city), then set
- * USE_PLACEHOLDER_PROJECTS to false (or delete this block). A city with its own projects in
- * SHOWCASE_PROJECTS always shows those instead of the placeholders.
+ * DEMO rows (demo: true) so the page can be reviewed before real projects are added: ALLEN campuses
+ * (the only client named, using the existing ALLEN photo) plus generic commercial / residential jobs
+ * (using the site's existing photos). Set USE_PLACEHOLDER_PROJECTS to false to switch them all off.
  */
 export const USE_PLACEHOLDER_PROJECTS = true;
 
-// The photo the old campus card used for every campus (Images/allen image.png).
 const ALLEN_PHOTO = new URL('../../Images/allen image.png', import.meta.url).href;
-
-// Name + short area / city, from the old campus records' supplied addresses (no full address).
-const PLACEHOLDER_CAMPUSES = [
-  ['ALLEN Sankalp (Head Office)', 'Indra Vihar, Kota'],
-  ['ALLEN Supath Campus', 'Naya Nohra, Kota'],
-  ['ALLEN Saakar Campus', 'Rajeev Gandhi Nagar, Kota'],
-  ['ALLEN Sangyan Campus', 'Kunhari, Kota'],
-  ['ALLEN Satyarth Campus', 'New Jawahar Nagar, Kota'],
-  ['ALLEN Sammunnat Campus', 'New Jawahar Nagar, Kota'],
-  ['ALLEN Samyak Campus', 'Landmark City, Kota'],
-  ['ALLEN Samarth Campus', 'Landmark City, Kota'],
-];
-
-export const PLACEHOLDER_PROJECTS = Object.freeze(
-  PLACEHOLDER_CAMPUSES.map(([name, location]) => ({
-    id: `placeholder-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')}`,
-    name,
-    city: null, // shown for every city
-    stateCode: null,
-    location,
-    type: 'Coaching centre',
-    scope: 'Complete wiring of the whole building',
-    year: 2022,
-    photos: [ALLEN_PHOTO],
-    beforePhoto: null,
-    afterPhoto: null,
-    lat: null,
-    lng: null,
-    placeholder: true,
-  }))
-);
-
-/**
- * A city's projects, in data order: only that city's own records (exact city + state match, never
- * another city's). A city without its own records gets the placeholders while they are on.
- */
-export const getShowcaseProjectsForCity = (stateCode, city) => {
-  if (!stateCode || !city) return [];
-  const own = SHOWCASE_PROJECTS.filter((p) => p.city === city && p.stateCode === stateCode);
-  return own.length > 0 || !USE_PLACEHOLDER_PROJECTS ? own : PLACEHOLDER_PROJECTS;
+const STOCK = {
+  building: '/images/hero-architecture.jpg',
+  lobby: '/images/project-lighting.jpg',
+  panels: '/images/project-distribution.jpg',
+  trays: '/images/project-infrastructure.jpg',
+  control: '/images/about-engineering.jpg',
 };
+const ALLEN = 'ALLEN Career Institute';
 
-/** All shown projects in a state (records with a city only). */
-export const getShowcaseProjectsForState = (stateCode) =>
-  !stateCode ? [] : SHOWCASE_PROJECTS.filter((p) => p.city && p.stateCode === stateCode);
+const demo = (row) => ({ lat: null, lng: null, ...row, demo: true });
+const allen = (id, name, area, city, stateCode, year, scope = ['Full wiring', 'Lighting'], status = 'completed') =>
+  demo({ id, client: ALLEN, category: 'Coaching centre', name, area, city, stateCode, scope, status, year, photos: [ALLEN_PHOTO] });
 
-/**
- * Every project for the /our-work project cards under the map: the records with a city, in data
- * order; while USE_PLACEHOLDER_PROJECTS is on and there are none yet, the placeholders.
- */
-export const getShowcaseProjectList = () => {
-  const own = SHOWCASE_PROJECTS.filter((p) => p.city && p.stateCode);
-  return own.length > 0 || !USE_PLACEHOLDER_PROJECTS ? own : PLACEHOLDER_PROJECTS;
-};
+export const DEMO_PROJECTS = Object.freeze([
+  // ALLEN, Kota
+  allen('demo-allen-sankalp', 'ALLEN Sankalp (Head Office)', 'Indra Vihar', 'Kota', 'IN-RJ', 2022, ['Full wiring', 'Lighting', 'DB panels']),
+  allen('demo-allen-supath', 'ALLEN Supath Campus', 'Naya Nohra', 'Kota', 'IN-RJ', 2022),
+  allen('demo-allen-saakar', 'ALLEN Saakar Campus', 'Rajeev Gandhi Nagar', 'Kota', 'IN-RJ', 2021),
+  allen('demo-allen-sangyan', 'ALLEN Sangyan Campus', 'Kunhari', 'Kota', 'IN-RJ', 2022, ['Full wiring', 'Lighting', 'Earthing']),
+  allen('demo-allen-satyarth', 'ALLEN Satyarth Campus', 'New Jawahar Nagar', 'Kota', 'IN-RJ', 2023),
+  allen('demo-allen-sammunnat', 'ALLEN Sammunnat Campus', 'New Jawahar Nagar', 'Kota', 'IN-RJ', 2023, ['Full wiring', 'DB panels']),
+  allen('demo-allen-samyak', 'ALLEN Samyak Campus', 'Landmark City', 'Kota', 'IN-RJ', null, ['Full wiring', 'Lighting'], 'ongoing'),
+  allen('demo-allen-samarth', 'ALLEN Samarth Campus', 'Landmark City', 'Kota', 'IN-RJ', null, ['Full wiring', 'Lighting', 'DB panels'], 'ongoing'),
+  // ALLEN, other worked cities
+  allen('demo-allen-jaipur-1', 'ALLEN Jaipur Campus', 'Central Jaipur', 'Jaipur', 'IN-RJ', 2021),
+  allen('demo-allen-jaipur-2', 'ALLEN Jaipur Campus 2', 'South Jaipur', 'Jaipur', 'IN-RJ', 2023, ['Full wiring', 'Lighting', 'Earthing']),
+  allen('demo-allen-mumbai', 'ALLEN Mumbai Campus', 'Western suburbs', 'Mumbai', 'IN-MH', 2022),
+  allen('demo-allen-pune', 'ALLEN Pune Campus', 'Central Pune', 'Pune', 'IN-MH', null, ['Full wiring', 'Lighting'], 'ongoing'),
+  allen('demo-allen-patna', 'ALLEN Patna Campus', 'Central Patna', 'Patna', 'IN-BR', 2020),
+  allen('demo-allen-ahmedabad', 'ALLEN Ahmedabad Campus', 'West Ahmedabad', 'Ahmedabad', 'IN-GJ', 2023, ['Full wiring', 'Lighting', 'DB panels']),
+  // Commercial (no client named)
+  demo({ id: 'demo-commercial-kota', client: null, category: 'Commercial', name: 'Commercial complex', area: 'City centre', city: 'Kota', stateCode: 'IN-RJ', scope: ['Full wiring', 'DB panels', 'Facade lighting'], status: 'completed', year: 2021, photos: [STOCK.building, STOCK.lobby, STOCK.panels] }),
+  demo({ id: 'demo-commercial-jaipur', client: null, category: 'Commercial', name: 'Office building', area: 'Business district', city: 'Jaipur', stateCode: 'IN-RJ', scope: ['Full wiring', 'Lighting', 'Cabling', 'DB panels'], status: 'completed', year: 2022, photos: [STOCK.lobby, STOCK.building, STOCK.panels, STOCK.trays, STOCK.control] }),
+  demo({ id: 'demo-commercial-mumbai', client: null, category: 'Commercial', name: 'Retail and office complex', area: 'Central Mumbai', city: 'Mumbai', stateCode: 'IN-MH', scope: ['Cabling', 'DB panels'], status: 'ongoing', year: null, photos: [STOCK.trays, STOCK.panels] }),
+  demo({ id: 'demo-commercial-pune', client: null, category: 'Commercial', name: 'Office building', area: 'IT park', city: 'Pune', stateCode: 'IN-MH', scope: ['Full wiring', 'Lighting'], status: 'completed', year: 2020, photos: [STOCK.building] }),
+  // Residential (no client named)
+  demo({ id: 'demo-residential-kota', client: null, category: 'Residential', name: 'Residential tower', area: 'Talwandi', city: 'Kota', stateCode: 'IN-RJ', scope: ['Full wiring', 'Lighting', 'Earthing'], status: 'completed', year: 2020, photos: [STOCK.building, STOCK.lobby] }),
+  demo({ id: 'demo-residential-nagpur', client: null, category: 'Residential', name: 'Housing society', area: 'West Nagpur', city: 'Nagpur', stateCode: 'IN-MH', scope: ['Full wiring', 'DB panels'], status: 'ongoing', year: null, photos: [STOCK.control] }),
+  demo({ id: 'demo-residential-jaipur', client: null, category: 'Residential', name: 'Apartment block', area: 'East Jaipur', city: 'Jaipur', stateCode: 'IN-RJ', scope: ['Full wiring', 'Lighting'], status: 'completed', year: 2024, photos: [STOCK.lobby] }),
+]);
+
+/** The rows the page uses: real projects, plus the demo rows while USE_PLACEHOLDER_PROJECTS is on. */
+export const getProjectRows = () => (USE_PLACEHOLDER_PROJECTS ? [...SHOWCASE_PROJECTS, ...DEMO_PROJECTS] : [...SHOWCASE_PROJECTS]);
 
 /** A project's photos (at most MAX_PHOTOS). */
 export const projectPhotos = (p) => (Array.isArray(p?.photos) ? p.photos.filter(Boolean).slice(0, MAX_PHOTOS) : []);
 
 export const hasSiteCoordinates = (p) => Number.isFinite(p?.lat) && Number.isFinite(p?.lng);
-
-/** Before / after slider only when both photos exist. */
-export const hasBeforeAfter = (p) => Boolean(p?.beforePhoto && p?.afterPhoto);
 
 export default SHOWCASE_PROJECTS;

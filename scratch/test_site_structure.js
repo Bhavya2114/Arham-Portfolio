@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url';
 import { NAV_ITEMS } from '../src/data/navigation.js';
 import { COMPANY, pageTitle } from '../src/data/company.js';
 import { SERVICES, PROCESS_STEPS } from '../src/data/services.js';
-import { PLACEHOLDER_PROJECTS, getShowcaseProjectList } from '../src/data/showcaseProjects.js';
+import { getProjectRows, DEMO_PROJECTS, USE_PLACEHOLDER_PROJECTS } from '../src/data/showcaseProjects.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const read = (rel) => fs.readFileSync(path.resolve(here, rel), 'utf-8');
@@ -73,9 +73,9 @@ const about = code(read('../src/sections/AboutArham.jsx'));
 const aboutSentences = (about.match(/<p[^>]*>([\s\S]*?)<\/p>/) || ['', ''])[1].split(/(?<=\.)\s+/).filter((x) => x.trim());
 assert(/id="about"/.test(about) && aboutSentences.length >= 3 && aboutSentences.length <= 4, `About Arham: ${aboutSentences.length} sentences`);
 
-console.log('\n5. Our Work: map, then project cards');
-assert(/<PresenceMap[\s\S]*?<ProjectGrid projects=\{projectList\}/.test(presence) && /getShowcaseProjectList\(\)/.test(presence), 'Map on top, project cards below it');
-assert(getShowcaseProjectList().length === PLACEHOLDER_PROJECTS.length, `Cards show the showcase projects (${getShowcaseProjectList().length}; placeholders until real projects are added)`);
+console.log('\n5. Our Work: the map is the way in to every project');
+assert(/<PresenceMap[\s\S]*?<ProjectSheet/.test(presence) && !/ProjectGrid/.test(presence) && !exists('../src/components/presence/ProjectGrid.jsx'), 'Map, then projects through the city sheet / panel (one way of browsing; the card list under the map is gone)');
+assert(USE_PLACEHOLDER_PROJECTS && getProjectRows().length === DEMO_PROJECTS.length && DEMO_PROJECTS.every((p) => p.demo === true), `Demo rows (${DEMO_PROJECTS.length}, all demo: true) until real projects are added`);
 assert(/root\.setAttribute\('data-map-card', 'open'\)/.test(presence) && /root\.removeAttribute\('data-map-card'\)/.test(presence), 'Page flags an open city card on <html> (for the phone bar)');
 
 console.log('\n6. Enquiry form');
@@ -94,7 +94,7 @@ assert(/html\[data-map-card="open"\] \.mobile-action-bar/.test(css), 'Hidden on 
 
 console.log('\n8. Footer and copy');
 assert(/© \{currentYear\} \{COMPANY\.name\}/.test(footer) && /COMPANY\.phoneHref/.test(footer) && /whatsappHref/.test(footer) && /COMPANY\.emailHref/.test(footer) && /NAV_ITEMS\.map/.test(footer) && !/Standalone Foundation|Core Capabilities|CORE_DISCIPLINES/i.test(footer), 'Slim footer: logo, one line, nav, phone, WhatsApp, email, ©');
-const visible = [home, presence, contact, services, notFound, hero, about, footer, header, form, read('../src/sections/PresenceTeaser.jsx'), read('../src/sections/ServicesList.jsx'), read('../src/components/presence/ProjectGrid.jsx')].map(code).join('\n');
+const visible = [home, presence, contact, services, notFound, hero, about, footer, header, form, read('../src/sections/PresenceTeaser.jsx'), read('../src/sections/ServicesList.jsx'), read('../src/components/presence/ProjectBrowser.jsx')].map(code).join('\n');
 const banned = ['Illustrative', 'Provisional', 'Subject to confirmation', 'Scope Disclosure', 'Documentation Notice', 'Verification Standard', 'Authenticated', 'pending executive', 'Standalone Foundation', 'Formulate', 'Corporate', 'being prepared', 'once approved', 'Route Not Found'];
 assert(banned.every((w) => !visible.includes(w)), `No disclaimers / jargon (${banned.filter((w) => visible.includes(w)).join(', ') || 'none found'})`);
 assert(!/to="\/#presence"|href="\/#presence"|to="\/projects"|to="\/presence"/.test(visible), 'No links to /#presence, /projects or /presence (all go to /our-work)');

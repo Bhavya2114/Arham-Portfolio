@@ -70,6 +70,7 @@ const viewBoxWidth = (vb) => Number(String(vb).trim().split(/[\s,]+/)[2]) || 1;
 
 export const IndiaMapSvg = ({
   activeStateCodes = [],
+  dimStateCodes = [], // worked states without projects for the current filter: drawn at DIM (per path)
   selectedStateCode = null,
   onSelectState = null,
   onSelectInactiveState = null,
@@ -89,7 +90,8 @@ export const IndiaMapSvg = ({
 
   // Latest handlers read through a ref, so the memoised dark-variant paths never call stale ones.
   const live = useRef({});
-  live.current = { activeSet, onSelectState, onSelectInactiveState, selectedStateCode };
+  const dimKey = (Array.isArray(dimStateCodes) ? [...dimStateCodes] : []).sort().join(',');
+  live.current = { activeSet, onSelectState, onSelectInactiveState, selectedStateCode, dimKey };
 
   // ---- Dark variant: hover / tap highlight ----
   // One extra path drawn over the hovered or tapped worked state with a brighter fill, updated
@@ -102,7 +104,8 @@ export const IndiaMapSvg = ({
     const selected = live.current.selectedStateCode;
     el.setAttribute('d', state.d);
     el.setAttribute('fill', `url(#india-map-worked-fill-${kind})`);
-    el.setAttribute('fill-opacity', String(selected && selected !== state.id ? DIM : 1));
+    const filteredOut = live.current.dimKey.split(',').includes(state.id);
+    el.setAttribute('fill-opacity', String((selected && selected !== state.id) || (filteredOut && selected !== state.id) ? DIM : 1));
   };
   const handleWorkedPointerEnter = (e, state) => {
     if (e.pointerType !== 'mouse' || !canHover()) return;
@@ -176,8 +179,11 @@ export const IndiaMapSvg = ({
     // Entrance order: worked states light up roughly west → east.
     const enterOrder = new Map([...worked].sort((a, b) => pathCentreX(a.d) - pathCentreX(b.d)).map((state, i) => [state.id, i]));
     const hero =selectedStateCode ? worked.find((state) => state.id === selectedStateCode) || null : null;
-    const dimmed = hero ? worked.filter((state) => state !== hero) : [];
-    const lit = hero ? [hero] : worked;
+    const filteredOut = new Set(dimKey ? dimKey.split(',') : []);
+    // Dimmed: the other worked states while one is selected, and (Our Work filter) worked states with no
+    // matching projects. Per-path fill opacity only, never group opacity.
+    const dimmed = worked.filter((state) => state !== hero && (hero || filteredOut.has(state.id)));
+    const lit = hero ? [hero] : worked.filter((state) => !filteredOut.has(state.id));
 
     const common = (state) => ({
       key: state.id,
@@ -252,7 +258,7 @@ export const IndiaMapSvg = ({
       heroEdge: hero ? strokes([hero], EDGE_WIDTH, 1, MAP_COLORS.edge) : null,
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDark, activeKey, selectedStateCode, regionEdges]);
+  }, [isDark, activeKey, selectedStateCode, regionEdges, dimKey]);
 
   const deco = { 'aria-hidden': 'true', className: 'pointer-events-none' };
 

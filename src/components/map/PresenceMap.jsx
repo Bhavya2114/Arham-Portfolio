@@ -47,7 +47,11 @@ const DRAG_THRESHOLD_PX = 6;
 const ENTRANCE = { statesFromMs: 250, staggerMs: 80, stateMs: 350, dotsOverlapMs: 150, dotsMs: 300, totalMs: 1500 };
 const MARKER_RADIUS_PX = 5;
 // Overview city dots: a small bright white dot, ~3 px across (screen px radius).
-const OVERVIEW_CITY = { dotPx: 1.5, opacity: 0.9 };
+const OVERVIEW_CITY = { dotPx: 1.5, opacity: 0.9, dimOpacity: 0.25 };
+// City pin with no projects for the current filter: the same pin, faded (per element, no group opacity).
+const DIM_PIN_OPACITY = 0.35;
+// Project-count badge on a city pin (yellow, dark number); hidden while the map moves.
+const COUNT_BADGE = { radiusPx: 8, fontPx: 10 };
 // Soft halo behind each zoomed city pin: white, ~2.2× the dot, no blur.
 const PIN_HALO = { scale: 2.2, opacity: 0.18 };
 // Plain graphite radial background behind the map (CSS only, static).
@@ -114,6 +118,8 @@ export const PresenceMap = ({
   onSelectCluster,
   footer = null,
   overlay = null,
+  toolbar = null, // replaces the default status toolbar above the map (Our Work: summary pill + filter chips)
+  dimStateCodes = [], // worked states with no projects for the current filter
 }) => {
   const wrapperRef = useRef(null);
   const [view, setView] = useState(HOME_VIEW);
@@ -373,7 +379,7 @@ export const PresenceMap = ({
   const overviewCityLayer = !selectedCode && !moving && overviewCities.length > 0 && (
     <g aria-hidden="true" className="pointer-events-none" data-layer="overview-cities">
       {overviewCities.map((c) => (
-        <circle key={`${c.stateCode}-${c.city}`} cx={c.x} cy={c.y} r={OVERVIEW_CITY.dotPx * unit} fill="#FFFFFF" fillOpacity={OVERVIEW_CITY.opacity} />
+        <circle key={`${c.stateCode}-${c.city}`} cx={c.x} cy={c.y} r={OVERVIEW_CITY.dotPx * unit} fill="#FFFFFF" fillOpacity={c.dim ? OVERVIEW_CITY.dimOpacity : OVERVIEW_CITY.opacity} />
       ))}
     </g>
   );
@@ -389,7 +395,7 @@ export const PresenceMap = ({
             transform={`translate(${m.x} ${m.y})`}
             role="button"
             tabIndex={0}
-            aria-label={`${m.city}, ${selectedState?.name || ''}`}
+            aria-label={`${m.city}, ${selectedState?.name || ''}${typeof m.count === 'number' ? ` — ${m.count} ${m.count === 1 ? 'project' : 'projects'}` : ''}`}
             aria-pressed={isSelected}
             className="group cursor-pointer outline-none"
             onClick={() => onSelectCity?.(m.city)}
@@ -397,7 +403,7 @@ export const PresenceMap = ({
           >
             <title>{m.city}</title>
             <circle r={hitRadiusPx[m.city] * unit} fill="transparent" />
-            {!moving && <circle r={r * PIN_HALO.scale} fill="#FFFFFF" fillOpacity={PIN_HALO.opacity} aria-hidden="true" />}
+            {!moving && !m.dim && <circle r={r * PIN_HALO.scale} fill="#FFFFFF" fillOpacity={PIN_HALO.opacity} aria-hidden="true" />}
             <circle
               r={r + 5 * unit}
               className="fill-none stroke-brand-accent opacity-0 group-focus-visible:opacity-100"
@@ -412,14 +418,15 @@ export const PresenceMap = ({
             <circle
               r={r}
               fill={isSelected ? MAP_COLORS.edge : '#FFFFFF'}
+              fillOpacity={m.dim && !isSelected ? DIM_PIN_OPACITY : 1}
               stroke={MAP_COLORS.land}
               strokeWidth={1.25}
               vectorEffect="non-scaling-stroke"
             />
-            {m.count > 0 && (
-              <g transform={`translate(${r * 1.1} ${-r * 1.1})`} aria-hidden="true">
-                <circle r={7 * unit} className="fill-white" />
-                <text textAnchor="middle" dominantBaseline="central" fontSize={9 * unit} className="fill-brand-navy font-bold">
+            {m.count > 0 && !moving && (
+              <g transform={`translate(${r + COUNT_BADGE.radiusPx * 0.55 * unit} ${-(r + COUNT_BADGE.radiusPx * 0.55 * unit)})`} aria-hidden="true" className="pointer-events-none" data-count-badge="">
+                <circle r={COUNT_BADGE.radiusPx * unit} fill={MAP_COLORS.edge} stroke={MAP_COLORS.land} strokeWidth={1.25} vectorEffect="non-scaling-stroke" />
+                <text textAnchor="middle" dominantBaseline="central" fontSize={COUNT_BADGE.fontPx * unit} fill="#14180A" className="font-bold">
                   {m.count}
                 </text>
               </g>
@@ -690,6 +697,9 @@ export const PresenceMap = ({
     <div className="relative mx-auto max-w-5xl [--map-fade:40px] md:[--map-fade:80px]">
       {/* Toolbar: selection status. Navigation is by map selection: covered state / city markers
           select; an uncovered state or the empty ocean returns to India. */}
+      {toolbar ? (
+        <div className="relative z-20 mb-2">{toolbar}</div>
+      ) : (
       <div className="relative z-20 mb-2 flex flex-wrap items-center justify-between gap-2">
         {selectedState ? (
           <div className="flex flex-wrap items-center gap-2 min-w-0">
@@ -708,6 +718,7 @@ export const PresenceMap = ({
           </span>
         )}
       </div>
+      )}
 
       {/* Map wrapper: no box. It extends --map-fade past the content area on every side (negative
           margin + equal padding), so the map itself is never faded; when zoomed or dragged the map
@@ -733,6 +744,7 @@ export const PresenceMap = ({
           variant="dark"
           viewBox={`${vb.x} ${vb.y} ${vb.w} ${vb.h}`}
           activeStateCodes={activeStateCodes}
+          dimStateCodes={dimStateCodes}
           selectedStateCode={selectedCode}
           onSelectState={onSelectState}
           onSelectInactiveState={onSelectInactiveState}

@@ -112,7 +112,7 @@ assert(getPublishedProjectsByStateAndCity('IN-RJ', 'Jaipur').length === 0, 'City
 const pageSrc = read('../src/pages/Presence.jsx');
 const stateNames = ['Rajasthan', 'Maharashtra', 'Gujarat', 'Chhattisgarh', 'West Bengal', 'Uttar Pradesh', 'Bihar', 'Jharkhand', 'Odisha', 'Assam', 'Goa'];
 assert(stateNames.every((n) => !pageSrc.includes(n)), 'Presence page has no hardcoded state names (uses config)');
-assert(pageSrc.includes('getPublishedProjects') && pageSrc.includes('presenceCoverage'), 'Presence page reads shared selectors and coverage config');
+assert(pageSrc.includes('projectBrowse.js') && pageSrc.includes('presenceCoverage'), 'Presence page reads shared selectors (projectBrowse.js) and coverage config');
 
 console.log('\n6. Route & Navigation:');
 const appSrc = read('../src/App.jsx');

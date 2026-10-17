@@ -1,18 +1,24 @@
 /**
- * Our Presence navigation state — India → State → City → Project.
+ * Our Work navigation state — India → State → City → Group → Project.
  *
  * Pure reducer so the discovery flow is predictable and testable outside React.
  * Only states and cities from `presenceCoverage.js` are accepted.
  *
- * State shape: { stateCode, city, projectId, clusterIds }
- * - `city`: selected city; its verified projects are listed one by one (the map does not zoom).
- * - `projectId`: project whose details are open. Opening one from a state-level pin also sets its city.
+ * State shape: { stateCode, city, groupId, projectId, clusterIds }
+ * - `city`: selected city; its summary (stats + client groups) opens in the sheet / side panel.
+ *   Selecting a city never zooms the map.
+ * - `groupId`: a client group in that city ('client:…' / 'category:…'); its project list is shown.
+ * - `projectId`: project whose details are open. Opening one from a map pin also sets its city / group.
  * - `clusterIds`: projects sharing one map location, offered as a short chooser.
+ * `back` steps up one level: project (or chooser) → group list → city summary → state map → India.
  */
 
 import { getPresenceState } from '../data/presenceCoverage.js';
 
-export const INITIAL_PRESENCE_NAV = Object.freeze({ stateCode: null, city: null, projectId: null, clusterIds: null });
+export const INITIAL_PRESENCE_NAV = Object.freeze({ stateCode: null, city: null, groupId: null, projectId: null, clusterIds: null });
+
+/** Sheet level for a nav state: null (no sheet) | 'city' | 'group' | 'project' | 'cluster'. */
+export const sheetLevel = (nav) => (nav.projectId ? 'project' : nav.clusterIds ? 'cluster' : nav.groupId ? 'group' : nav.city ? 'city' : null);
 
 export const presenceNavReducer = (state, action) => {
   switch (action.type) {
@@ -24,14 +30,19 @@ export const presenceNavReducer = (state, action) => {
     case 'selectCity': {
       const coverage = getPresenceState(action.stateCode);
       if (!coverage || !coverage.cities.includes(action.city)) return state;
-      if (state.stateCode === action.stateCode && state.city === action.city && !state.projectId && !state.clusterIds) return state;
+      if (state.stateCode === action.stateCode && state.city === action.city && !state.groupId && !state.projectId && !state.clusterIds) return state;
       return { ...INITIAL_PRESENCE_NAV, stateCode: action.stateCode, city: action.city };
     }
+    case 'openGroup':
+      if (!state.city || !action.groupId) return state;
+      return { ...state, groupId: action.groupId, projectId: null, clusterIds: null };
     case 'selectProject': {
       if (!state.stateCode || !action.projectId) return state;
       const city = action.city ?? state.city;
       if (!city || !getPresenceState(state.stateCode).cities.includes(city)) return state;
-      return { ...state, city, projectId: action.projectId, clusterIds: null };
+      // A different city (e.g. a pin elsewhere in the state) starts from that city's own levels.
+      const groupId = action.groupId ?? (city === state.city ? state.groupId : null);
+      return { ...state, city, groupId, projectId: action.projectId, clusterIds: null };
     }
     case 'showCluster':
       if (!state.stateCode || !Array.isArray(action.projectIds) || action.projectIds.length === 0) return state;
@@ -40,8 +51,11 @@ export const presenceNavReducer = (state, action) => {
       return { ...state, projectId: null, clusterIds: null };
     case 'back':
       if (state.projectId || state.clusterIds) return { ...state, projectId: null, clusterIds: null };
+      if (state.groupId) return { ...state, groupId: null };
       if (state.city) return { ...INITIAL_PRESENCE_NAV, stateCode: state.stateCode };
       return INITIAL_PRESENCE_NAV;
+    case 'closeSheet':
+      return state.stateCode ? { ...INITIAL_PRESENCE_NAV, stateCode: state.stateCode } : INITIAL_PRESENCE_NAV;
     case 'reset':
       return INITIAL_PRESENCE_NAV;
     default:

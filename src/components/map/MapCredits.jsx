@@ -49,7 +49,7 @@ export const MapCredits = ({ cities = false, districts = false }) => {
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-controls="presence-map-credits"
-        className="inline-flex h-11 min-w-[44px] items-center justify-center gap-1 rounded-md px-2 text-[11px] text-slate-500 hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
+        className="inline-flex h-11 min-w-[44px] items-center justify-center gap-1 rounded-md px-2 text-[11px] text-muted hover:text-slate-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-accent"
       >
         <Info className="h-3 w-3" aria-hidden="true" />
         Map data

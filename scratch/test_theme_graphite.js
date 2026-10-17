@@ -23,7 +23,7 @@ const config = (await import(pathToFileURL(path.resolve(here, '../tailwind.confi
 const c = config.theme.extend.colors;
 const CONTENT = ['pages/Services.jsx', 'pages/Contact.jsx', 'pages/NotFound.jsx', 'pages/Home.jsx',
   'sections/Hero.jsx', 'sections/PresenceTeaser.jsx', 'sections/ServicesList.jsx', 'sections/AboutArham.jsx',
-  'components/contact/EnquiryForm.jsx', 'components/presence/ProjectGrid.jsx', 'components/layout/Footer.jsx', 'components/layout/MobileActionBar.jsx',
+  'components/contact/EnquiryForm.jsx', 'components/presence/ProjectBrowser.jsx', 'components/presence/PhotoGallery.jsx', 'components/layout/Footer.jsx', 'components/layout/MobileActionBar.jsx',
   'components/ui/Card.jsx', 'components/ui/Badge.jsx', 'components/ui/SectionHeading.jsx', 'components/ui/PageHero.jsx'];
 const src = Object.fromEntries(CONTENT.map((f) => [f, read(`../src/${f}`)]));
 const all = Object.values(src).join('\n');
@@ -49,7 +49,11 @@ console.log('\n4. Forms, photos, text size');
 const form = src['components/contact/EnquiryForm.jsx'];
 assert(/const FIELD =\s*'w-full text-base bg-navy-900 \[color-scheme:dark\] border /.test(form) && (form.match(/className=\{`\$\{FIELD\} /g) || []).length === 4 && /'border-white\/\[0\.14\]'/.test(form), 'Inputs (4) #101114 with a white/14 % border (dark native pickers)');
 assert(/text-heading placeholder:text-muted focus:outline-none focus:border-ink focus:ring-\[3px\] focus:ring-accent/.test(form), 'Inputs: heading-colour text, muted placeholder, yellow focus ring');
-const imgs = all.match(/<img\b[\s\S]*?\/>/g) || [];
+// The photo gallery frames its photos on the container (white/8 % border, rounded), so its own <img>s
+// (and its thumbnail buttons / full-screen viewer) are checked separately.
+const gallery = src['components/presence/PhotoGallery.jsx'];
+assert(/relative overflow-hidden rounded-xl border border-white\/\[0\.08\]/.test(gallery), 'Project photos framed: the gallery has a white/8 % border and rounded corners');
+const imgs = Object.entries(src).filter(([f]) => f !== 'components/presence/PhotoGallery.jsx').map(([, v]) => v).join('\n').match(/<img\b[\s\S]*?\/>/g) || [];
 assert(imgs.length >= 3 && imgs.filter((t) => !/PRESENCE_OVERVIEW_IMAGE/.test(t)).every((t) => /rounded-xl border border-white\/\[0\.08\]/.test(t)), `Photos framed: white/8 % border + rounded corners (${imgs.length} images; the transparent map teaser excepted)`);
 const longParas = [...all.matchAll(/<p\s+className="([^"]*leading-[^"]*)"/g)].map((m) => m[1]).filter((cls) => !/\btext-xs\b(?! sm:)|text-\[1[01]px\]/.test(cls) || /sm:text-base|text-base/.test(cls));
 assert(longParas.every((cls) => !/\btext-sm\b/.test(cls)), 'Long paragraphs at least 16 px (text-sm body copy raised to text-base)');
