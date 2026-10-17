@@ -11,7 +11,7 @@ import { performance } from 'perf_hooks';
 import { SHOWCASE_PROJECTS, SCOPE_LABELS, USE_PLACEHOLDER_PROJECTS, MAX_PHOTOS, getProjectRows, projectPhotos } from '../src/data/showcaseProjects.js';
 import {
   FILTER_ALL, isListable, getBrowsableProjects, groupIdOf, getGroups, getFilterOptions, filterProjects, countByCity, cityKey,
-  statesWithProjects, projectsInState, projectsInCity, placeSummary, statusStats, filterByStatus, cityLine, statusLabel, similarProjectText, scopeSummary,
+  statesWithProjects, projectsInState, projectsInCity, placeSummary, statusStats, filterByStatus, cityLine, statusLabel, similarProjectText, scopeSummary, statusTabs, statTiles,
 } from '../src/data/projectBrowse.js';
 import { presenceNavReducer, INITIAL_PRESENCE_NAV, sheetLevel } from '../src/lib/presenceNavigation.js';
 import { getPresenceState } from '../src/data/presenceCoverage.js';
@@ -88,6 +88,19 @@ const t0 = performance.now();
 for (let i = 0; i < 50; i += 1) getGroups(projectsInCity(filterProjects(getBrowsableProjects(big), FILTER_ALL), 'IN-RJ', 'Kota'));
 const perRun = (performance.now() - t0) / 50;
 assert(perRun < 5, `60 rows: filter + city + groups in ${perRun.toFixed(2)} ms`);
+
+console.log('\n2b. Empty statuses are hidden, and come back by themselves');
+const realKota = projectsInCity(getBrowsableProjects(), 'IN-RJ', 'Kota');
+assert(statusTabs(realKota).map((t) => `${t.label} ${t.count}`).join(', ') === `All ${realKota.length}, Completed ${realKota.length}`, `No ongoing projects → no "Ongoing" tab (${statusTabs(realKota).map((t) => `${t.label} ${t.count}`).join(', ')})`);
+assert(statTiles(realKota).map((t) => t.label).join(',') === 'Projects,Completed' && !statTiles(realKota).some((t) => t.value === 0), 'No "0 Ongoing" tile in the city summary');
+const withOngoing = [...realKota, TEST_ONLY_ROWS[2]];
+assert(statusTabs(withOngoing).map((t) => t.label).join(',') === 'All,Completed,Ongoing' && statusTabs(withOngoing).find((t) => t.id === 'ongoing').count === 1, 'One ongoing row → the "Ongoing (1)" tab reappears');
+assert(statTiles(withOngoing).map((t) => `${t.label} ${t.value}`).join(', ') === `Projects ${withOngoing.length}, Completed ${realKota.length}, Ongoing 1`, 'One ongoing row → the "Ongoing 1" tile reappears');
+const onlyOngoing = [TEST_ONLY_ROWS[1], TEST_ONLY_ROWS[2]];
+assert(statusTabs(onlyOngoing).map((t) => t.id).join(',') === 'all,ongoing' && statTiles(onlyOngoing).map((t) => t.id).join(',') === 'total,ongoing', 'Only ongoing work → no "Completed" tab or tile');
+assert(statusTabs([])[0].id === 'all' && statusTabs([]).length === 1 && statTiles([]).length === 1, '"All" tab and "Projects" tile always shown');
+const browserSrc = read('../src/components/presence/ProjectBrowser.jsx');
+assert(/statusTabs\(group\.projects\)/.test(browserSrc) && /const tiles = statTiles\(cityProjects\)/.test(browserSrc) && /TILE_COLS\[tiles\.length\]/.test(browserSrc), 'Sheet / panel use these selectors (tile grid sized to the tiles shown)');
 
 console.log('\n3. Navigation: map → city → group → project, back one level at a time');
 const run = (actions, from = INITIAL_PRESENCE_NAV) => actions.reduce(presenceNavReducer, from);

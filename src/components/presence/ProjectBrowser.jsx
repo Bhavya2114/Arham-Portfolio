@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight, X, GraduationCap, Building2, Home, Factory, Briefcase, Check, MessageCircle, MapPin, ExternalLink } from 'lucide-react';
 import PhotoGallery from './PhotoGallery';
 import { projectPhotos, mapsSearchUrl } from '../../data/showcaseProjects';
-import { statusStats, cityLine, filterByStatus, STATUS_TABS, statusLabel, similarProjectText } from '../../data/projectBrowse';
+import { cityLine, filterByStatus, statusTabs, statTiles, statusLabel, similarProjectText } from '../../data/projectBrowse';
 import { COMPANY, whatsappHref } from '../../data/company';
 
 /**
@@ -17,6 +17,7 @@ import { COMPANY, whatsappHref } from '../../data/company';
  */
 const CATEGORY_ICONS = { 'Coaching centre': GraduationCap, Commercial: Building2, Residential: Home, Industrial: Factory };
 const BTN_FOCUS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent';
+const TILE_COLS = { 1: 'grid-cols-1', 2: 'grid-cols-2', 3: 'grid-cols-3' };
 
 export const StatusTag = ({ project, long = false }) =>
   project.status === 'ongoing' ? (
@@ -123,11 +124,8 @@ export const ProjectBrowser = ({
     setTab('all');
   }, [focusKey]);
 
-  const groupTabs = useMemo(() => {
-    if (!group) return [];
-    const stats = statusStats(group.projects);
-    return STATUS_TABS.map((t) => ({ id: t, label: t === 'all' ? 'All' : t === 'completed' ? 'Completed' : 'Ongoing', count: t === 'all' ? stats.total : stats[t] }));
-  }, [group]);
+  // Tabs with 0 projects are hidden (they return once a row has that status).
+  const groupTabs = useMemo(() => (group ? statusTabs(group.projects) : []), [group]);
 
   const heading = (text, extra = null) => (
     <h2 id={headingId} ref={headingRef} tabIndex={-1} className="text-2xl font-bold font-heading text-heading tracking-tight outline-none focus:outline-none focus-visible:outline-none focus-visible:shadow-none">
@@ -242,7 +240,7 @@ export const ProjectBrowser = ({
   }
 
   // City summary
-  const stats = statusStats(cityProjects);
+  const tiles = statTiles(cityProjects); // Completed / Ongoing tiles hidden while 0
   return (
     <div className="space-y-4 pb-2">
       <div className="flex items-start justify-between gap-2">
@@ -265,9 +263,9 @@ export const ProjectBrowser = ({
         </div>
       ) : (
         <>
-          <dl className="grid grid-cols-3 gap-2">
-            {[['Projects', stats.total], ['Completed', stats.completed], ['Ongoing', stats.ongoing]].map(([label, value]) => (
-              <div key={label} className="flex flex-col-reverse rounded-xl border border-white/[0.07] bg-white/[0.03] px-3 py-2.5">
+          <dl className={`grid ${TILE_COLS[tiles.length]} gap-2`}>
+            {tiles.map(({ id, label, value }) => (
+              <div key={id} className="flex flex-col-reverse rounded-xl border border-white/[0.07] bg-white/[0.03] px-3 py-2.5">
                 <dt className="text-xs text-muted">{label}</dt>
                 <dd className="font-heading text-2xl font-bold text-heading tabular-nums">{value}</dd>
               </div>

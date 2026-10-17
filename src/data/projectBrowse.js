@@ -111,6 +111,26 @@ export const statusStats = (projects) => ({
 });
 
 export const STATUS_TABS = Object.freeze(['all', 'completed', 'ongoing']);
+const STATUS_LABELS = { all: 'All', completed: 'Completed', ongoing: 'Ongoing' };
+
+/**
+ * Group-list status tabs: "All", plus Completed / Ongoing only when that status has projects (a tab
+ * with 0 is hidden and comes back by itself once a row has that status).
+ */
+export const statusTabs = (projects) => {
+  const stats = statusStats(projects);
+  return STATUS_TABS.map((id) => ({ id, label: STATUS_LABELS[id], count: id === 'all' ? stats.total : stats[id] })).filter((t) => t.id === 'all' || t.count > 0);
+};
+
+/** City-summary stat tiles: "Projects", plus Completed / Ongoing only when not 0. */
+export const statTiles = (projects) => {
+  const stats = statusStats(projects);
+  return [
+    { id: 'total', label: 'Projects', value: stats.total },
+    { id: 'completed', label: 'Completed', value: stats.completed },
+    { id: 'ongoing', label: 'Ongoing', value: stats.ongoing },
+  ].filter((t) => t.id === 'total' || t.value > 0);
+};
 export const filterByStatus = (projects, tab) => (tab === 'completed' || tab === 'ongoing' ? projects.filter((p) => p.status === tab) : projects);
 
 /** One line under a city name: "Electrical work for coaching centres, commercial buildings and homes." */
