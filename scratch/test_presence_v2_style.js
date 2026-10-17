@@ -63,11 +63,11 @@ const two = splitRegionEdges([{ d: 'M0 0l10 0l0 10l-10 0z' }, { d: 'M10 0l10 0l0
 assert(edges.outer.length > 0 && edges.shared.length > 0 && two.shared === 'M10 0L10 10' && !two.outer.includes('10 0L10 10') && two.outer === 'M0 0L10 0M10 10L0 10 0 0M10 0L20 0 20 10 10 10', 'Edge split: a border between two states is drawn once as shared, everything else as outer');
 
 console.log('\n2b. Overview city dots');
-assert(/const OVERVIEW_CITY = \{ dotPx: 1\.5, opacity: 0\.9 \};/.test(mapSrc) && /r=\{OVERVIEW_CITY\.dotPx \* unit\} fill="#FFFFFF" fillOpacity=\{OVERVIEW_CITY\.opacity\}/.test(mapSrc) && !/haloPx|OVERVIEW_CITY\.halo/.test(mapCode), 'Overview: only a ~3 px bright white dot (90 %), no halo');
+assert(/const OVERVIEW_CITY = \{ dotPx: 1\.5, opacity: 0\.9, dimOpacity: 0\.25 \};/.test(mapSrc) && /r=\{OVERVIEW_CITY\.dotPx \* unit\} fill="#FFFFFF" fillOpacity=\{c\.dim \? OVERVIEW_CITY\.dimOpacity : OVERVIEW_CITY\.opacity\}/.test(mapSrc) && !/haloPx|OVERVIEW_CITY\.halo/.test(mapCode), 'Overview: only a ~3 px bright white dot (90 %; 25 % when the filter has no projects there), no halo');
 
 console.log('\n2c. Zoomed state: districts and pins');
 assert(/const DISTRICT_LINE = \{ color: '#1A2A06', opacity: 0\.6, width: 0\.7 \};/.test(mapSrc) && /stroke=\{DISTRICT_LINE\.color\}\s*strokeOpacity=\{DISTRICT_LINE\.opacity\}\s*strokeWidth=\{DISTRICT_LINE\.width\}/.test(mapSrc), 'District lines: dark olive "engraved" lines, 60 %, 0.7 px');
-assert(/const PIN_HALO = \{ scale: 2\.2, opacity: 0\.18 \};/.test(mapSrc) && /\{!moving && <circle r=\{r \* PIN_HALO\.scale\} fill="#FFFFFF" fillOpacity=\{PIN_HALO\.opacity\} aria-hidden="true" \/>\}/.test(mapSrc), 'Pin halo: white circle 2.2x the dot at 18 %, no blur, hidden while moving');
+assert(/const PIN_HALO = \{ scale: 2\.2, opacity: 0\.18 \};/.test(mapSrc) && /\{!moving && !m\.dim && <circle r=\{r \* PIN_HALO\.scale\} fill="#FFFFFF" fillOpacity=\{PIN_HALO\.opacity\} aria-hidden="true" \/>\}/.test(mapSrc), 'Pin halo: white circle 2.2x the dot at 18 %, no blur, hidden while moving (and on filtered-out pins)');
 assert(/\{isSelected && \(\s*<text[\s\S]*?paintOrder="stroke"[\s\S]*?className="fill-white[^"]*"[\s\S]*?\{m\.city\}/.test(mapSrc), 'Selected pin: city name in white with a dark paint-order outline');
 assert(/<g aria-hidden="true" className="pointer-events-none" data-layer="overview-cities">/.test(mapSrc) && /\{overviewCityLayer\}/.test(mapSrc), 'Overview dots are decorative and not interactive');
 assert(/overviewCities=\{overviewCities\}/.test(presenceSrc) && /const overviewCities = useMemo\(/.test(presenceSrc), 'Presence page passes every worked city');
@@ -94,7 +94,7 @@ assert(!/Drag to pan/.test(mapSrc), 'No "Drag to pan · pinch to zoom" hint');
 const creditsSrc = read('../src/components/map/MapCredits.jsx');
 assert(/City locations ©/.test(creditsSrc) && /href="https:\/\/www\.openstreetmap\.org\/copyright"/.test(creditsSrc) && /href="https:\/\/www\.geoboundaries\.org\/"/.test(creditsSrc) && /\/ LGD \(ODbL\)/.test(creditsSrc) && /\(ODbL\) and Wikipedia/.test(creditsSrc), 'Credits kept, with the same links, in the "Map data" popover');
 assert(/className="absolute right-0 top-0 z-30 flex flex-col items-end pointer-events-auto"/.test(creditsSrc) && /<MapCredits cities=/.test(mapSrc), '"ⓘ Map data" in the top-right corner of the map area (never over the bottom-anchored card)');
-assert(/inline-flex h-11 min-w-\[44px\] items-center justify-center gap-1 rounded-md px-2 text-\[11px\] text-slate-500/.test(creditsSrc) && /<Info className="h-3 w-3" aria-hidden="true" \/>\s*Map data/.test(creditsSrc), 'Tiny (11 px), low-contrast grey button with a 44 px tap target');
+assert(/inline-flex h-11 min-w-\[44px\] items-center justify-center gap-1 rounded-md px-2 text-\[11px\] text-muted /.test(creditsSrc) && /<Info className="h-3 w-3" aria-hidden="true" \/>\s*Map data/.test(creditsSrc), 'Tiny (11 px), quiet grey (muted, still AA) button with a 44 px tap target');
 assert(/onClick=\{\(\) => setOpen\(\(v\) => !v\)\}/.test(creditsSrc) && /aria-expanded=\{open\}/.test(creditsSrc), 'Tap toggles the popover (a second tap closes it)');
 assert(/window\.addEventListener\('keydown', onKey, true\);/.test(creditsSrc) && /e\.key !== 'Escape'/.test(creditsSrc) && /e\.stopPropagation\(\);\s*setOpen\(false\);/.test(creditsSrc), 'Escape closes it (and only it)');
 assert(/document\.addEventListener\('pointerdown', onPointerDown, true\);/.test(creditsSrc) && /if \(!rootRef\.current\?\.contains\(e\.target\)\) setOpen\(false\);/.test(creditsSrc), 'A tap outside closes it');
@@ -108,7 +108,7 @@ assert(!/texture|slab|SLAB/i.test(svgCode + mapCode), 'No texture lines or slab'
 console.log('\n3. Structure kept');
 assert(!/renderLightState|fill-blue/.test(svgSrc) && /variant = 'dark'/.test(svgSrc), 'Light (homepage) variant removed: the map is dark-only and lives on /presence');
 assert(/role="button"\s*tabIndex=\{0\}\s*aria-label=\{`\$\{state\.name\} \(\$\{state\.type\}\)`\}\s*aria-pressed=\{selectedStateCode === state\.id\}/.test(svgSrc), 'Worked states keep button role, focus and aria-pressed');
-assert(/live\.current = \{ activeSet, onSelectState, onSelectInactiveState, selectedStateCode \};/.test(svgSrc) && /const L = useMemo\(/.test(svgSrc), 'Static layers memoised; handlers read through a ref');
+assert(/live\.current = \{ activeSet, onSelectState, onSelectInactiveState, selectedStateCode, dimKey \};/.test(svgSrc) && /const L = useMemo\(/.test(svgSrc), 'Static layers memoised; handlers read through a ref');
 
 console.log('\n4. Motion (CSS transform / opacity or ref-driven; no per-frame React state; reduced motion off)');
 const entranceCss = css.slice(css.indexOf('@keyframes presence-enter'), css.indexOf('.presence-highlight {'));

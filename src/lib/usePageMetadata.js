@@ -42,8 +42,10 @@ export const usePageMetadata = (title, description) => {
       setMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', title);
     }
 
-    // 4. Reset Window Scroll Position
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // 4. Scroll: to the #section in the address (e.g. /#about, /#contact), otherwise to the top.
+    const target = window.location.hash.length > 1 ? document.getElementById(decodeURIComponent(window.location.hash.slice(1))) : null;
+    if (target) target.scrollIntoView({ block: 'start' });
+    else window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [title, description]);
 };
 

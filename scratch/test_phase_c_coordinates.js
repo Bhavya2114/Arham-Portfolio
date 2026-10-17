@@ -153,15 +153,15 @@ assert(mapSrc.includes('role="button"') && mapSrc.includes('tabIndex={0}') && ma
 const pageSrc = read('../src/pages/Presence.jsx');
 assert(!/LocationExplorer|Explore locations/.test(pageSrc), '"Explore locations" button removed (navigation is by map selection)');
 assert(!pageSrc.includes('States we cover'), 'No permanent "States we cover" grid on the India overview');
-// Project discovery phase: details open only after a project pin (or same-site cluster) is chosen.
-assert((pageSrc.match(/\{detailsOpen && \(/g) || []).length === 2, 'Desktop panel and mobile sheet render only while project details are open');
-assert(pageSrc.includes('hidden lg:block') && pageSrc.includes('<BottomSheet'), 'Desktop side panel + mobile bottom sheet');
-assert((pageSrc.match(/dispatch\(\{ type: 'selectCity'/g) || []).length === 2 && /onSelectCity=\{\(city\) => dispatch\(\{ type: 'selectCity'/.test(pageSrc) && /if \(project\.city !== nav\.city\) dispatch\(\{ type: 'selectCity'/.test(pageSrc), 'City markers (and a tapped project pin in another city) drive the selected-city state through the one reducer');
-const sheetSrc = read('../src/components/presence/BottomSheet.jsx');
-assert(sheetSrc.includes('lg:hidden') && sheetSrc.includes("['peek', 'half', 'full']"), 'Bottom sheet is mobile-only with three snap points');
-assert(sheetSrc.includes('Expand details') && sheetSrc.includes('Close details'), 'Sheet has expand/collapse and close buttons');
-const statusSrc = read('../src/components/presence/CityStatus.jsx');
-assert(statusSrc.includes('Project locations will appear here as approved project information becomes available.'), 'Selected city shows a compact, honest empty state');
+// Our Work: the city's sheet (phones) or side panel (desktop) opens once a city is chosen.
+assert(/\{isDesktop && level && \(/.test(pageSrc) && /\{!isDesktop && level && \(/.test(pageSrc), 'Desktop side panel and phone sheet render only while a city (or a project in it) is open — never both');
+assert(/<aside[\s\S]*?w-\[400px\]/.test(pageSrc) && pageSrc.includes('<ProjectSheet'), 'Desktop ~400 px side panel + phone bottom sheet');
+assert((pageSrc.match(/dispatch\(\{ type: 'selectCity'/g) || []).length === 1 && /onSelectCity=\{\(city\) => dispatch\(\{ type: 'selectCity'/.test(pageSrc) && /dispatch\(\{ type: 'selectProject', projectId, city: p\.city, groupId: groupIdOf\(p\) \}\)/.test(pageSrc), 'City markers drive the selected city; a tapped project pin opens its project in its own city and group (one reducer)');
+const sheetSrc = read('../src/components/presence/ProjectSheet.jsx');
+assert(sheetSrc.includes('lg:hidden') && /snap === 'full'/.test(sheetSrc) && /const HALF = 0\.5;/.test(sheetSrc), 'Bottom sheet is phone-only with half and full snap points');
+assert(sheetSrc.includes("'Collapse panel' : 'Expand panel'") && read('../src/components/presence/ProjectBrowser.jsx').includes('return to the map'), 'Sheet has expand / collapse and close buttons');
+const statusSrc = read('../src/components/presence/ProjectBrowser.jsx');
+assert(statusSrc.includes('Project photos for ${city} are on the way.'), 'A city without projects shows a compact, honest empty state');
 const previewSrc = read('../src/sections/PresenceTeaser.jsx');
 assert(!previewSrc.includes('PresenceMap') && !previewSrc.includes('cityCoordinates'), 'Homepage teaser does not use markers or the Phase C map (static image only)');
 

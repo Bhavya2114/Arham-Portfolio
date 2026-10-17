@@ -171,7 +171,7 @@ assert(!previewSrc.includes('geo/') && !homeSrc.includes('geo/') && !previewSrc.
 console.log('\n5. UI Wiring:');
 const mapSrc = read('../src/components/map/PresenceMap.jsx');
 const pageSrc = read('../src/pages/Presence.jsx');
-const statusSrc = read('../src/components/presence/CityStatus.jsx');
+const statusSrc = read('../src/components/presence/ProjectBrowser.jsx'); // city status now lives in the Our Work browser
 assert(mapSrc.includes('clipPath="url(#presence-selected-state-clip)"') && mapSrc.includes('data-layer="districts"'), 'District lines are clipped to the selected state');
 // City selection no longer draws a city-level view: city outlines stay in the data modules but are not rendered.
 assert(!mapSrc.includes('data-city-area') && !mapSrc.includes('data-layer="city-areas"'), 'Map renders no city-boundary outlines');

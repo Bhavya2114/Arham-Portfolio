@@ -133,6 +133,7 @@ advance(0);
 assert(noReflow.transitions === 0, 'Hidden state never committed → no transition (why reset is applied before paint and reflowed)');
 
 console.log('\n4. PresenceMap wiring');
+const exists = (rel) => fs.existsSync(path.resolve(here, rel));
 const mapSrc = read('../src/components/map/PresenceMap.jsx');
 assert(/useLayoutEffect\(\(\) => \{[\s\S]*?return startOverlayEntrance\(\{[\s\S]*?reflow: \(\) => overlayRef\.current\?\.offsetHeight,[\s\S]*?\}, \[overlayKey\]\);/.test(mapSrc), 'Layout effect keyed on the selected city starts the entrance (cleanup cancels the previous one)');
 assert(/'transition-\[transform,opacity\] duration-300 ease-out translate-y-0 opacity-100 pointer-events-auto'/.test(mapSrc) && /'transition-none translate-y-\[calc\(100%\+1rem\)\] opacity-0 pointer-events-none'/.test(mapSrc), 'One slide-up style for every entrance: no transition while hidden, 300 ms ease-out in');
@@ -140,9 +141,10 @@ assert(/const MAP_SHIFT_MS = 240;/.test(mapSrc) && /animateTo\(\{ \.\.\.v, cy: v
 assert(!/setTimeout\(/.test(mapSrc.slice(mapSrc.indexOf('const overlayShifted'), mapSrc.indexOf('const controlButton'))), 'No fixed timer in the entrance effect');
 assert(/if \(onDone\) settle\.add\(onDone\);/.test(mapSrc) && /commitView\(to\);\s*stopAnimation\('finished'\);\s*return;/.test(mapSrc) && /settle\.flush\(reason\);/.test(mapSrc), 'animateTo signals completion when finished, interrupted or skipped (reduced motion)');
 const pageSrc = read('../src/pages/Presence.jsx');
-assert(/<CampusCard\s*key=\{`\$\{nav\.stateCode\}\|\$\{selectedCity\}`\}/.test(pageSrc), 'Card content remounts per city → carousel resets to 1 / 8; the map is not remounted');
-const cardSrc = read('../src/components/presence/CampusCard.jsx');
-assert(cardSrc.includes('const SLIDE_MS = 320;') && /campus-in-from-right/.test(cardSrc), 'Horizontal 320 ms campus slide unchanged');
+// Our Work replaced the floating campus card with a bottom sheet / side panel: the map's overlay slot
+// stays available (tested above) but the page passes no overlay, and the sheet remounts per city.
+assert(!exists('../src/components/presence/CampusCard.jsx') && !/overlay=\{/.test(pageSrc), 'Floating campus card removed; the page passes no map overlay');
+assert(/<ProjectSheet key=\{`\$\{nav\.stateCode\}\|\$\{selectedCity\}`\}/.test(pageSrc), 'The sheet content remounts per city; the map is not remounted');
 
 console.log('\n5. LocationExplorer removed');
 assert(!fs.existsSync(path.resolve(here, '../src/components/presence/LocationExplorer.jsx')), 'LocationExplorer.jsx deleted');

@@ -1,11 +1,11 @@
 import React from 'react';
 import Header from './Header';
 import Footer from './Footer';
+import MobileActionBar from './MobileActionBar';
 
 /**
- * Shared Website Layout component
- * Wraps all application routes with the unified Header and Footer,
- * ensuring the main content area occupies all remaining vertical space.
+ * Shared layout: header, page, footer, and on phones the Call · WhatsApp · Enquire bar. The spacer
+ * after the footer is the bar's height, so the end of the page is never hidden behind it.
  */
 export const Layout = ({ children }) => {
   return (
@@ -15,6 +15,8 @@ export const Layout = ({ children }) => {
         {children}
       </main>
       <Footer />
+      <div className="mobile-bar-spacer md:hidden bg-footer" aria-hidden="true" />
+      <MobileActionBar />
     </div>
   );
 };

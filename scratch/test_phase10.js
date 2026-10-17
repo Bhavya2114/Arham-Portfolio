@@ -12,7 +12,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { PROJECTS } from '../src/data/projects.js';
-import { COMPANY_CONTACT } from '../src/data/contactConfig.js';
+import { COMPANY } from '../src/data/company.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -84,8 +84,9 @@ assert(!fs.existsSync(path.resolve(distPath, 'test_map.html')), 'dist/ does NOT 
 // 4. Production Dataset Purity
 console.log('\n4. Production Dataset Purity & Neutral Configuration:');
 assert(Array.isArray(PROJECTS) && PROJECTS.length === 0, 'Production PROJECTS dataset is strictly empty');
-assert(COMPANY_CONTACT.isEmailConfigured === false, 'COMPANY_CONTACT automated enquiry delivery remains unconfigured');
-assert(COMPANY_CONTACT.isPhoneConfigured === true, 'COMPANY_CONTACT phone channel is configured with verified number 7878787878');
+assert(COMPANY.phoneHref === 'tel:+916378391640' && COMPANY.whatsappUrl === 'https://wa.me/916378391640' && COMPANY.email === 'arhampower@gmail.com', 'Company phone, WhatsApp and email set (src/data/company.js)');
+const distSitemap = fs.readFileSync(path.resolve(distPath, 'sitemap.xml'), 'utf-8');
+assert(['/', '/our-work', '/services', '/contact'].every((r) => distSitemap.includes(`<loc>${r}</loc>`)) && !/<loc>\/(about|projects|presence)<\/loc>/.test(distSitemap), 'dist sitemap lists the 4 pages only');
 
 console.log('\n============================================================');
 console.log(`PHASE 10 RESULTS: ${passed} passed, ${failed} failed.`);

@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Arham Corporate Website - Production Routes Sitemap
-  Note: Fully-qualified domain (e.g., https://example.com) will be prefixed 
-  upon official production domain confirmation by management in Phase 10.
-  Unpublished or empty project IDs are deliberately excluded.
--->
+<!-- Arham Power Solutions: the 4 public pages. Prefix each address with the production domain once it is set. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>/</loc>
@@ -12,9 +7,9 @@
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>/about</loc>
+    <loc>/our-work</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.9</priority>
   </url>
   <url>
     <loc>/services</loc>
@@ -22,18 +17,8 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>/projects</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>/presence</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>/contact</loc>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
 </urlset>

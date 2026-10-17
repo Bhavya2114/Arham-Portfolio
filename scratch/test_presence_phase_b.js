@@ -112,15 +112,15 @@ assert(getPublishedProjectsByStateAndCity('IN-RJ', 'Jaipur').length === 0, 'City
 const pageSrc = read('../src/pages/Presence.jsx');
 const stateNames = ['Rajasthan', 'Maharashtra', 'Gujarat', 'Chhattisgarh', 'West Bengal', 'Uttar Pradesh', 'Bihar', 'Jharkhand', 'Odisha', 'Assam', 'Goa'];
 assert(stateNames.every((n) => !pageSrc.includes(n)), 'Presence page has no hardcoded state names (uses config)');
-assert(pageSrc.includes('getPublishedProjects') && pageSrc.includes('presenceCoverage'), 'Presence page reads shared selectors and coverage config');
+assert(pageSrc.includes('projectBrowse.js') && pageSrc.includes('presenceCoverage'), 'Presence page reads shared selectors (projectBrowse.js) and coverage config');
 
 console.log('\n6. Route & Navigation:');
 const appSrc = read('../src/App.jsx');
-assert(appSrc.includes('path="/presence"'), 'Route "/presence" registered');
+assert(appSrc.includes('<Route path="/our-work" element={<Presence />} />') && appSrc.includes('<Route path="/presence" element={<Navigate to="/our-work" replace />} />'), 'The map page is at /our-work; /presence redirects there');
 assert(appSrc.includes("lazy(() => import('./pages/Presence'))"), 'Presence page is lazy loaded');
-const presenceNav = NAV_ITEMS.find((i) => i.path === '/presence');
-assert(presenceNav && presenceNav.isAvailable === true, 'Our Presence nav item is enabled');
-assert(read('../public/sitemap.xml').includes('<loc>/presence</loc>'), 'Sitemap lists /presence');
+const presenceNav = NAV_ITEMS.find((i) => i.path === '/our-work');
+assert(presenceNav && presenceNav.name === 'Our Work' && NAV_ITEMS[0] === presenceNav, 'Our Work is the first nav item');
+assert(read('../public/sitemap.xml').includes('<loc>/our-work</loc>'), 'Sitemap lists /our-work');
 
 console.log('\n7. Homepage Map Preservation:');
 const mapSrc = read('../src/components/map/IndiaMapSvg.jsx');
@@ -128,7 +128,7 @@ assert(mapSrc.includes("variant = 'dark'") && !/renderLightState/.test(mapSrc), 
 assert(mapSrc.includes('viewBox = INDIA_MAP_VIEWBOX'), 'IndiaMapSvg defaults to the original viewBox');
 const previewSrc = read('../src/sections/PresenceTeaser.jsx');
 assert(!/IndiaMapSvg|PresenceMap/.test(previewSrc), 'Homepage teaser renders no map component');
-assert(previewSrc.includes('PRESENCE_TEASER_STATS') && previewSrc.includes('to="/presence"'), 'Homepage teaser shows the stats constant and links to /presence');
+assert(previewSrc.includes('PRESENCE_TEASER_STATS') && previewSrc.includes('to="/our-work"'), 'Homepage teaser shows the stats constant and links to /our-work');
 
 console.log('\n8. Single Source of Truth for Coverage:');
 const statesSrc = read('../src/data/states.js');

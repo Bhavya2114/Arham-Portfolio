@@ -1,11 +1,9 @@
 import React from 'react';
+import { COMPANY } from '../../data/company';
 
 /**
- * Temporary Brand Mark Component
- * 
- * NOTE: This is a provisional text-based brand mark for "ARHAM".
- * The official corporate logo will replace the inner representation of this
- * component when provided, leaving all parent call sites unaffected.
+ * Text logo: "ARHAM" + "POWER SOLUTIONS" (from data/company.js). A drawn logo can replace the inside of
+ * this component later without touching its call sites.
  */
 export const BrandLogo = ({
   className = '',
@@ -30,7 +28,7 @@ export const BrandLogo = ({
   return (
     <div
       className={`inline-flex flex-col select-none ${className}`}
-      aria-label="ARHAM — Electrical, Wiring and Lighting"
+      aria-label={COMPANY.name}
       role="img"
     >
       <div className="flex items-center gap-1.5 font-heading">
@@ -39,7 +37,7 @@ export const BrandLogo = ({
             isLight ? 'text-white' : 'text-ink'
           }`}
         >
-          ARHAM
+          {COMPANY.logoWord}
         </span>
         {/* Subtle, architectural electrical dot indicator */}
         <span
@@ -54,7 +52,7 @@ export const BrandLogo = ({
             isLight ? 'text-muted-dark' : 'text-muted'
           }`}
         >
-          Electrical & Lighting
+          {COMPANY.logoLine}
         </span>
       )}
     </div>

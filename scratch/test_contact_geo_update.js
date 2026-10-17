@@ -27,12 +27,13 @@ import { fileURLToPath } from 'url';
 import { PROJECTS } from '../src/data/projects.js';
 import { INDIAN_STATES, STATE_BY_CODE } from '../src/data/states.js';
 import { getPresenceStateCodes, getPresenceCities } from '../src/data/presenceCoverage.js';
-import { 
-  COMPANY_CONTACT, 
-  ENQUIRY_TYPES, 
-  validateEnquiryForm, 
-  generateMailtoDraft 
-} from '../src/data/contactConfig.js';
+import {
+  COMPANY,
+  validateEnquiry,
+  enquiryWhatsappHref,
+  enquiryMailtoHref,
+  isValidPhone,
+} from '../src/data/company.js';
 import {
   getPublishedProjects,
   getPublishedStateCodes,
@@ -61,43 +62,34 @@ const assert = (condition, description) => {
 
 console.log('=== BUSINESS DETAILS & GEOGRAPHIC DATA UPDATE TEST SUITE ===\n');
 
-// 1. Company Contact Configuration
-console.log('1. Contact Configuration Values:');
-assert(COMPANY_CONTACT.email === 'arham@gmail.com', 'Company email is arham@gmail.com');
-assert(COMPANY_CONTACT.phone === '7878787878', 'Phone number is 7878787878');
-assert(COMPANY_CONTACT.whatsapp === '7878787878', 'WhatsApp number is 7878787878');
-assert(COMPANY_CONTACT.address === 'Borkheda, Kota, Rajasthan, India', 'Office address is Borkheda, Kota, Rajasthan, India');
-assert(COMPANY_CONTACT.businessHours === '9 AM – 6 PM', 'Business hours are 9 AM – 6 PM');
+// 1. Company details (src/data/company.js: the one config file)
+console.log('1. Company details:');
+assert(COMPANY.name === 'Arham Power Solutions', 'Name is Arham Power Solutions');
+assert(COMPANY.logoWord === 'ARHAM' && COMPANY.logoLine === 'POWER SOLUTIONS', 'Logo: ARHAM + POWER SOLUTIONS');
+assert(COMPANY.phoneDisplay === '+91 63783 91640' && COMPANY.phoneHref === 'tel:+916378391640', 'Phone +91 63783 91640 (tel:+916378391640)');
+assert(COMPANY.whatsappUrl === 'https://wa.me/916378391640' && /^https:\/\/wa\.me\/[0-9]+$/.test(COMPANY.whatsappUrl), 'WhatsApp https://wa.me/916378391640 (digits only)');
+assert(COMPANY.email === 'arhampower@gmail.com' && COMPANY.emailHref === 'mailto:arhampower@gmail.com', 'Email arhampower@gmail.com');
+assert(COMPANY.address === '39 Borkheda, Kota, Rajasthan' && COMPANY.pin === null && COMPANY.hours === '10 AM – 6 PM' && COMPANY.days === 'Monday to Friday' && COMPANY.hoursShort === 'Mon–Fri 10 AM–6 PM', 'Office 39 Borkheda, Kota (PIN to come); hours Mon–Fri 10 AM–6 PM');
 
-// 2. WhatsApp URL Format & Safety
-console.log('\n2. WhatsApp URL & Formatting:');
-assert(COMPANY_CONTACT.isWhatsAppConfigured === true, 'isWhatsAppConfigured returns true');
-assert(COMPANY_CONTACT.whatsappUrl === 'https://wa.me/917878787878', 'WhatsApp URL is https://wa.me/917878787878');
-assert(!COMPANY_CONTACT.whatsappUrl.includes('+'), 'WhatsApp URL does not contain "+"');
-assert(!COMPANY_CONTACT.whatsappUrl.includes(' '), 'WhatsApp URL does not contain spaces');
-assert(!COMPANY_CONTACT.whatsappUrl.includes('-'), 'WhatsApp URL does not contain hyphens');
-assert(/^https:\/\/wa\.me\/[0-9]+$/.test(COMPANY_CONTACT.whatsappUrl), 'WhatsApp URL matches strict https://wa.me/<digits> pattern');
+// 2. No placeholder contact details left anywhere in the site source
+console.log('\n2. Placeholder contact details removed:');
+const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((d) => (d.isDirectory() ? walk(path.join(dir, d.name)) : [path.join(dir, d.name)]));
+const siteFiles = [...walk(path.resolve(__dirname, '../src')), path.resolve(__dirname, '../index.html'), path.resolve(__dirname, '../README.md')].filter((f) => /\.(jsx?|html|md)$/.test(f));
+const stale = siteFiles.filter((f) => /7878787878|arham@gmail\.com/.test(fs.readFileSync(f, 'utf-8')));
+assert(stale.length === 0, `No 7878787878 / arham@gmail.com in src, index.html or README (${stale.map((f) => path.basename(f)).join(', ') || 'none'})`);
+assert(!fs.existsSync(path.resolve(__dirname, '../src/data/contactConfig.js')), 'Old contactConfig.js removed (company.js is the one config file)');
 
-// 3. Enquiry Form Unconfigured Invariant
-console.log('\n3. Automated Delivery Unconfigured Invariant:');
-assert(COMPANY_CONTACT.isDeliveryConfigured === false, 'isDeliveryConfigured is strictly false');
-assert(COMPANY_CONTACT.isEmailConfigured === false, 'isEmailConfigured is strictly false (does not treat email presence as delivery proof)');
-assert(COMPANY_CONTACT.hasEmail === true, 'hasEmail returns true (email exists for display/mailto)');
-
-// 4. Form Validation & Draft Generator
-console.log('\n4. Form Validation & Mailto Preparation:');
-const sampleValid = {
-  name: 'Anil Kumar',
-  email: 'anil@example.com',
-  enquiryType: 'lighting',
-  message: 'Detailed requirements for industrial high-bay lighting replacement.',
-};
-const valResult = validateEnquiryForm(sampleValid);
-assert(valResult.isValid, 'Valid enquiry passes validation');
-
-const mailtoResult = generateMailtoDraft(sampleValid);
-assert(mailtoResult.mailtoUri.startsWith('mailto:arham@gmail.com?'), 'Default mailto recipient is arham@gmail.com');
-assert(mailtoResult.formattedDraft.includes('Architectural & Commercial Lighting'), 'Subject draft category is included');
+// 4. Enquiry: validation, WhatsApp and email links
+console.log('\n4. Enquiry validation, WhatsApp and email:');
+assert(Object.keys(validateEnquiry({ name: '', phone: '' })).join(',') === 'name,phone', 'Name and phone are required');
+assert(!validateEnquiry({ name: 'Anil Kumar', phone: '98765 43210' }).name && !validateEnquiry({ name: 'Anil Kumar', phone: '98765 43210' }).phone, 'Valid name and phone pass (city, message optional)');
+assert(isValidPhone('+91 98765-43210') && isValidPhone('9876543210') && !isValidPhone('12345') && !isValidPhone('abcdefghij'), 'Phone check: 10–13 digits');
+const sample = { name: 'Anil Kumar', phone: '98765 43210', city: 'Jaipur', message: 'High-bay lighting & wiring' };
+const wa = enquiryWhatsappHref(sample);
+assert(wa.startsWith('https://wa.me/916378391640?text=') && decodeURIComponent(wa.split('?text=')[1]).includes('Name: Anil Kumar\nPhone: 98765 43210\nCity: Jaipur\nMessage: High-bay lighting & wiring'), 'WhatsApp link carries all fields, URL-encoded');
+const mail = enquiryMailtoHref(sample);
+assert(mail.startsWith('mailto:arhampower@gmail.com?subject=') && decodeURIComponent(mail).includes('subject=Project enquiry from Anil Kumar (Jaipur)') && decodeURIComponent(mail).includes('Phone: 98765 43210'), 'Email draft: subject and the fields in the body');
+assert(!decodeURIComponent(enquiryWhatsappHref({ name: 'A B', phone: '9876543210', city: '', message: '' })).includes('City:'), 'Empty optional fields are left out');
 
 // 5. Geographic Coverage Registry
 console.log('\n5. Geographic Coverage Registry & State Highlights:');
@@ -140,20 +132,13 @@ assert(getPublishedStateCodes().length === 0, 'getPublishedStateCodes() returns 
 assert(getStateDetails('IN-RJ')?.name === 'Rajasthan', 'getStateDetails(IN-RJ) returns Rajasthan');
 assert(getStateDetails('IN-MH')?.name === 'Maharashtra', 'getStateDetails(IN-MH) returns Maharashtra');
 
-// 8. Contact Component Integrity
+// 8. Pages read the details from company.js
 console.log('\n8. Page & Component File References:');
-const contactPage = fs.readFileSync(path.resolve(__dirname, '../src/pages/Contact.jsx'), 'utf-8');
-assert(contactPage.includes('COMPANY_CONTACT.phone'), 'Contact.jsx references COMPANY_CONTACT.phone');
-assert(contactPage.includes('COMPANY_CONTACT.whatsappUrl'), 'Contact.jsx references COMPANY_CONTACT.whatsappUrl');
-assert(contactPage.includes('COMPANY_CONTACT.hasEmail'), 'Contact.jsx references COMPANY_CONTACT.hasEmail');
-assert(contactPage.includes('COMPANY_CONTACT.address'), 'Contact.jsx references COMPANY_CONTACT.address');
-assert(contactPage.includes('COMPANY_CONTACT.businessHours'), 'Contact.jsx references COMPANY_CONTACT.businessHours');
-
-const footerFile = fs.readFileSync(path.resolve(__dirname, '../src/components/layout/Footer.jsx'), 'utf-8');
-assert(footerFile.includes('COMPANY_CONTACT.phone'), 'Footer.jsx references COMPANY_CONTACT.phone');
-assert(footerFile.includes('COMPANY_CONTACT.email'), 'Footer.jsx references COMPANY_CONTACT.email');
-assert(footerFile.includes('COMPANY_CONTACT.address'), 'Footer.jsx references COMPANY_CONTACT.address');
-assert(footerFile.includes('COMPANY_CONTACT.businessHours'), 'Footer.jsx references COMPANY_CONTACT.businessHours');
+const read = (rel) => fs.readFileSync(path.resolve(__dirname, rel), 'utf-8');
+const contactPage = read('../src/pages/Contact.jsx');
+assert(/COMPANY\.phoneHref/.test(contactPage) && /whatsappHref\(/.test(contactPage) && /COMPANY\.emailHref/.test(contactPage) && /fullAddress\(\)/.test(contactPage) && /COMPANY\.hoursShort/.test(contactPage), 'Contact page: call, WhatsApp, email, office and hours from COMPANY');
+const footerFile = read('../src/components/layout/Footer.jsx');
+assert(/COMPANY\.phoneHref/.test(footerFile) && /whatsappHref\(/.test(footerFile) && /COMPANY\.emailHref/.test(footerFile) && /© \{currentYear\} \{COMPANY\.name\}/.test(footerFile), 'Footer: phone, WhatsApp, email and © Arham Power Solutions from COMPANY');
 
 console.log('\n============================================================');
 console.log(`UPDATE TEST RESULTS: ${passed} passed, ${failed} failed.`);

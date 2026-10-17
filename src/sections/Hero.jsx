@@ -1,112 +1,77 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import { Map as MapIcon, MessageCircle } from 'lucide-react';
 import Container from '../components/ui/Container';
-import Badge from '../components/ui/Badge';
 import Button from '../components/ui/Button';
-import { Zap, ArrowRight, MessageSquare, ShieldCheck, Sparkles } from 'lucide-react';
+import { COMPANY, whatsappHref, WHATSAPP_HELLO, heroStats } from '../data/company';
 
 /**
- * Hero Section — Homepage Phase 2.1
- * Provides the primary visual entry point for Arham's corporate website.
+ * Homepage hero: a short plain-English headline and one line; "See our work on the map" (→ /our-work)
+ * and "WhatsApp us"; a stats row ("Since 2019 · 30+ team", plus projects / cities once set in
+ * data/company.js). The photo shows on wide screens only, so on a phone the map teaser comes next.
  */
-export const Hero = ({ onOpenEnquiry }) => {
+export const Hero = () => {
   return (
-    <section className="relative w-full py-12 sm:py-16 lg:py-20 overflow-hidden bg-navy-950">
+    <section className="relative w-full py-10 sm:py-14 lg:py-20 overflow-hidden bg-navy-950" aria-labelledby="hero-heading">
       <Container size="default">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-          
-          {/* Left Content Area (7 columns on large screens) */}
-          <div className="lg:col-span-7 space-y-6 text-left">
-            
-            {/* Eyebrow Badge */}
-            <div className="inline-flex">
-              <Badge variant="neutral-dark" icon={Zap}>
-                Electrical Engineering & Lighting Solutions
-              </Badge>
-            </div>
+          <div className="lg:col-span-7 space-y-5 text-left">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-accent">{COMPANY.name}</p>
 
-            {/* Primary Headline */}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.85rem] font-bold font-heading text-heading tracking-tight leading-[1.1]">
-              High-Precision Electrical Infrastructure & Architectural Lighting
+            <h1 id="hero-heading" className="text-3xl sm:text-4xl md:text-5xl lg:text-[2.85rem] font-bold font-heading text-heading tracking-tight leading-[1.1]">
+              Electrical wiring, lighting and power distribution across India
             </h1>
 
-            {/* Supporting Paragraph */}
-            <p className="text-base sm:text-lg text-body leading-relaxed max-w-2xl">
-              Arham delivers specialized electrical engineering, industrial infrastructure wiring, power distribution systems, and architectural lighting installations for commercial and industrial facilities.
+            <p className="text-base sm:text-lg text-body leading-[1.65] max-w-2xl">
+              From the first cable to the final switch-on, we handle the complete electrical work for your building.
             </p>
 
-            {/* Call-to-Action Buttons */}
-            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
-              <Button
-                variant="primary"
-                size="lg"
-                icon={ArrowRight}
-                iconPosition="right"
-                as="a"
-                href="#projects"
-                className="justify-center"
-              >
-                Explore Our Projects
+            <div className="pt-1 flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+              <Button as={Link} to="/our-work" variant="primary" size="lg" icon={MapIcon} className="justify-center min-h-[48px]">
+                See our work on the map
               </Button>
-
               <Button
+                as="a"
+                href={whatsappHref(WHATSAPP_HELLO)}
+                target="_blank"
+                rel="noopener noreferrer"
                 variant="outline"
                 onDark
                 size="lg"
-                icon={MessageSquare}
-                iconPosition="left"
-                onClick={onOpenEnquiry}
-                className="justify-center"
+                icon={MessageCircle}
+                className="justify-center min-h-[48px]"
               >
-                Discuss Your Project
+                WhatsApp us
               </Button>
             </div>
 
-            {/* Neutral Engineering Verification Cues */}
-            <div className="pt-4 border-t border-white/10 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-muted-dark">
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-muted-dark shrink-0" aria-hidden="true" />
-                <span>Commercial & Industrial Contracting</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-muted-dark shrink-0" aria-hidden="true" />
-                <span>Code-Compliant Engineering Standards</span>
-              </div>
-            </div>
-
-          </div>
-
-          {/* Right Visual Area (5 columns on large screens) */}
-          <div className="lg:col-span-5 w-full">
-            <div className="relative rounded-2xl bg-surface p-2 sm:p-2.5 border border-white/[0.08] shadow-card">
-              
-              {/* Architectural Image Container */}
-              <div className="relative w-full aspect-[4/3] sm:aspect-[16/11] lg:aspect-[4/3] rounded-xl overflow-hidden bg-white/[0.06]">
-                <img
-                  src="/images/hero-architecture.jpg"
-                  alt="Modern commercial facility with architectural exterior lighting and structural engineering"
-                  className="w-full h-full object-cover object-center rounded-xl border border-white/[0.08]"
-                  loading="eager"
-                />
-
-                {/* Status Overlay Pill */}
-                <div className="absolute top-3 left-3">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium bg-navy-950/85 text-white border border-white/10 shadow-sm">
-                    <Sparkles className="w-3 h-3 text-white/80" aria-hidden="true" />
-                    Architectural Illumination
-                  </span>
+            <dl className="pt-2 flex flex-wrap gap-x-6 gap-y-2" aria-label="About us in numbers">
+              {heroStats().map((stat) => (
+                <div key={stat.key} className="flex items-baseline gap-1.5">
+                  <dt className="sr-only">{stat.label}</dt>
+                  <dd className="text-base text-body">
+                    {stat.before && <span>{stat.before} </span>}
+                    <span className="font-heading text-2xl font-bold text-heading">{stat.value}</span>
+                    {stat.after && <span> {stat.after}</span>}
+                  </dd>
                 </div>
-              </div>
-
-              {/* Transparent Placeholder Label */}
-              <div className="mt-2.5 px-1 pb-1">
-                <p className="text-[11px] text-muted-dark leading-snug">
-                  <span className="font-semibold text-white">Illustrative Visualization:</span> Modern commercial infrastructure and lighting. Verified project photography will be featured upon corporate verification.
-                </p>
-              </div>
-
-            </div>
+              ))}
+            </dl>
           </div>
 
+          <div className="hidden lg:block lg:col-span-5">
+            <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl">
+              <img
+                src="/images/hero-architecture.jpg"
+                alt="Commercial building with its lighting switched on at night"
+                className="absolute inset-0 w-full h-full object-cover rounded-xl border border-white/[0.08]"
+                width="800"
+                height="600"
+                loading="eager"
+                decoding="async"
+              />
+            </div>
+          </div>
         </div>
       </Container>
     </section>
