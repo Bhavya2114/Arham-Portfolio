@@ -335,7 +335,7 @@ export const Presence = () => {
               <aside
                 role="region"
                 aria-labelledby="our-work-panel-heading"
-                className="relative z-30 w-[400px] shrink-0 self-start max-h-full min-h-0 flex flex-col overflow-hidden rounded-2xl panel-surface p-5"
+                className={`relative z-30 w-[400px] shrink-0 ${level === 'project' ? 'h-full' : 'self-start max-h-full'} min-h-0 flex flex-col overflow-hidden rounded-2xl panel-surface p-5`}
               >
                 {browser('our-work-panel')}
               </aside>

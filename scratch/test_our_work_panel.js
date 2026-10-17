@@ -28,7 +28,7 @@ const css = read('../src/styles/index.css');
 
 console.log('\n1. Panel / sheet height never exceeds the viewport');
 assert(/lg:h-\[calc\(100dvh-5rem\)\]/.test(page) && /data-map-area=""/.test(page), 'Desktop: the map + panel area is exactly 100dvh minus the header (h-20 = 5rem)');
-assert(/<aside[\s\S]*?className="relative z-30 w-\[400px\] shrink-0 self-start max-h-full min-h-0 flex flex-col overflow-hidden/.test(page) && !/lg:sticky lg:top-24 max-h/.test(page), 'Desktop panel: as tall as its content, never taller than that area (max-h-full); it does not scroll itself');
+assert(/<aside[\s\S]*?className=\{`relative z-30 w-\[400px\] shrink-0 \$\{level === 'project' \? 'h-full' : 'self-start max-h-full'\} min-h-0 flex flex-col overflow-hidden/.test(page) && !/lg:sticky lg:top-24 max-h/.test(page), 'Desktop panel: lists as tall as their content (never taller than that area, max-h-full); a project fills it (h-full); it does not scroll itself');
 assert(/const MAX_SHARE = 0\.85;/.test(sheet) && /Math\.min\(vh - TOP_GAP, Math\.round\(vh \* MAX_SHARE\)\)/.test(sheet), 'Phone sheet: full height at most 85 % of the screen');
 for (const [label, vh] of [['desktop 1440×900', 900], ['phone 390×844', 844]]) {
   const fullH = Math.max(320, Math.min(vh - 72, Math.round(vh * 0.85)));
@@ -38,7 +38,7 @@ assert(/@media \(max-width: 1023px\) \{\s*html\[data-map-card="open"\] \{ overfl
 assert(/className="flex-auto min-h-0 flex flex-col overflow-hidden px-4"/.test(sheet), 'Sheet body does not scroll (only the list inside does)');
 
 console.log('\n2. Pinned header + scrolling body, thin scrollbar, bottom fade');
-assert(/const Layout = \(\{ header, scrollKey, children \}\) => \(/.test(browser) && /data-panel-header=""/.test(browser) && /data-panel-scroll=""/.test(browser), 'Every level: pinned header + scrolling body');
+assert(/const Layout = \(\{ header, scrollKey, fill = false, children \}\) => \(/.test(browser) && /data-panel-header=""/.test(browser) && /data-panel-scroll=""/.test(browser), 'Every level: pinned header + scrolling body');
 assert((browser.match(/<Layout/g) || []).length === 4, 'Used by all four levels (city, group, project, cluster)');
 assert(/role="tablist"[\s\S]*?<\/>\s*\);\s*return \(\s*<Layout scrollKey=\{`\$\{focusKey\}\|\$\{tab\}`\} header=\{header\}>/.test(browser), 'Group list: back link, title and status tabs are in the pinned header');
 assert(/<TopBar backLabel=\{autoGroup \? project\.city : `\$\{owner\} · \$\{project\.city\}`\}/.test(browser), 'Project detail: back link + close pinned');
@@ -117,7 +117,7 @@ assert(/autoProject \? \(/.test(browser) && /data-project-context=""/.test(brows
 assert(/<CloseButton onClose=\{onClose\} label="Close list and return to the map" \/>/.test(browser) && !/backLabel="Map"/.test(browser), 'Lists opened directly have no "‹ Map" link; ✕ closes');
 assert(/backLabel=\{autoGroup \? project\.city : `\$\{owner\} · \$\{project\.city\}`\}/.test(browser), 'A project opened from a list keeps its back link ("‹ Kota")');
 // Height fits the content, up to the max.
-assert(/const Layout = \(\{ header, scrollKey, children \}\) => \(\s*<div className="flex min-h-0 flex-col">/.test(browser) && /<div className="relative flex min-h-0 flex-col">/.test(browser), 'Panel content is as tall as its content (no flex-1 / h-full filling)');
+assert(/const Layout = \(\{ header, scrollKey, fill = false, children \}\) => \(\s*<div className=\{`flex min-h-0 flex-col\$\{fill \? ' lg:flex-1' : ''\}`\}>/.test(browser) && /<div className=\{`relative flex min-h-0 flex-col\$\{fill \? ' lg:flex-1' : ''\}`\}>/.test(browser) &&(browser.match(/scrollKey=\{focusKey\}\s*fill\s/g) || []).length === 1, 'Lists are as tall as their content (only the project detail layout fills)');
 assert(/const fitContent = snap === 'full';/.test(sheet) && /fitContent \? \{ height: 'auto', maxHeight: expanded \? fullH : capH \} : \{ height: fullH \}/.test(sheet), 'Phone sheet: content height, capped at 65 % (85 % once expanded)');
 assert(/if \(fitContent\) \{[\s\S]*?\} else if \(d\.y - d\.grow > Math\.min\(\(h - d\.grow\) \* 0\.35, 160\)\) \{\s*place\(fullH, true\);/.test(sheet), 'Content-height sheet: dragged far down closes');
 
@@ -130,19 +130,26 @@ const endFn10 = sheet.slice(sheet.indexOf('const onPointerEnd'), sheet.indexOf('
 assert(/if \(d\.grow > 0 && d\.y < d\.grow \/ 2\) \{\s*place\(0, true\);\s*setExpanded\(true\);/.test(endFn10) && /\} else if \(d\.grow > 0 \|\| \(expanded && d\.y > COLLAPSE_DRAG_PX\)\) \{\s*collapseFrom\(d\.y\);/.test(endFn10), 'Release: past halfway up → 85 %; dragged down a little → back to 65 %; far → closes');
 assert(/const collapseFrom = \(y\) => \{[\s\S]*?place\(y - shrink, false\);[\s\S]*?place\(0, true\);/.test(sheet) && /const expandFrom = \(y\) => \{[\s\S]*?place\(y \+ grow, false\);[\s\S]*?place\(0, true\);/.test(sheet), 'Expand / collapse keep the top edge in place and animate the transform only');
 assert(/else if \(expanded\) collapseFrom\(0\);\s*else expandFrom\(0\);/.test(sheet) && /aria-label=\{fitContent && expanded \? 'Collapse panel' : 'Expand panel'\}/.test(sheet) && /aria-expanded=\{fitContent && expanded\}/.test(sheet), 'Handle button (keyboard / tap): expand to 85 % and back');
-assert(/<div className="space-y-3 lg:space-y-4">/.test(browser) && /py-2\.5 text-\[15px\] leading-snug font-semibold lg:py-3 lg:text-base/.test(browser), 'Phone detail a little tighter so it fits the 65 % cap with WhatsApp visible (desktop unchanged)');
+assert(/<div className="space-y-3 lg:flex lg:flex-1 lg:flex-col lg:space-y-4" data-project-detail="">/.test(browser) && /py-2\.5 text-\[15px\] leading-snug font-semibold lg:py-3 lg:text-base/.test(browser), 'Phone detail a little tighter so it fits the 65 % cap with WhatsApp visible (desktop unchanged)');
 
 console.log('\n9. Compact project detail: short photo, place · Map, one chip row');
 const gallery = read('../src/components/presence/PhotoGallery.jsx');
 const bik = projectsInCity(all, 'IN-RJ', 'Bikaner');
 assert(bik.length >= 1 && bik.every((p) => p.address && mapsSearchUrl(p).startsWith('https://www.google.com/maps/search/?api=1&query=')), 'Bikaner rows keep their address (it builds the Maps URL)');
-assert(/className="block w-full aspect-video lg:aspect-\[2\/1\] object-cover"/.test(gallery) && !/aspect-\[10\/7\]/.test(gallery), 'Photo: 16:9 on phones, 2:1 in the desktop panel');
+assert(/fill \? 'aspect-video lg:aspect-auto lg:h-full' : 'aspect-video lg:aspect-\[2\/1\]'/.test(gallery) && !/aspect-\[10\/7\]/.test(gallery), 'Photo: 16:9 on phones; on desktop it fills the free height (see 10.)');
 assert(/\{badge && \(/.test(gallery) && /\{photos\.length > 1 && \(\s*<span data-photo-counter=""/.test(gallery), 'Client badge kept on the photo; "1 / N" counter only with 2+ photos (swipe + thumbnails too)');
 const detail = browser.slice(browser.indexOf("if (level === 'project' && project)"), browser.indexOf("if (level === 'cluster')"));
 assert(/data-project-place=""/.test(detail) && /\[project\.area, project\.city\]\.filter\(Boolean\)\.join\(', '\)/.test(detail), 'Under the name: "Area, City" on one line');
 assert(/href=\{mapsSearchUrl\(project\)\}/.test(detail) && /target="_blank"/.test(detail) && /aria-label=\{`Open \$\{project\.name\} in Google Maps`\}/.test(detail) && /<MapPin[^>]*\/>\s*Map\s*<\/a>/.test(detail), 'Small "📍 Map" link: same Maps URL, new tab, aria-label "Open <name> in Google Maps"');
 assert(/aria-label="Status and work done"/.test(detail) && /<li><StatusTag project=\{project\} long \/><\/li>\s*\{\(project\.scope \|\| \[\]\)\.map/.test(detail), 'One row of chips: "✓ Completed 2022" / "Ongoing" first, then the scope chips');
 assert(!/Open in Google Maps<|\{project\.address\}|\{project\.category\}|Work done<|ExternalLink/.test(detail), 'Removed: address text, "Open in Google Maps", category chip, "Work done" heading');
+
+console.log('\n10. Desktop detail: full-height panel, the photo fills the free space');
+assert(/className=\{`relative z-30 w-\[400px\] shrink-0 \$\{level === 'project' \? 'h-full' : 'self-start max-h-full'\}/.test(page), 'Project detail: the desktop panel uses the full (viewport-fit) height, same as a long list');
+assert(/<Layout\s+scrollKey=\{focusKey\}\s+fill\s+header=\{\s+autoProject/.test(browser) && /const ScrollBody = \(\{ resetKey, fill = false, children \}\)/.test(browser) && /\$\{fill \? ' lg:flex lg:flex-1 lg:flex-col' : ''\}`\} data-panel-scroll=""/.test(browser), 'Detail layout + scroll body pass the full height down (desktop only; still scrolls if it cannot fit)');
+assert(/<PhotoGallery photos=\{photos\} alt=\{project\.name\} badge=\{owner\} viewer=\{photoViewer\} onViewerChange=\{onPhotoViewer\} fill \/>/.test(browser) && /fill \? ' lg:flex lg:flex-1 lg:min-h-\[260px\] lg:flex-col' : ''/.test(gallery) && /fill \? ' lg:min-h-0 lg:flex-1' : ''/.test(gallery) && /fill \? ' lg:absolute lg:inset-0' : ''/.test(gallery) && /object-cover/.test(gallery), 'Photo grows into the free space (flex 1, at least 260 px, object-fit cover) → text + WhatsApp sit at the bottom');
+assert(/\{badge && \(/.test(gallery) && /data-project-place=""/.test(browser) && /aria-label="Status and work done"/.test(browser), 'Client badge, area · Map and chips kept from detail-compact');
+assert(!/lg:/.test(read('../src/components/presence/ProjectSheet.jsx').match(/className="lg:hidden[^"]*"/)[0].replace('lg:hidden', '')), 'Phone sheet unchanged (all fill classes are lg: only; the sheet is lg:hidden)');
 
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);
