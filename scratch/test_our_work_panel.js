@@ -8,7 +8,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { getProjectRows, hasOwnPhoto, PLACEHOLDER_PHOTOS, projectPhotos } from '../src/data/showcaseProjects.js';
+import { getProjectRows, hasOwnPhoto, PLACEHOLDER_PHOTOS, projectPhotos, mapsSearchUrl } from '../src/data/showcaseProjects.js';
 import { getBrowsableProjects, projectsInCity, getGroups, listName, clientBrand, typicalScope, scopeDiffers } from '../src/data/projectBrowse.js';
 import { presenceNavReducer, INITIAL_PRESENCE_NAV, sheetLevel } from '../src/lib/presenceNavigation.js';
 import { historyDepth } from '../src/lib/useSheetHistory.js';
@@ -80,7 +80,7 @@ const kotaGroup = getGroups(projectsInCity(all, 'IN-RJ', 'Kota'))[0];
 assert(typicalScope(kotaGroup.projects).join() === 'Full wiring,Lighting' && kotaGroup.typicalScope.join() === 'Full wiring,Lighting', 'Group typical work: Full wiring + Lighting');
 assert(kotaGroup.projects.every((p) => !scopeDiffers(p, kotaGroup)), 'Every Kota row matches → no chips');
 assert(scopeDiffers({ ...kotaGroup.projects[0], scope: ['Full wiring', 'Lighting', 'DB panels'] }, kotaGroup) && !scopeDiffers({ ...kotaGroup.projects[0], scope: ['Lighting', 'Full wiring'] }, kotaGroup), 'Extra work (DB panels) shows chips; the same work in another order does not');
-assert(/\{\(!group \|\| scopeDiffers\(project, group\)\) && <ScopeChips scope=\{project\.scope\} inline \/>\}/.test(browser), 'Rows render chips only when scopeDiffers');
+assert(/\{\(!group \|\| scopeDiffers\(project, group\)\) && <ScopeChips scope=\{project\.scope\} \/>\}/.test(browser), 'Rows render chips only when scopeDiffers');
 assert(getProjectRows().length === 98, 'Data unchanged (98 rows)');
 
 console.log('\n7. Panel / sheet styling (no behaviour change)');
@@ -120,6 +120,18 @@ assert(/backLabel=\{autoGroup \? project\.city : `\$\{owner\} · \$\{project\.ci
 assert(/const Layout = \(\{ header, scrollKey, children \}\) => \(\s*<div className="flex min-h-0 flex-col">/.test(browser) && /<div className="relative flex min-h-0 flex-col">/.test(browser), 'Panel content is as tall as its content (no flex-1 / h-full filling)');
 assert(/const fitContent = snap === 'full';/.test(sheet) && /fitContent \? \{ height: 'auto', maxHeight: fullH \} : \{ height: fullH \}/.test(sheet), 'Phone sheet: content height up to the 85 % max when expanded');
 assert(/if \(fitContent\) \{[\s\S]*?if \(d\.y > Math\.min\(h \* 0\.35, 160\)\) \{/.test(sheet), 'Content-height sheet: drag down closes, otherwise springs back');
+
+console.log('\n9. Compact project detail: short photo, place · Map, one chip row');
+const gallery = read('../src/components/presence/PhotoGallery.jsx');
+const bik = projectsInCity(all, 'IN-RJ', 'Bikaner');
+assert(bik.length >= 1 && bik.every((p) => p.address && mapsSearchUrl(p).startsWith('https://www.google.com/maps/search/?api=1&query=')), 'Bikaner rows keep their address (it builds the Maps URL)');
+assert(/className="block w-full aspect-video lg:aspect-\[2\/1\] object-cover"/.test(gallery) && !/aspect-\[10\/7\]/.test(gallery), 'Photo: 16:9 on phones, 2:1 in the desktop panel');
+assert(/\{badge && \(/.test(gallery) && /\{photos\.length > 1 && \(\s*<span data-photo-counter=""/.test(gallery), 'Client badge kept on the photo; "1 / N" counter only with 2+ photos (swipe + thumbnails too)');
+const detail = browser.slice(browser.indexOf("if (level === 'project' && project)"), browser.indexOf("if (level === 'cluster')"));
+assert(/data-project-place=""/.test(detail) && /\[project\.area, project\.city\]\.filter\(Boolean\)\.join\(', '\)/.test(detail), 'Under the name: "Area, City" on one line');
+assert(/href=\{mapsSearchUrl\(project\)\}/.test(detail) && /target="_blank"/.test(detail) && /aria-label=\{`Open \$\{project\.name\} in Google Maps`\}/.test(detail) && /<MapPin[^>]*\/>\s*Map\s*<\/a>/.test(detail), 'Small "📍 Map" link: same Maps URL, new tab, aria-label "Open <name> in Google Maps"');
+assert(/aria-label="Status and work done"/.test(detail) && /<li><StatusTag project=\{project\} long \/><\/li>\s*\{\(project\.scope \|\| \[\]\)\.map/.test(detail), 'One row of chips: "✓ Completed 2022" / "Ongoing" first, then the scope chips');
+assert(!/Open in Google Maps<|\{project\.address\}|\{project\.category\}|Work done<|ExternalLink/.test(detail), 'Removed: address text, "Open in Google Maps", category chip, "Work done" heading');
 
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);

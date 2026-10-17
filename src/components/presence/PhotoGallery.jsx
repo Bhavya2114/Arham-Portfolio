@@ -3,7 +3,7 @@ import { Camera, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 /**
  * Project photos: swipe between them (native horizontal scroll-snap, so the finger drives the browser's
- * own scrolling — no JS per frame), a "1 / 6" counter, a badge (client) on the photo, a thumbnail strip,
+ * own scrolling — no JS per frame), a "1 / 6" counter (2+ photos only), a badge (client) on the photo, a thumbnail strip,
  * and a full-screen viewer on tap. The index is read from the scroll position once per frame at most and
  * stored only when it changes.
  */
@@ -135,8 +135,8 @@ export const PhotoGallery = ({ photos, alt, badge, viewer: viewerProp, onViewerC
                 loading={i === 0 ? 'eager' : 'lazy'}
                 decoding="async"
                 width="800"
-                height="560"
-                className="block w-full aspect-[10/7] object-cover"
+                height="450"
+                className="block w-full aspect-video lg:aspect-[2/1] object-cover"
               />
             </button>
           ))}
@@ -144,10 +144,12 @@ export const PhotoGallery = ({ photos, alt, badge, viewer: viewerProp, onViewerC
         {badge && (
           <span className="pointer-events-none absolute left-2 top-2 max-w-[70%] truncate rounded-full bg-black/70 px-2.5 py-1 text-xs font-semibold text-white">{badge}</span>
         )}
-        <span data-photo-counter="" className="pointer-events-none absolute right-2 bottom-2 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-xs font-semibold text-white tabular-nums">
-          <Camera className="w-3.5 h-3.5" aria-hidden="true" />
-          {index + 1} / {photos.length}
-        </span>
+        {photos.length > 1 && (
+          <span data-photo-counter="" className="pointer-events-none absolute right-2 bottom-2 inline-flex items-center gap-1.5 rounded-full bg-black/70 px-2.5 py-1 text-xs font-semibold text-white tabular-nums">
+            <Camera className="w-3.5 h-3.5" aria-hidden="true" />
+            {index + 1} / {photos.length}
+          </span>
+        )}
       </div>
 
       {photos.length > 1 && (
