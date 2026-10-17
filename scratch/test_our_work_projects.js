@@ -11,7 +11,7 @@ import { performance } from 'perf_hooks';
 import { SHOWCASE_PROJECTS, SCOPE_LABELS, USE_PLACEHOLDER_PROJECTS, MAX_PHOTOS, getProjectRows, projectPhotos } from '../src/data/showcaseProjects.js';
 import {
   FILTER_ALL, isListable, getBrowsableProjects, groupIdOf, getGroups, getFilterOptions, filterProjects, countByCity, cityKey,
-  statesWithProjects, projectsInState, projectsInCity, placeSummary, statusStats, filterByStatus, cityLine, statusLabel, similarProjectText, scopeSummary, statusTabs, statTiles, uniformStatusLine, showClientFilter, ongoingSuffix,
+  statesWithProjects, projectsInState, projectsInCity, placeSummary, statusStats, filterByStatus, cityLine, statusLabel, statusAriaLabel, similarProjectText, scopeSummary, statusTabs, statTiles, uniformStatusLine, showClientFilter, ongoingSuffix,
 } from '../src/data/projectBrowse.js';
 import { presenceNavReducer, INITIAL_PRESENCE_NAV, sheetLevel } from '../src/lib/presenceNavigation.js';
 import { getPresenceState } from '../src/data/presenceCoverage.js';
@@ -76,7 +76,8 @@ assert(cityLine(kota) === 'Electrical work for coaching centres, commercial buil
 assert(scopeSummary([{ scope: ['DB panels'] }, { scope: ['DB panels', 'Lighting'] }]) === 'panels & lighting', 'Scope summary: the two most common kinds of work');
 const done = rows.find((p) => p.status === 'completed');
 const ongoing = rows.find((p) => p.status === 'ongoing');
-assert(statusLabel(done) === String(done.year) && statusLabel(done, { long: true }) === `Completed ${done.year}` && statusLabel(ongoing) === 'Ongoing', 'Status tags: "✓ 2022" / "Completed 2022" / "Ongoing"');
+assert(statusLabel(done) === String(done.year) && statusLabel({ ...done, year: null }) === 'Completed' && statusLabel(ongoing) === 'Ongoing', 'Status chip text: "2022" / "Completed" (no year) / "Ongoing"');
+assert(statusAriaLabel(done) === `Completed in ${done.year}` && statusAriaLabel({ ...done, year: null }) === 'Completed' && statusAriaLabel(ongoing) === 'Ongoing', 'Status chip label for screen readers: "Completed in 2022" / "Completed" / "Ongoing"');
 assert(similarProjectText(done, 'Arham Power Solutions').includes(`"${done.name}" (${done.area}, ${done.city})`), 'WhatsApp text names the project and its place');
 // Adding a row updates every count.
 const extra = { ...rows[0], id: 'extra-row', city: 'Patna', stateCode: 'IN-BR', client: null, category: 'Residential' };
@@ -104,7 +105,7 @@ const browserSrc = read('../src/components/presence/ProjectBrowser.jsx');
 assert(/statusTabs\(group\.projects\)/.test(browserSrc) && /\{groupTabs\.length > 0 && \(/.test(browserSrc) && /const line = uniformStatusLine\(projects\);\s*if \(line\) return <p/.test(browserSrc) && (browserSrc.match(/<StatTiles projects=/g) || []).length === 1, 'Sheet / panel: tabs row only when there are tabs; StatTiles (line or tiles) only on the city summary of a multi-client city');
 assert(ongoingSuffix(realKota) === '' && ongoingSuffix(mixed) === ' · 1 ongoing' && ongoingSuffix(onlyOngoing) === ' · 2 ongoing', 'List subtitle: nothing extra when all completed; " · N ongoing" when some rows are ongoing');
 assert((browserSrc.match(/\{ongoingSuffix\(group\.projects\)\}/g) || []).length === 2 && !/data-status-line=""[\s\S]{0,80}group\.projects/.test(browserSrc), 'Both list headers (direct and via the summary) use the subtitle as the only count');
-assert(/\{statusLabel\(project, \{ long \}\)\}/.test(browserSrc) && /<Check className="w-3 h-3"/.test(browserSrc), 'Completed rows keep the ✓ year chip')
+assert(/\{statusLabel\(project\)\}/.test(browserSrc) && !/<Check\b/.test(browserSrc) && !/✓/.test(browserSrc), 'Completed rows keep the year chip (calendar icon, no ✓)')
 
 console.log('\n2c. Client filter chips only while there are 2+ clients');
 const oneClient = getFilterOptions(getBrowsableProjects());

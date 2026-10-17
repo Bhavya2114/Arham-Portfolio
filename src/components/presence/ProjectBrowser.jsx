@@ -1,8 +1,8 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, X, GraduationCap, Building2, Home, Factory, Briefcase, Check, MessageCircle, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, GraduationCap, Building2, Home, Factory, Briefcase, CalendarCheck, CalendarClock, MessageCircle, MapPin } from 'lucide-react';
 import PhotoGallery from './PhotoGallery';
 import { projectPhotos, mapsSearchUrl, hasOwnPhoto } from '../../data/showcaseProjects';
-import { cityLine, filterByStatus, statusTabs, statTiles, uniformStatusLine, ongoingSuffix, statusLabel, similarProjectText, listName, scopeDiffers, workSummary } from '../../data/projectBrowse';
+import { cityLine, filterByStatus, statusTabs, statTiles, uniformStatusLine, ongoingSuffix, statusLabel, statusAriaLabel, similarProjectText, listName, scopeDiffers, workSummary } from '../../data/projectBrowse';
 import { COMPANY, whatsappHref } from '../../data/company';
 
 /**
@@ -22,15 +22,22 @@ const CATEGORY_ICONS = { 'Coaching centre': GraduationCap, Commercial: Building2
 const BTN_FOCUS = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent';
 const TILE_COLS = { 1: 'grid-cols-1', 2: 'grid-cols-2', 3: 'grid-cols-3' };
 
-export const StatusTag = ({ project, long = false }) =>
-  project.status === 'ongoing' ? (
-    <span className="inline-flex items-center gap-1 rounded-full border border-accent/30 bg-accent/10 px-2 py-0.5 text-xs font-semibold text-accent">Ongoing</span>
-  ) : (
-    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-2 py-0.5 text-xs font-semibold text-emerald-200">
-      <Check className="w-3 h-3" aria-hidden="true" />
-      {statusLabel(project, { long })}
+// Status chip: [CalendarCheck] 2022 or [CalendarClock] Ongoing. The icon takes the chip's text colour; screen
+// readers get the chip's label ("Completed in 2022" / "Ongoing") instead of the bare year.
+export const StatusTag = ({ project }) => {
+  const ongoing = project.status === 'ongoing';
+  const Icon = ongoing ? CalendarClock : CalendarCheck;
+  return (
+    <span
+      role="img"
+      aria-label={statusAriaLabel(project)}
+      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-semibold ${ongoing ? 'border-accent/30 bg-accent/10 text-accent' : 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200'}`}
+    >
+      <Icon className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+      {statusLabel(project)}
     </span>
   );
+};
 
 const CHIP = 'rounded-full border border-white/[0.14] bg-white/[0.06] px-2 py-0.5 text-xs text-body';
 
@@ -280,7 +287,7 @@ export const ProjectBrowser = ({
               )}
               <span className="inline-flex items-center gap-x-1.5 whitespace-nowrap" data-project-status="">
                 <span className="text-muted" aria-hidden="true">·</span>
-                <StatusTag project={project} long />
+                <StatusTag project={project} />
               </span>
             </p>
             {summary && <p className="text-body [font-size:15px] leading-snug" data-project-summary="">{summary}</p>}

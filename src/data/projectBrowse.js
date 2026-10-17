@@ -214,11 +214,16 @@ export const cityLine = (projects) => {
   return `Electrical work for ${list}.`;
 };
 
-/** Status label: "✓ 2022" / "Completed" / "Ongoing". */
-export const statusLabel = (p, { long = false } = {}) => {
+/** Status chip text (beside a calendar icon): "2022" / "Completed" (no year) / "Ongoing". */
+export const statusLabel = (p) => {
   if (p.status === 'ongoing') return 'Ongoing';
-  if (long) return p.year ? `Completed ${p.year}` : 'Completed';
   return p.year ? String(p.year) : 'Completed';
+};
+
+/** What the status chip says to screen readers: "Completed in 2022" / "Completed" / "Ongoing". */
+export const statusAriaLabel = (p) => {
+  if (p.status === 'ongoing') return 'Ongoing';
+  return p.year ? `Completed in ${p.year}` : 'Completed';
 };
 
 /** WhatsApp text for "Ask about a similar project". */
