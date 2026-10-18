@@ -53,9 +53,11 @@ assert(['/', '/our-work', '/services', '/contact'].every((r) => sitemap.includes
 // /our-work, /services, /contact and the old /presence, /projects, /about load the app (which redirects).
 const vercel = JSON.parse(read('../vercel.json'));
 const rw = vercel.rewrites || [];
-assert(rw.length === 4 && rw[3].source === '/(.*)' && rw[3].destination === '/index.html' && !vercel.headers,
+assert(rw.length === 7 && rw[6].source === '/(.*)' && rw[6].destination === '/index.html' && !vercel.headers,
   'vercel.json: SPA fallback rewrite to /index.html, last (real files such as images, sitemap and robots.txt are still served first)');
-assert(['our-work', 'services', 'contact'].every((r, i) => rw[i].source === `/${r}/?` && rw[i].destination === `/${r}/index.html`), 'vercel.json: /our-work, /services, /contact (± trailing slash) → their own prerendered HTML, before the SPA fallback');
+assert(['our-work', 'services', 'contact'].every((r, i) => rw[2 * i].source === `/${r}` && rw[2 * i + 1].source === `/${r}/` && rw[2 * i].destination === `/${r}/index.html` && rw[2 * i + 1].destination === `/${r}/index.html`), 'vercel.json: /our-work, /services, /contact (with and without the trailing slash) → their own prerendered HTML, before the SPA fallback');
+// Vercel rejects sources it cannot parse (a deploy failed on "/our-work/?"): keep them plain paths or the catch-all.
+assert(rw.every((r) => /^\/[a-z-]*\/?$/.test(r.source) || r.source === '/(.*)') && (vercel.redirects || []).every((r) => r.source === '/(.*)'), 'vercel.json: every route source is a plain path or /(.*) (no "?" modifiers Vercel rejects)');
 
 console.log('\n2. Navigation');
 assert(NAV_ITEMS.map((i) => `${i.name}:${i.path}`).join(',') === 'Our Work:/our-work,Services:/services,Contact:/contact', 'Nav: Our Work · Services · Contact');

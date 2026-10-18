@@ -4,7 +4,7 @@
  * dist/<route>/index.html, a copy of dist/index.html with that page's <title>, meta description,
  * og:title / og:description / twitter:title / twitter:description, og:url and canonical link; the
  * WebSite JSON-LD block stays on the home page only. dist/index.html itself gets the home canonical.
- * vercel.json rewrites /our-work, /services and /contact (with or without a trailing slash) to these files
+ * vercel.json rewrites /our-work, /services and /contact (each with and without a trailing slash) to these files
  * before its SPA fallback, so every other address still gets dist/index.html.
  *
  * Titles and descriptions come from src/data/pageMeta.js (the same values the pages set at runtime).
