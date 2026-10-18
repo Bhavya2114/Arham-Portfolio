@@ -6,6 +6,7 @@
 export const COMPANY = Object.freeze({
   name: 'Arham Power Solutions',
   shortName: 'Arham',
+  siteUrl: 'https://www.arhampowersolutions.com', // canonical host (no trailing slash)
   logoWord: 'ARHAM',
   logoLine: 'POWER SOLUTIONS',
   tagline: 'Electrical wiring, lighting and power distribution across India.',

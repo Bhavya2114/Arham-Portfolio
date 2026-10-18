@@ -1,9 +1,8 @@
 # Robots.txt for the Arham Power Solutions website
-# Production Domain: To be finalized upon management confirmation in Phase 10.
 User-agent: *
 Allow: /
 Disallow: /scratch/
 Disallow: /test_map.html
 
 # XML Sitemap reference
-Sitemap: /sitemap.xml
+Sitemap: https://www.arhampowersolutions.com/sitemap.xml
