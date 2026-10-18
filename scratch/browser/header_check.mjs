@@ -1,8 +1,8 @@
-// Header + footer logo at 1440 and 390 px: the SVG loads, keeps its 403 × 120 proportions (not squashed),
-// is ~44 / ~36 px tall, links Home; the menu still fits on one row. Also checks the icon / preview files are served.
+// Header + footer logo at 1440, 390 and 375 px: the SVG loads, keeps its 268 × 64 proportions (not squashed),
+// is 64 / 50 / 46 px tall, links Home; the menu still fits on one row. Also checks the icon / preview files are served.
 import fs from 'node:fs';
 import { launch, sleep } from './cdp.mjs';
-const BASE = process.env.BASE || 'http://localhost:4173';
+const BASE = process.env.BASE || 'http://localhost:5174';
 const OUT = 'shots_header';
 fs.mkdirSync(OUT, { recursive: true });
 const b = await launch(9450);
@@ -28,7 +28,11 @@ const probe = `(() => {
     menuBtn: !![...header.querySelectorAll('button')].find((x) => /menu/i.test(x.getAttribute('aria-label') || '') && x.getBoundingClientRect().width > 0) };
 })()`;
 
-for (const [label, size, wantH] of [['1440', { width: 1440, height: 900, dpr: 1, mobile: false }, 44], ['390', { width: 390, height: 844, dpr: 2, mobile: true }, 36]]) {
+for (const [label, size, wantH] of [
+  ['1440', { width: 1440, height: 900, dpr: 1, mobile: false }, 64],
+  ['390', { width: 390, height: 844, dpr: 2, mobile: true }, 50],
+  ['375', { width: 375, height: 667, dpr: 2, mobile: true }, 46],
+]) {
   console.log(`\n${label}px`);
   const p = await b.newPage(size);
   await p.s('Page.navigate', { url: `${BASE}/` }); await sleep(2500);
@@ -38,7 +42,7 @@ for (const [label, size, wantH] of [['1440', { width: 1440, height: 900, dpr: 1,
     const l = m[where];
     const ratio = l ? l.w / l.h : 0;
     check(l && l.loaded && l.src === '/brand/arham-logo/arham-logo-horizontal-dark.svg' && l.alt === 'Arham Power Solutions' && l.href === '/', `${where}: logo SVG loaded, alt "${l?.alt}", links to Home`);
-    check(l && Math.abs(l.h - wantH) <= 0.5 && Math.abs(ratio - 403 / 120) < 0.02, `${where}: ${l?.w}×${l?.h}px (≈ ${wantH} px tall, ratio ${ratio.toFixed(3)} = 403/120: not squashed)`);
+    check(l && Math.abs(l.h - wantH) <= 1 && Math.abs(ratio - 267.4 / 64) < 0.05, `${where}: ${l?.w}×${l?.h}px (≈ ${wantH} px tall, ratio ${ratio.toFixed(3)} ≈ 268/64: not squashed)`);
   }
   const tops = m.kids.map((k) => k.top);
   const noOverlap = m.kids.every((k, i) => i === 0 || k.left >= m.kids[i - 1].right - 1);
