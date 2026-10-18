@@ -8,5 +8,10 @@
       "permanent": true
     }
   ],
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/our-work/?", "destination": "/our-work/index.html" },
+    { "source": "/services/?", "destination": "/services/index.html" },
+    { "source": "/contact/?", "destination": "/contact/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }

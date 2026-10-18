@@ -4,7 +4,8 @@ import Container from '../components/ui/Container';
 import PageHero from '../components/ui/PageHero';
 import EnquiryForm from '../components/contact/EnquiryForm';
 import usePageMetadata from '../lib/usePageMetadata';
-import { COMPANY, pageTitle, whatsappHref, WHATSAPP_HELLO, fullAddress } from '../data/company';
+import { PAGE_META } from '../data/pageMeta';
+import { COMPANY, whatsappHref, WHATSAPP_HELLO, fullAddress } from '../data/company';
 
 /**
  * Contact: Call / WhatsApp / Email first, then the enquiry form (sent on WhatsApp or by email), then
@@ -14,10 +15,7 @@ const ACTION =
   'flex items-center gap-4 rounded-2xl bg-card border border-white/[0.07] p-4 min-h-[64px] hover:border-accent/40 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent';
 
 export const Contact = () => {
-  usePageMetadata(
-    pageTitle('Contact'),
-    `Call, WhatsApp or email ${COMPANY.name}: ${COMPANY.phoneDisplay}, ${COMPANY.email}. Send us your project details.`
-  );
+  usePageMetadata(PAGE_META['/contact'].title, PAGE_META['/contact'].description);
 
   const actions = [
     { href: COMPANY.phoneHref, icon: Phone, label: 'Call', value: COMPANY.phoneDisplay },
