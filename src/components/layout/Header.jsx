@@ -42,7 +42,7 @@ export const Header = () => {
         <div className="h-16 sm:h-20 flex items-center justify-between gap-4">
           {/* Logo = Home */}
           <Link to="/" className={`flex items-center rounded-lg p-1 ${FOCUS_ON_DARK}`} aria-label={`${COMPANY.name} — home`}>
-            <BrandLogo size="default" variant="light" />
+            <BrandLogo />
           </Link>
 
           {/* Desktop navigation */}
