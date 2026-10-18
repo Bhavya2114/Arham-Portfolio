@@ -1,62 +1,22 @@
 import React from 'react';
 import { COMPANY } from '../../data/company';
 
+// The horizontal logo for dark backgrounds (public/brand/arham-logo/, see README.txt there).
+export const LOGO_SRC = '/brand/arham-logo/arham-logo-horizontal-dark.svg';
+
 /**
- * Text logo: "ARHAM" + "POWER SOLUTIONS" (from data/company.js). A drawn logo can replace the inside of
- * this component later without touching its call sites.
+ * The Arham logo (header and footer): 36 px tall on phones, 44 px from `sm` up. Its width follows from
+ * the drawing's 403 × 120 proportions (w-auto), so it is never squashed.
  */
-export const BrandLogo = ({
-  className = '',
-  variant = 'dark', // 'dark' (navy text) | 'light' (white text)
-  showTagline = true,
-  size = 'default', // 'sm' | 'default' | 'lg'
-}) => {
-  const isLight = variant === 'light';
-
-  const sizeClasses = {
-    sm: 'text-lg tracking-widest',
-    default: 'text-2xl tracking-widest',
-    lg: 'text-3xl md:text-4xl tracking-widest',
-  };
-
-  const dotSizes = {
-    sm: 'w-1.5 h-1.5',
-    default: 'w-2 h-2',
-    lg: 'w-2.5 h-2.5',
-  };
-
-  return (
-    <div
-      className={`inline-flex flex-col select-none ${className}`}
-      aria-label={COMPANY.name}
-      role="img"
-    >
-      <div className="flex items-center gap-1.5 font-heading">
-        <span
-          className={`font-bold uppercase tracking-wider transition-colors ${sizeClasses[size] || sizeClasses.default} ${
-            isLight ? 'text-white' : 'text-ink'
-          }`}
-        >
-          {COMPANY.logoWord}
-        </span>
-        {/* Subtle, architectural electrical dot indicator */}
-        <span
-          className={`rounded-full bg-accent shrink-0 ${dotSizes[size] || dotSizes.default}`}
-          aria-hidden="true"
-        />
-      </div>
-
-      {showTagline && (
-        <span
-          className={`text-[9px] uppercase tracking-[0.2em] font-medium -mt-0.5 ${
-            isLight ? 'text-muted-dark' : 'text-muted'
-          }`}
-        >
-          {COMPANY.logoLine}
-        </span>
-      )}
-    </div>
-  );
-};
+export const BrandLogo = ({ className = '' }) => (
+  <img
+    src={LOGO_SRC}
+    alt={COMPANY.name}
+    width="403"
+    height="120"
+    decoding="async"
+    className={`block h-9 w-auto sm:h-11 select-none ${className}`}
+  />
+);
 
 export default BrandLogo;

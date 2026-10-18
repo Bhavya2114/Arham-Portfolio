@@ -20,7 +20,7 @@ export const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
           <div className="space-y-3">
             <Link to="/" className={`inline-block ${LINK}`} aria-label={`${COMPANY.name} — home`}>
-              <BrandLogo variant="light" size="default" />
+              <BrandLogo />
             </Link>
             <p className="text-sm text-muted max-w-xs">{COMPANY.tagline}</p>
           </div>

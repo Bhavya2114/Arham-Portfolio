@@ -12,6 +12,7 @@ node tall_check.mjs      # any script below
 
 | Script | Checks |
 |---|---|
+| `header_check.mjs` | Header + footer logo at 1440 and 390 px (loaded, 44 / 36 px tall, not squashed, links Home, menu fits); icon, preview and manifest files served |
 | `tall_check.mjs` | Desktop project detail at 1920×800, 1440×900, 1366×768, 1280×720: full-height panel, no scrollbar, photo ≥ 180 px, area · Map · status on one line, status chip icon + label, WhatsApp at the bottom |
 | `summary_check.mjs` | Detail summary sentence and status chip at 1440, 1366 and 390 px (sheet fits, WhatsApp visible) |
 | `detail_check.mjs` | Compact detail (Bikaner, Kota → Sankalp) at 1440, 1366 and 390 px |

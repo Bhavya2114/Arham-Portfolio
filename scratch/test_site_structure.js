@@ -63,7 +63,10 @@ const siteFiles = [...walk(path.resolve(here, '../src')), path.resolve(here, '..
 const textOf = (f) => fs.readFileSync(f, 'utf-8');
 assert(siteFiles.every((f) => !/7878787878|arham@gmail\.com/.test(textOf(f))), 'No placeholder 7878787878 / arham@gmail.com anywhere');
 assert(siteFiles.filter((f) => /\.(jsx|html|md)$/.test(f)).every((f) => !/Electrical (&|&amp;|and) Lighting(?! across)|ARHAM — Electrical|Arham Corporate Website/.test(textOf(f).replace(/\/\*[\s\S]*?\*\//g, ''))), 'Old name ("Electrical & Lighting", "ARHAM — Electrical…") gone from pages, index.html and README');
-assert(/\{COMPANY\.logoWord\}/.test(read('../src/components/ui/BrandLogo.jsx')) && /\{COMPANY\.logoLine\}/.test(read('../src/components/ui/BrandLogo.jsx')) && COMPANY.logoLine === 'POWER SOLUTIONS', 'Logo: ARHAM + POWER SOLUTIONS');
+const logoSrc = read('../src/components/ui/BrandLogo.jsx');
+assert(/export const LOGO_SRC = '\/brand\/arham-logo\/arham-logo-horizontal-dark\.svg';/.test(logoSrc) && /src=\{LOGO_SRC\}/.test(logoSrc) && /alt=\{COMPANY\.name\}/.test(logoSrc) && COMPANY.name === 'Arham Power Solutions' && exists('../public/brand/arham-logo/arham-logo-horizontal-dark.svg'), 'Logo: the horizontal dark SVG, alt "Arham Power Solutions"');
+assert(/width="403"\s*height="120"/.test(logoSrc) && /h-9 w-auto sm:h-11/.test(logoSrc) && /viewBox="0 0 403 120"/.test(read('../public/brand/arham-logo/arham-logo-horizontal-dark.svg')), 'Logo 36 px tall on phones, 44 px from sm, width from its 403 × 120 proportions (not squashed)');
+assert(/<Link to="\/"[^>]*>\s*<BrandLogo \/>\s*<\/Link>/.test(read('../src/components/layout/Header.jsx')) && /<Link to="\/"[^>]*>\s*<BrandLogo \/>\s*<\/Link>/.test(read('../src/components/layout/Footer.jsx')), 'Header and footer: the logo links to Home');
 assert(/<title>Arham Power Solutions — /.test(index) && /og:site_name" content="Arham Power Solutions"/.test(index) && /"telephone": "\+91 63783 91640"/.test(index) && /"email": "arhampower@gmail.com"/.test(index), 'index.html: title, share tags and schema.org with the company details');
 assert(pageTitle('Our Work') === 'Our Work — Arham Power Solutions' && [presence, services, contact, notFound].every((s) => /pageTitle\(/.test(s)), 'Every page title ends "— Arham Power Solutions"');
 assert(/Arham Power Solutions/.test(read('../README.md')) && /\+91 63783 91640/.test(read('../README.md')), 'README names the company and its contact details');
@@ -107,6 +110,19 @@ assert(!/to="\/#presence"|href="\/#presence"|to="\/projects"|to="\/presence"/.te
 assert(PROCESS_STEPS.length === 6 && /<HowWeWork bare/.test(services) && /Our services/.test(services) && /SERVICES\.map/.test(services), 'Services: "Our services", all 9 services, "How we work" in 6 steps');
 assert(/Page not found/.test(notFound) && /to="\/our-work"/.test(notFound) && /to="\/contact"/.test(notFound), '404: "Page not found" with Home · Our Work · Contact');
 assert(exists('../src/components/map/MapCredits.jsx') && /MapCredits/.test(read('../src/components/map/PresenceMap.jsx')), 'Map data credits kept');
+
+console.log('\nBrand: icons, theme colour, link preview, schema logo');
+const SITE = 'https://arham-portfolio-tau.vercel.app';
+const pngSize = (rel) => { const buf = fs.readFileSync(path.resolve(here, rel)); return [buf.readUInt32BE(16), buf.readUInt32BE(20)]; };
+const B = '../public/brand/arham-logo/';
+assert(pngSize(B + 'favicon-32.png').join() === '32,32' && pngSize(B + 'apple-touch-icon.png').join() === '180,180' && pngSize(B + 'icon-192.png').join() === '192,192' && pngSize(B + 'icon-512.png').join() === '512,512' && pngSize(B + 'og-image.png').join() === '1200,630', 'Brand PNGs: 32, 180, 192, 512 and the 1200×630 preview image');
+assert(index.includes('<link rel="icon" type="image/png" sizes="32x32" href="/brand/arham-logo/favicon-32.png" />') && index.includes('<link rel="apple-touch-icon" sizes="180x180" href="/brand/arham-logo/apple-touch-icon.png" />') && !index.includes('href="/favicon.svg"'), 'Favicon + Apple touch icon from the brand folder (old SVG favicon no longer linked)');
+const manifest = JSON.parse(read('../public/site.webmanifest'));
+assert(index.includes('<link rel="manifest" href="/site.webmanifest" />') && manifest.icons.map((i) => `${i.src} ${i.sizes}`).join() === '/brand/arham-logo/icon-192.png 192x192,/brand/arham-logo/icon-512.png 512x512' && manifest.theme_color === '#0C0D0F' && manifest.background_color === '#0C0D0F' && manifest.name === COMPANY.name, 'Web manifest: icons 192 + 512, theme #0C0D0F');
+assert(index.includes('<meta name="theme-color" content="#0C0D0F" />'), 'theme-color #0C0D0F');
+assert(index.includes(`<meta property="og:image" content="${SITE}/brand/arham-logo/og-image.png" />`) && index.includes('<meta property="og:image:width" content="1200" />') && index.includes('<meta property="og:image:height" content="630" />') && index.includes(`<meta name="twitter:image" content="${SITE}/brand/arham-logo/og-image.png" />`) && !/project-infrastructure\.jpg/.test(index.split('</head>')[0]), 'og:image + twitter:image: absolute URL of the 1200×630 og-image.png');
+const ld = JSON.parse(index.split('application/ld+json">')[1].split('</script>')[0]);
+assert(ld.logo === `${SITE}/brand/arham-logo/icon-512.png`, 'schema.org logo: icon-512.png (absolute URL)');
 
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);

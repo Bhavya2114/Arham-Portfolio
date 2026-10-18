@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img"><title>Arham icon</title><defs><linearGradient id="ic-gold" x1="0" y1="0" x2="0" y2="110" gradientUnits="userSpaceOnUse">
+<stop offset="0" stop-color="#F7DE8F"/><stop offset="0.55" stop-color="#E2B54E"/><stop offset="1" stop-color="#B4842A"/></linearGradient>
+<radialGradient id="ic-glow" cx="60" cy="90" r="24" gradientUnits="userSpaceOnUse">
+<stop offset="0" stop-color="#FFF3C4" stop-opacity="0.95"/><stop offset="0.35" stop-color="#E2B54E" stop-opacity="0.4"/><stop offset="1" stop-color="#E2B54E" stop-opacity="0"/></radialGradient>
+<mask id="ic-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="120" height="110">
+<rect width="120" height="110" fill="#fff"/>
+<g fill="#000" stroke="#000" stroke-width="4" stroke-linejoin="round"><path d="M60 98 C43 98 28 89 14 71 C30 82 45 89 60 89.5 C75 89 90 82 106 71 C92 89 77 98 60 98 Z"/><path d="M60 52 C69 65 69 79 60 92 C51 79 51 65 60 52 Z"/></g></mask></defs><rect width="512" height="512" rx="112.6" fill="#0C0D0F"/><g transform="translate(81.92 96.43) scale(2.9013)"><path d="M60 2 C69 14 75 22 75 31.5 A15 15 0 0 1 45 31.5 C45 22 51 14 60 2 Z M60 19 C63 23.5 65 26.5 65 30.5 A5 5 0 0 1 55 30.5 C55 26.5 57 23.5 60 19 Z" fill="url(#ic-gold)" fill-rule="evenodd"/>
+<path d="M52 47 L59 47 L31 104 L17 104 Z M68 47 L61 47 L89 104 L103 104 Z" fill="url(#ic-gold)" mask="url(#ic-cut)"/>
+
+<path d="M60 98 C43 98 28 89 14 71 C30 82 45 89 60 89.5 C75 89 90 82 106 71 C92 89 77 98 60 98 Z" fill="url(#ic-gold)"/><path d="M60 52 C69 65 69 79 60 92 C51 79 51 65 60 52 Z" fill="url(#ic-gold)"/>
+</g></svg>
