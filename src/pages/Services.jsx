@@ -7,7 +7,8 @@ import Button from '../components/ui/Button';
 import HowWeWork from '../sections/HowWeWork';
 import TrustStrips from '../sections/TrustStrips';
 import usePageMetadata from '../lib/usePageMetadata';
-import { COMPANY, pageTitle, whatsappHref, WHATSAPP_HELLO } from '../data/company';
+import { PAGE_META } from '../data/pageMeta';
+import { COMPANY, whatsappHref, WHATSAPP_HELLO } from '../data/company';
 import { SERVICES } from '../data/services';
 import { SERVICE_ICONS } from '../components/ui/contentIcons';
 
@@ -16,10 +17,7 @@ import { SERVICE_ICONS } from '../components/ui/contentIcons';
  * use, and a Call / WhatsApp / Enquire block.
  */
 export const Services = () => {
-  usePageMetadata(
-    pageTitle('Services'),
-    `${COMPANY.name}: building and house wiring, lighting, electrical panels, CCTV, earthing, fire alarm wiring, backup power connections and annual maintenance.`
-  );
+  usePageMetadata(PAGE_META['/services'].title, PAGE_META['/services'].description);
 
   return (
     <div className="w-full bg-navy-800 flex-1">

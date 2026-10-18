@@ -1,14 +1,7 @@
 import { useEffect } from 'react';
-import { COMPANY } from '../data/company';
+import { canonicalUrl } from '../data/pageMeta';
 
-/**
- * Canonical address of a route on the production host: https://www.arhampowersolutions.com + the path,
- * with no trailing slash except for the home page ("/our-work/" → ".../our-work", "" → ".../").
- */
-export const canonicalUrl = (pathname = '/') => {
-  const path = `/${String(pathname).replace(/^\/+/, '')}`.replace(/\/+$/, '');
-  return `${COMPANY.siteUrl}${path || '/'}`;
-};
+export { canonicalUrl };
 
 /**
  * Custom React hook for dynamic SEO document title and meta description updates.

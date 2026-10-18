@@ -27,8 +27,9 @@ import { projectLatLon } from '../lib/mapProjection.js';
 import { loadStateGeography } from '../data/geo/stateGeography.js';
 import { presenceNavReducer, INITIAL_PRESENCE_NAV, sheetLevel } from '../lib/presenceNavigation.js';
 import usePageMetadata from '../lib/usePageMetadata';
+import { PAGE_META } from '../data/pageMeta';
 import { useSheetHistory, historyDepth } from '../lib/useSheetHistory.js';
-import { COMPANY, pageTitle, whatsappHref, WHATSAPP_HELLO } from '../data/company';
+import { COMPANY, whatsappHref, WHATSAPP_HELLO } from '../data/company';
 import { ArrowRight, Phone, MessageCircle } from 'lucide-react';
 
 /**
@@ -64,10 +65,7 @@ const cityPinFor = (city) =>
   [...document.querySelectorAll('svg [role="button"][aria-pressed]')].find((el) => (el.getAttribute('aria-label') || '').startsWith(`${city},`));
 
 export const Presence = () => {
-  usePageMetadata(
-    pageTitle('Our Work'),
-    `See where ${COMPANY.name} has done electrical wiring, lighting and power distribution work across India.`
-  );
+  usePageMetadata(PAGE_META['/our-work'].title, PAGE_META['/our-work'].description);
 
   const [nav, dispatch] = useReducer(presenceNavReducer, INITIAL_PRESENCE_NAV);
   const [filter, setFilter] = useState(FILTER_ALL);

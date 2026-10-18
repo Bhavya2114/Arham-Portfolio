@@ -10,6 +10,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { NAV_ITEMS } from '../src/data/navigation.js';
 import { COMPANY, pageTitle } from '../src/data/company.js';
+import { PAGE_META, canonicalUrl } from '../src/data/pageMeta.js';
+import { routeHtml, ROUTES } from '../scripts/prerender-routes.mjs';
 import { SERVICES, PROCESS_STEPS } from '../src/data/services.js';
 import { getProjectRows, SHOWCASE_PROJECTS, USE_PLACEHOLDER_PROJECTS } from '../src/data/showcaseProjects.js';
 
@@ -50,8 +52,10 @@ assert(['/', '/our-work', '/services', '/contact'].every((r) => sitemap.includes
 // Hosting (Vercel): every path that is not a real file serves index.html, so direct visits / refreshes on
 // /our-work, /services, /contact and the old /presence, /projects, /about load the app (which redirects).
 const vercel = JSON.parse(read('../vercel.json'));
-assert(Array.isArray(vercel.rewrites) && vercel.rewrites.length === 1 && vercel.rewrites[0].source === '/(.*)' && vercel.rewrites[0].destination === '/index.html' && !vercel.headers,
-  'vercel.json: SPA fallback rewrite to /index.html (real files such as images, sitemap and robots.txt are still served first)');
+const rw = vercel.rewrites || [];
+assert(rw.length === 4 && rw[3].source === '/(.*)' && rw[3].destination === '/index.html' && !vercel.headers,
+  'vercel.json: SPA fallback rewrite to /index.html, last (real files such as images, sitemap and robots.txt are still served first)');
+assert(['our-work', 'services', 'contact'].every((r, i) => rw[i].source === `/${r}/?` && rw[i].destination === `/${r}/index.html`), 'vercel.json: /our-work, /services, /contact (± trailing slash) → their own prerendered HTML, before the SPA fallback');
 
 console.log('\n2. Navigation');
 assert(NAV_ITEMS.map((i) => `${i.name}:${i.path}`).join(',') === 'Our Work:/our-work,Services:/services,Contact:/contact', 'Nav: Our Work · Services · Contact');
@@ -67,7 +71,7 @@ const logoSrc = read('../src/components/ui/BrandLogo.jsx');
 assert(/width="268"\s*height="64"/.test(logoSrc) && /w-auto/.test(logoSrc) && /viewBox="0 0 267\.4 64"/.test(read('../public/brand/arham-logo/arham-logo-horizontal-dark.svg')), 'Logo: width and height 268 × 64, w-auto proportions, new SVG viewBox (not squashed)');
 assert(/<Link to="\/"[^>]*>\s*<BrandLogo \/>\s*<\/Link>/.test(read('../src/components/layout/Header.jsx')) && /<Link to="\/"[^>]*>\s*<BrandLogo \/>\s*<\/Link>/.test(read('../src/components/layout/Footer.jsx')), 'Header and footer: the logo links to Home');
 assert(/<title>Arham Power Solutions — /.test(index) && /og:site_name" content="Arham Power Solutions"/.test(index) && /"telephone": "\+91 63783 91640"/.test(index) && /"email": "arhampower@gmail.com"/.test(index), 'index.html: title, share tags and schema.org with the company details');
-assert(pageTitle('Our Work') === 'Our Work — Arham Power Solutions' && [presence, services, contact, notFound].every((s) => /pageTitle\(/.test(s)), 'Every page title ends "— Arham Power Solutions"');
+assert(pageTitle('Our Work') === 'Our Work — Arham Power Solutions' && /pageTitle\(/.test(notFound) && [presence, services, contact].every((s) => /usePageMetadata\(PAGE_META\['\/[a-z-]+'\]\.title, PAGE_META\['\/[a-z-]+'\]\.description\);/.test(s)) && Object.values(PAGE_META).every((m) => m.title.includes(COMPANY.name)), 'Every page title ends "— Arham Power Solutions"');
 assert(/Arham Power Solutions/.test(read('../README.md')) && /\+91 63783 91640/.test(read('../README.md')), 'README names the company and its contact details');
 
 console.log('\n4. Homepage');
@@ -134,7 +138,7 @@ assert(/^User-agent: \*$/m.test(robots) && /^Allow: \/$/m.test(robots) && /^Disa
 assert(index.includes(`<meta property="og:url" content="${WWW}/" />`) && !index.includes('arham-portfolio-tau') && ld.url === `${WWW}/` && ld.logo === `${WWW}/brand/arham-logo/icon-512.png`, 'index.html: og:url, og/twitter image, schema url + logo on the www host (no tau domain left)');
 assert(!/<link rel="canonical"/.test(index), 'No fixed canonical in index.html (every route is served this file; the page sets its own)');
 const meta = read('../src/lib/usePageMetadata.js');
-assert(/export const canonicalUrl = \(pathname = '\/'\) => \{\s*const path = `\/\$\{String\(pathname\)\.replace\(\/\^\\\/\+\/, ''\)\}`\.replace\(\/\\\/\+\$\/, ''\);\s*return `\$\{COMPANY\.siteUrl\}\$\{path \|\| '\/'\}`;/.test(meta), 'canonicalUrl: site URL + path, no trailing slash except home');
+assert(/export const canonicalUrl = \(pathname = '\/'\) => \{\s*const path = `\/\$\{String\(pathname\)\.replace\(\/\^\\\/\+\/, ''\)\}`\.replace\(\/\\\/\+\$\/, ''\);\s*return `\$\{COMPANY\.siteUrl\}\$\{path \|\| '\/'\}`;/.test(read('../src/data/pageMeta.js')) && /import \{ canonicalUrl \} from '\.\.\/data\/pageMeta';/.test(meta), 'canonicalUrl: site URL + path, no trailing slash except home');
 // The same rule, run: (mirrors canonicalUrl so it can be checked without React)
 const canon = (p = '/') => `${WWW}${`/${String(p).replace(/^\/+/, '')}`.replace(/\/+$/, '') || '/'}`;
 assert(canon('/') === `${WWW}/` && canon('') === `${WWW}/` && canon('/our-work') === `${WWW}/our-work` && canon('/our-work/') === `${WWW}/our-work` && canon('/contact') === `${WWW}/contact`, 'Canonical: "/" → www/, "/our-work/" → www/our-work');
@@ -143,6 +147,42 @@ const red = vercel.redirects || [];
 assert(red.length === 1 && red[0].source === '/(.*)' && red[0].has?.length === 1 && red[0].has[0].type === 'host' && red[0].has[0].value === 'arham-portfolio-tau.vercel.app' && red[0].destination === `${WWW}/$1` && red[0].permanent === true, 'vercel.json: permanent redirect arham-portfolio-tau.vercel.app → www (path kept)');
 const noindexFiles = [...walk(path.resolve(here, '../src')), path.resolve(here, '../index.html'), path.resolve(here, '../vercel.json'), path.resolve(here, '../public/robots.txt')].filter((f) => /noindex|nofollow/i.test(fs.readFileSync(f, 'utf-8')));
 assert(noindexFiles.length === 0, 'No noindex / nofollow anywhere in the site');
+
+console.log('\nSEO: WebSite schema + per-route HTML before JavaScript');
+const WEB = 'https://www.arhampowersolutions.com';
+const ldBlocks = (html) => [...html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)].map((m) => JSON.parse(m[1]));
+const site = ldBlocks(index).find((b) => b['@type'] === 'WebSite');
+assert(site && site.name === 'Arham Power Solutions' && site.alternateName === 'Arham' && site.url === `${WEB}/` && site['@context'] === 'https://schema.org' && ldBlocks(index).some((b) => b['@type'] === 'Electrician'), 'index.html: WebSite JSON-LD (name, alternateName "Arham", url) beside the Electrician block');
+assert(ROUTES.join() === '/,/our-work,/services,/contact' && ROUTES.every((r) => sitemap.includes(`<loc>${canonicalUrl(r)}</loc>`)), 'PAGE_META covers exactly the sitemap pages');
+assert(/usePageMetadata\(PAGE_META\['\/'\]\.title, PAGE_META\['\/'\]\.description\);/.test(read('../src/pages/Home.jsx')) && /PAGE_META\['\/our-work'\]/.test(presence) && /PAGE_META\['\/services'\]/.test(services) && /PAGE_META\['\/contact'\]/.test(contact), 'Pages set their title + description from PAGE_META (the same values the build writes)');
+const tag = (html, re) => (html.match(re) || [])[1];
+const esc = (v) => v.replace(/&/g, '&amp;');
+for (const r of ROUTES) {
+  const h = routeHtml(index, r);
+  const m = PAGE_META[r];
+  const url = canonicalUrl(r);
+  const ok = tag(h, /<title>([^<]*)<\/title>/) === esc(m.title)
+    && tag(h, /<meta\s+name="description"\s+content="([^"]*)"/) === esc(m.description)
+    && tag(h, /<meta property="og:title" content="([^"]*)"/) === esc(m.title)
+    && tag(h, /<meta property="og:description" content="([^"]*)"/) === esc(m.description)
+    && tag(h, /<meta name="twitter:title" content="([^"]*)"/) === esc(m.title)
+    && tag(h, /<meta property="og:url" content="([^"]*)"/) === url
+    && (h.match(/<link rel="canonical"/g) || []).length === 1 && tag(h, /<link rel="canonical" href="([^"]*)"/) === url
+    && ldBlocks(h).some((b) => b['@type'] === 'Electrician')
+    && ldBlocks(h).some((b) => b['@type'] === 'WebSite') === (r === '/');
+  assert(ok, `routeHtml('${r}'): title, description, og:title/description, twitter, og:url + one canonical ${url}; WebSite schema ${r === '/' ? 'kept' : 'removed'}`);
+}
+let threw = false;
+try { routeHtml(index.replace(/<title>[^<]*<\/title>/, ''), '/our-work'); } catch { threw = true; }
+assert(threw, 'The build fails if a tag to replace is missing (no silently stale HTML)');
+const viteCfg = read('../vite.config.js');
+const pre = read('../scripts/prerender-routes.mjs');
+assert(/import \{ prerenderRoutesPlugin \} from '\.\/scripts\/prerender-routes\.mjs';/.test(viteCfg) && /plugins: \[react\(\), prerenderRoutesPlugin\(\)\]/.test(viteCfg) && /isBuild = config\.command === 'build';/.test(pre) && /if \(!isBuild\) return;/.test(pre), 'Runs after every production build (Vite plugin), not on dev-server shutdown');
+const dist = path.resolve(here, '../dist');
+if (fs.existsSync(path.join(dist, 'our-work', 'index.html'))) {
+  const built = (r) => fs.readFileSync(path.join(dist, r === '/' ? '' : r.slice(1), 'index.html'), 'utf-8');
+  assert(ROUTES.every((r) => tag(built(r), /<link rel="canonical" href="([^"]*)"/) === canonicalUrl(r) && tag(built(r), /<title>([^<]*)<\/title>/) === esc(PAGE_META[r].title) && /src="\/assets\/[^"]+\.js"/.test(built(r))), 'dist/: index.html + our-work/, services/, contact/index.html with their own title + canonical (absolute /assets/ paths)');
+}
 
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);

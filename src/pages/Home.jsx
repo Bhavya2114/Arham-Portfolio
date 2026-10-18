@@ -10,7 +10,7 @@ import TrustStrips from '../sections/TrustStrips';
 import Container from '../components/ui/Container';
 import EnquiryForm from '../components/contact/EnquiryForm';
 import usePageMetadata from '../lib/usePageMetadata';
-import { COMPANY, pageTitle } from '../data/company';
+import { PAGE_META } from '../data/pageMeta';
 
 /**
  * Homepage, top to bottom: hero (+ stats) → India map teaser → who we work with → what we do → about →
@@ -18,10 +18,7 @@ import { COMPANY, pageTitle } from '../data/company';
  * Sections alternate the two Graphite shades (bg / bg2 = navy-950 / navy-800).
  */
 export const Home = () => {
-  usePageMetadata(
-    pageTitle(),
-    `${COMPANY.name} does electrical wiring, lighting installation and power distribution for buildings across India. Call or WhatsApp ${COMPANY.phoneDisplay}.`
-  );
+  usePageMetadata(PAGE_META['/'].title, PAGE_META['/'].description);
 
   return (
     <div className="flex-1 w-full flex flex-col">
