@@ -1,10 +1,20 @@
 import { useEffect } from 'react';
+import { COMPANY } from '../data/company';
+
+/**
+ * Canonical address of a route on the production host: https://www.arhampowersolutions.com + the path,
+ * with no trailing slash except for the home page ("/our-work/" → ".../our-work", "" → ".../").
+ */
+export const canonicalUrl = (pathname = '/') => {
+  const path = `/${String(pathname).replace(/^\/+/, '')}`.replace(/\/+$/, '');
+  return `${COMPANY.siteUrl}${path || '/'}`;
+};
 
 /**
  * Custom React hook for dynamic SEO document title and meta description updates.
  * 
  * Ensures that client-side route transitions in the Vite single-page application
- * dynamically update page titles, meta descriptions, and Open Graph tags,
+ * dynamically update page titles, meta descriptions, Open Graph tags and the canonical link,
  * preventing stale metadata during navigation.
  * 
  * @param {string} title - Page document title
@@ -42,7 +52,18 @@ export const usePageMetadata = (title, description) => {
       setMetaTag('meta[name="twitter:title"]', 'name', 'twitter:title', title);
     }
 
-    // 4. Scroll: to the #section in the address (e.g. /#about, /#contact), otherwise to the top.
+    // 4. Canonical link + og:url for this route (always the production host, whatever host served it).
+    const url = canonicalUrl(window.location.pathname);
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement('link');
+      canonical.setAttribute('rel', 'canonical');
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute('href', url);
+    setMetaTag('meta[property="og:url"]', 'property', 'og:url', url);
+
+    // 5. Scroll: to the #section in the address (e.g. /#about, /#contact), otherwise to the top.
     const target = window.location.hash.length > 1 ? document.getElementById(decodeURIComponent(window.location.hash.slice(1))) : null;
     if (target) target.scrollIntoView({ block: 'start' });
     else window.scrollTo({ top: 0, behavior: 'smooth' });

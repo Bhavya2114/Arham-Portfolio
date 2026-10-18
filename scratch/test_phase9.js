@@ -44,7 +44,7 @@ assert(robotsContent.includes('User-agent: *'), 'robots.txt targets all user age
 assert(robotsContent.includes('Allow: /'), 'robots.txt allows root public routes');
 assert(robotsContent.includes('Disallow: /scratch/'), 'robots.txt disallows scratch directory');
 assert(robotsContent.includes('Disallow: /test_map.html'), 'robots.txt disallows internal test map page');
-assert(robotsContent.includes('Sitemap: /sitemap.xml'), 'robots.txt references /sitemap.xml');
+assert(robotsContent.includes('Sitemap: https://www.arhampowersolutions.com/sitemap.xml') && !/Phase 10/.test(robotsContent), 'robots.txt: absolute Sitemap URL on the www host (no "Phase 10" note)');
 
 // 2. Technical SEO: sitemap.xml
 console.log('\n2. Technical SEO — sitemap.xml:');
@@ -52,11 +52,11 @@ const sitemapPath = path.resolve(__dirname, '../public/sitemap.xml');
 assert(fs.existsSync(sitemapPath), 'public/sitemap.xml file exists');
 const sitemapContent = fs.readFileSync(sitemapPath, 'utf-8');
 assert(sitemapContent.includes('<urlset'), 'sitemap.xml contains valid XML urlset root element');
-assert(sitemapContent.includes('<loc>/</loc>'), 'sitemap.xml includes "/" home route');
-assert(sitemapContent.includes('<loc>/our-work</loc>'), 'sitemap.xml includes "/our-work" route');
-assert(sitemapContent.includes('<loc>/services</loc>'), 'sitemap.xml includes "/services" route');
-assert(sitemapContent.includes('<loc>/contact</loc>'), 'sitemap.xml includes "/contact" route');
-assert(!/<loc>\/(about|projects|presence)<\/loc>/.test(sitemapContent), 'sitemap.xml lists no removed / redirected routes (/about, /projects, /presence)');
+assert(sitemapContent.includes('<loc>https://www.arhampowersolutions.com/</loc>'), 'sitemap.xml includes the home page (absolute)');
+assert(sitemapContent.includes('<loc>https://www.arhampowersolutions.com/our-work</loc>'), 'sitemap.xml includes /our-work (absolute)');
+assert(sitemapContent.includes('<loc>https://www.arhampowersolutions.com/services</loc>'), 'sitemap.xml includes /services (absolute)');
+assert(sitemapContent.includes('<loc>https://www.arhampowersolutions.com/contact</loc>'), 'sitemap.xml includes /contact (absolute)');
+assert(!/<loc>[^<]*\/(about|projects|presence)<\/loc>/.test(sitemapContent), 'sitemap.xml lists no removed / redirected routes (/about, /projects, /presence)');
 assert(!sitemapContent.includes('/projects/proj-'), 'sitemap.xml does NOT index fictional or unpublished project IDs');
 
 // 3. Static HTML Metadata (index.html)

@@ -86,7 +86,7 @@ console.log('\n4. Production Dataset Purity & Neutral Configuration:');
 assert(Array.isArray(PROJECTS) && PROJECTS.length === 0, 'Production PROJECTS dataset is strictly empty');
 assert(COMPANY.phoneHref === 'tel:+916378391640' && COMPANY.whatsappUrl === 'https://wa.me/916378391640' && COMPANY.email === 'arhampower@gmail.com', 'Company phone, WhatsApp and email set (src/data/company.js)');
 const distSitemap = fs.readFileSync(path.resolve(distPath, 'sitemap.xml'), 'utf-8');
-assert(['/', '/our-work', '/services', '/contact'].every((r) => distSitemap.includes(`<loc>${r}</loc>`)) && !/<loc>\/(about|projects|presence)<\/loc>/.test(distSitemap), 'dist sitemap lists the 4 pages only');
+assert(['/', '/our-work', '/services', '/contact'].every((r) => distSitemap.includes(`<loc>https://www.arhampowersolutions.com${r}</loc>`)) && !/<loc>[^<]*\/(about|projects|presence)<\/loc>/.test(distSitemap), 'dist sitemap lists the 4 pages only');
 
 console.log('\n============================================================');
 console.log(`PHASE 10 RESULTS: ${passed} passed, ${failed} failed.`);

@@ -120,7 +120,7 @@ assert(appSrc.includes('<Route path="/our-work" element={<Presence />} />') && a
 assert(appSrc.includes("lazy(() => import('./pages/Presence'))"), 'Presence page is lazy loaded');
 const presenceNav = NAV_ITEMS.find((i) => i.path === '/our-work');
 assert(presenceNav && presenceNav.name === 'Our Work' && NAV_ITEMS[0] === presenceNav, 'Our Work is the first nav item');
-assert(read('../public/sitemap.xml').includes('<loc>/our-work</loc>'), 'Sitemap lists /our-work');
+assert(read('../public/sitemap.xml').includes('<loc>https://www.arhampowersolutions.com/our-work</loc>'), 'Sitemap lists /our-work');
 
 console.log('\n7. Homepage Map Preservation:');
 const mapSrc = read('../src/components/map/IndiaMapSvg.jsx');

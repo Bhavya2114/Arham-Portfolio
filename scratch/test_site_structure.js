@@ -45,12 +45,12 @@ assert(['About', 'ProjectsGallery', 'ProjectDetail'].every((p) => !exists(`../sr
 assert(/path="\/presence" element=\{<Navigate to="\/our-work" replace \/>\}/.test(app) && /path="\/projects" element=\{<Navigate to="\/our-work" replace \/>\}/.test(app) && /path="\/projects\/:id" element=\{<Navigate to="\/our-work" replace \/>\}/.test(app) && /path="\/about" element=\{<Navigate to="\/#about" replace \/>\}/.test(app), 'Redirects: /presence, /projects, /projects/:id → /our-work; /about → /#about');
 assert(/window\.location\.hash/.test(read('../src/lib/usePageMetadata.js')) && /scrollIntoView/.test(read('../src/lib/usePageMetadata.js')), '/#about (and other #sections) scroll into view on arrival');
 const sitemap = read('../public/sitemap.xml');
-assert(['/', '/our-work', '/services', '/contact'].every((r) => sitemap.includes(`<loc>${r}</loc>`)) && (sitemap.match(/<loc>/g) || []).length === 4, 'sitemap.xml: the 4 pages');
+assert(['/', '/our-work', '/services', '/contact'].every((r) => sitemap.includes(`<loc>https://www.arhampowersolutions.com${r}</loc>`)) && (sitemap.match(/<loc>/g) || []).length === 4, 'sitemap.xml: the 4 pages');
 
 // Hosting (Vercel): every path that is not a real file serves index.html, so direct visits / refreshes on
 // /our-work, /services, /contact and the old /presence, /projects, /about load the app (which redirects).
 const vercel = JSON.parse(read('../vercel.json'));
-assert(Array.isArray(vercel.rewrites) && vercel.rewrites.length === 1 && vercel.rewrites[0].source === '/(.*)' && vercel.rewrites[0].destination === '/index.html' && !vercel.redirects && !vercel.headers,
+assert(Array.isArray(vercel.rewrites) && vercel.rewrites.length === 1 && vercel.rewrites[0].source === '/(.*)' && vercel.rewrites[0].destination === '/index.html' && !vercel.headers,
   'vercel.json: SPA fallback rewrite to /index.html (real files such as images, sitemap and robots.txt are still served first)');
 
 console.log('\n2. Navigation');
@@ -111,7 +111,7 @@ assert(/Page not found/.test(notFound) && /to="\/our-work"/.test(notFound) && /t
 assert(exists('../src/components/map/MapCredits.jsx') && /MapCredits/.test(read('../src/components/map/PresenceMap.jsx')), 'Map data credits kept');
 
 console.log('\nBrand: icons, theme colour, link preview, schema logo');
-const SITE = 'https://arham-portfolio-tau.vercel.app';
+const SITE = 'https://www.arhampowersolutions.com';
 const pngSize = (rel) => { const buf = fs.readFileSync(path.resolve(here, rel)); return [buf.readUInt32BE(16), buf.readUInt32BE(20)]; };
 const B = '../public/brand/arham-logo/';
 assert(pngSize(B + 'favicon-32.png').join() === '32,32' && pngSize(B + 'apple-touch-icon.png').join() === '180,180' && pngSize(B + 'icon-192.png').join() === '192,192' && pngSize(B + 'icon-512.png').join() === '512,512' && pngSize(B + 'og-image.png').join() === '1200,630', 'Brand PNGs: 32, 180, 192, 512 and the 1200×630 preview image');
@@ -122,6 +122,27 @@ assert(index.includes('<meta name="theme-color" content="#0C0D0F" />'), 'theme-c
 assert(index.includes(`<meta property="og:image" content="${SITE}/brand/arham-logo/og-image.png" />`) && index.includes('<meta property="og:image:width" content="1200" />') && index.includes('<meta property="og:image:height" content="630" />') && index.includes(`<meta name="twitter:image" content="${SITE}/brand/arham-logo/og-image.png" />`) && !/project-infrastructure\.jpg/.test(index.split('</head>')[0]), 'og:image + twitter:image: absolute URL of the 1200×630 og-image.png');
 const ld = JSON.parse(index.split('application/ld+json">')[1].split('</script>')[0]);
 assert(ld.logo === `${SITE}/brand/arham-logo/icon-512.png`, 'schema.org logo: icon-512.png (absolute URL)');
+
+console.log('\nSEO: canonical host https://www.arhampowersolutions.com');
+const WWW = 'https://www.arhampowersolutions.com';
+assert(COMPANY.siteUrl === WWW, 'COMPANY.siteUrl is the canonical host (no trailing slash)');
+const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+assert(locs.join() === [`${WWW}/`, `${WWW}/our-work`, `${WWW}/services`, `${WWW}/contact`].join(), `Sitemap: absolute <loc> for the 4 pages (${locs.length})`);
+assert((sitemap.match(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/g) || []).length === 4 && !/Prefix each address|production domain/.test(sitemap) && /^<\?xml version="1\.0" encoding="UTF-8"\?>\n<urlset xmlns="http:\/\/www\.sitemaps\.org\/schemas\/sitemap\/0\.9">/.test(sitemap.replace(/\r\n/g, '\n')) && (sitemap.match(/<url>/g) || []).length === (sitemap.match(/<\/url>/g) || []).length, 'Sitemap: <lastmod> on each page, no "prefix with the domain" note, well-formed urlset');
+const robots = read('../public/robots.txt');
+assert(/^User-agent: \*$/m.test(robots) && /^Allow: \/$/m.test(robots) && /^Disallow: \/scratch\/$/m.test(robots) && /^Disallow: \/test_map\.html$/m.test(robots) && /^Sitemap: https:\/\/www\.arhampowersolutions\.com\/sitemap\.xml$/m.test(robots) && !/Phase 10|Disallow: \/\s*$/m.test(robots), 'robots.txt: Allow /, the two disallows, absolute Sitemap; no blanket Disallow');
+assert(index.includes(`<meta property="og:url" content="${WWW}/" />`) && !index.includes('arham-portfolio-tau') && ld.url === `${WWW}/` && ld.logo === `${WWW}/brand/arham-logo/icon-512.png`, 'index.html: og:url, og/twitter image, schema url + logo on the www host (no tau domain left)');
+assert(!/<link rel="canonical"/.test(index), 'No fixed canonical in index.html (every route is served this file; the page sets its own)');
+const meta = read('../src/lib/usePageMetadata.js');
+assert(/export const canonicalUrl = \(pathname = '\/'\) => \{\s*const path = `\/\$\{String\(pathname\)\.replace\(\/\^\\\/\+\/, ''\)\}`\.replace\(\/\\\/\+\$\/, ''\);\s*return `\$\{COMPANY\.siteUrl\}\$\{path \|\| '\/'\}`;/.test(meta), 'canonicalUrl: site URL + path, no trailing slash except home');
+// The same rule, run: (mirrors canonicalUrl so it can be checked without React)
+const canon = (p = '/') => `${WWW}${`/${String(p).replace(/^\/+/, '')}`.replace(/\/+$/, '') || '/'}`;
+assert(canon('/') === `${WWW}/` && canon('') === `${WWW}/` && canon('/our-work') === `${WWW}/our-work` && canon('/our-work/') === `${WWW}/our-work` && canon('/contact') === `${WWW}/contact`, 'Canonical: "/" → www/, "/our-work/" → www/our-work');
+assert(/const url = canonicalUrl\(window\.location\.pathname\);/.test(meta) && /link\[rel="canonical"\]/.test(meta) && /canonical\.setAttribute\('href', url\);/.test(meta) && /setMetaTag\('meta\[property="og:url"\]', 'property', 'og:url', url\);/.test(meta), 'usePageMetadata sets <link rel="canonical"> and og:url for every route');
+const red = vercel.redirects || [];
+assert(red.length === 1 && red[0].source === '/(.*)' && red[0].has?.length === 1 && red[0].has[0].type === 'host' && red[0].has[0].value === 'arham-portfolio-tau.vercel.app' && red[0].destination === `${WWW}/$1` && red[0].permanent === true, 'vercel.json: permanent redirect arham-portfolio-tau.vercel.app → www (path kept)');
+const noindexFiles = [...walk(path.resolve(here, '../src')), path.resolve(here, '../index.html'), path.resolve(here, '../vercel.json'), path.resolve(here, '../public/robots.txt')].filter((f) => /noindex|nofollow/i.test(fs.readFileSync(f, 'utf-8')));
+assert(noindexFiles.length === 0, 'No noindex / nofollow anywhere in the site');
 
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);
